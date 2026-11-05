@@ -18,9 +18,10 @@ local S = {
 }
 Eligibility.STATES = S
 
--- Legacy 10/25-player difficulties. In Cataclysm/MoP raids these sizes may
--- share one lockout; not validated yet, so a kill on a sibling size makes the
--- other size "verification required" instead of Ready.
+-- Legacy 10/25-player difficulties share one lockout per mode (team knowledge,
+-- 2026-11-05): a kill on 25N also locks 10N, and 25H also locks 10H.
+-- Whether Normal and Heroic share a lockout in Cata/MoP raids is still being
+-- validated (Dragon Soul probe).
 local SIZE_SIBLINGS = { [3] = { 4 }, [4] = { 3 }, [5] = { 6 }, [6] = { 5 } }
 
 local encounterNameCache = {}
@@ -74,7 +75,7 @@ function Eligibility:Evaluate(src, difficultyID)
     for _, sibling in ipairs(SIZE_SIBLINGS[difficultyID] or {}) do
         local other = inst.mapID and ns.Lockouts:Get(inst.mapID, sibling)
         if other and boss and other.killed[boss] then
-            return S.VERIFY, L["REASON_SHARED_SIZE"], other.resetAt
+            return S.LOCKED_OUT, L["REASON_SHARED_SIZE"]:format(boss), other.resetAt
         end
     end
 

@@ -50,7 +50,7 @@ Nivel, facción y clase del personaje; la colección del journal; las misiones c
 **Regla implementada** (`Integrations/Lockouts.lua` + `Modules/Eligibility.lua`): una fuente (montura, boss, dificultad) está **Locked out** si existe un registro guardado vigente con el mismo `instanceMapID` (14.º valor de `GetSavedInstanceInfo`, igual al `mapID` del Encounter Journal) y la misma dificultad, y el boss de la montura aparece con `isKilled`. Si el registro existe pero el boss sigue vivo, la fuente está **Ready**. El boss se identifica por nombre (`EJ_GetEncounterInfo`), y ambos nombres vienen en el idioma del cliente.
 
 **Pendiente de validar:**
-- Raids de Cataclysm y MoP con tamaños 10/25 (dificultades 3–6): pueden compartir un lockout. Mientras no se valide, una muerte en el tamaño hermano produce **Verification Required**, no Ready.
+- **Tamaños 10/25 (dificultades 3–6): comparten lockout** por modo, según el conocimiento del equipo. Una muerte en 25N bloquea también 10N, y una en 25H bloquea 10H; el addon lo marca **Locked out**. Falta confirmar en el probe si Normal y Heroic también comparten lockout en las raids de Cata y MoP (prueba en Dragon Soul 25H).
 - Lockouts extendidos y comportamiento justo después del reset.
 - Mazmorras heroicas legacy: reset diario, observado en Utgarde Pinnacle.
 
