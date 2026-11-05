@@ -33,6 +33,44 @@ function MJ:GetMount(mountID)
     }
 end
 
+--- Model and text data for the preview panel, or nil.
+--- Return order of GetMountInfoExtraByID as used by Blizzard's Mount Journal;
+--- [3] sourceText was validated by /aplan probe (see CLAUDE.md §5).
+function MJ:GetMountExtra(mountID)
+    if not C_MountJournal.GetMountInfoExtraByID then return nil end
+    local creatureDisplayID, description, sourceText, isSelfMount, mountTypeID,
+          uiModelSceneID, animID, spellVisualKitID, disablePlayerMountPreview =
+        C_MountJournal.GetMountInfoExtraByID(mountID)
+    if not creatureDisplayID and not description then return nil end
+    return {
+        creatureDisplayID = creatureDisplayID,
+        description = description,
+        sourceText = sourceText,
+        isSelfMount = isSelfMount,
+        mountTypeID = mountTypeID,
+        uiModelSceneID = uiModelSceneID,
+        animID = animID,
+        spellVisualKitID = spellVisualKitID,
+        disablePlayerMountPreview = disablePlayerMountPreview,
+    }
+end
+
+--- Opens Blizzard's Mount Journal on this mount. Returns false in combat.
+function MJ:OpenInJournal(mountID)
+    if InCombatLockdown() then return false end
+    if not CollectionsJournal then
+        local load = (C_AddOns and C_AddOns.LoadAddOn) or LoadAddOn
+        if load then load("Blizzard_Collections") end
+    end
+    if SetCollectionsJournalShown then
+        SetCollectionsJournalShown(true, COLLECTIONS_JOURNAL_TAB_INDEX_MOUNTS or 1)
+    elseif ToggleCollectionsJournal then
+        ToggleCollectionsJournal(1)
+    end
+    if MountJournal_SelectByMountID then MountJournal_SelectByMountID(mountID) end
+    return true
+end
+
 --- Iterates every mount in the journal. Returns false if the journal is not ready.
 function MJ:ForEach(callback)
     if not self:IsAvailable() then return false end

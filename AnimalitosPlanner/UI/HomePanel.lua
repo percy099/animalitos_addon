@@ -14,7 +14,7 @@ local RING_TILE_W = 128
 local RING_SIZE = 92
 local RING_THICKNESS = 10
 local RESETS_W = 200
-local START_ROWS = 3
+local START_ROWS = 4
 local START_ROW_H = 38
 local RING_DURATION = 1000 -- the swipe is paused; only the ratio matters
 local WEEKDAYS = { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY" }
@@ -203,13 +203,17 @@ local function createStart(p, top)
         r.go:SetPoint("RIGHT", -6, 0)
         r.go:SetText(L["BTN_GO"])
 
+        r.count = ns.UI.fs(r, "GameFontHighlightSmall", C.success)
+        r.count:SetPoint("RIGHT", r.go, "LEFT", -8, 0)
+        r.count:SetJustifyH("RIGHT")
+
         r.name = ns.UI.fs(r, "GameFontNormal")
         r.name:SetPoint("TOPLEFT", r.badge, "TOPRIGHT", 8, 3)
-        r.name:SetPoint("RIGHT", r.go, "LEFT", -6, 0)
+        r.name:SetPoint("RIGHT", r.count, "LEFT", -6, 0)
         r.name:SetWordWrap(false)
         r.detail = ns.UI.fs(r, "GameFontHighlightSmall", C.muted)
         r.detail:SetPoint("TOPLEFT", r.name, "BOTTOMLEFT", 0, -2)
-        r.detail:SetPoint("RIGHT", r.go, "LEFT", -6, 0)
+        r.detail:SetPoint("RIGHT", r.count, "LEFT", -6, 0)
         r.detail:SetWordWrap(false)
         p.startRows[i] = r
     end
@@ -323,8 +327,8 @@ function HomePanel:Refresh(p, entries, sum)
             local parts = { e.inst.isRaid and L["TYPE_RAID"] or L["TYPE_DUNGEON"] }
             local zone = e.inst.entrance and C_Map.GetMapInfo(e.inst.entrance.uiMapID)
             if zone then parts[#parts + 1] = zone.name end
-            parts[#parts + 1] = e.readyCount == 1 and L["MOUNT_ONE"] or L["MOUNTS_N"]:format(e.readyCount)
             r.detail:SetText(table.concat(parts, " · "))
+            r.count:SetText(e.readyCount == 1 and L["MOUNT_ONE"] or L["MOUNTS_N"]:format(e.readyCount))
             local jid = e.jid
             r.go:SetEnabled(e.inst.entrance ~= nil)
             r.go:SetScript("OnClick", function() ns.Navigation:GoToInstance(jid) end)

@@ -167,6 +167,10 @@ function FarmList:InstanceName(jid)
     return (EJ_GetInstanceInfo(jid)) or ("#" .. jid)
 end
 
+function FarmList:BossName(src)
+    return (src and src.journalEncounterID and EJ_GetEncounterInfo(src.journalEncounterID)) or "?"
+end
+
 -- Compact, language-neutral difficulty labels for lists.
 local SHORT = {
     [1] = "N", [2] = "H", [23] = "M",
