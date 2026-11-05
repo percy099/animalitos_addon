@@ -1,4 +1,5 @@
--- Main window: header, two tabs (Farmable now / Summary) and footer.
+-- Main window (redesign, part 1): header, left sidebar navigation with four
+-- sections (Farmable now / Home / Collection / Settings) and footer.
 -- Native frames only; palette from the UX spec (docs/02-ux-ui.md §8).
 local _, ns = ...
 local L = ns.L
@@ -16,9 +17,27 @@ UI.COLORS = {
 }
 local COLORS = UI.COLORS
 local WHITE = "Interface\\Buttons\\WHITE8x8"
+local BORDER = "Interface\\Tooltips\\UI-Tooltip-Border" -- client texture with softly rounded corners
 local MAX_SOURCE_ROWS = 8
-UI.WIDTH, UI.HEIGHT = 460, 500
+
+-- Layout
+UI.WIDTH, UI.HEIGHT = 720, 500
 local WIDTH, HEIGHT = UI.WIDTH, UI.HEIGHT
+local PAD = 10
+local HEADER_H = 52
+local FOOTER_H = 36
+local SIDEBAR_W = 160
+local NAV_BUTTON_H = 30
+UI.CONTENT_WIDTH = WIDTH - SIDEBAR_W - PAD * 3
+
+-- Sidebar sections, in display order. Icons are client icon files.
+local SECTIONS = {
+    { key = "farm",       label = "NAV_FARM",       icon = "Interface\\Icons\\Ability_Mount_RidingHorse" },
+    { key = "home",       label = "NAV_HOME",       icon = "Interface\\Icons\\INV_Misc_Map_01" },
+    { key = "collection", label = "NAV_COLLECTION", icon = "Interface\\Icons\\INV_Misc_Book_09" },
+    { key = "settings",   label = "NAV_SETTINGS",   icon = "Interface\\Icons\\Trade_Engineering" },
+}
+local DEFAULT_SECTION = "farm"
 
 function UI.fs(parent, template, color)
     local f = parent:CreateFontString(nil, "OVERLAY", template or "GameFontHighlight")
@@ -28,12 +47,24 @@ function UI.fs(parent, template, color)
 end
 local fs = UI.fs
 
+--- Applies the panel look: flat fill plus a tinted, softly rounded border.
+function UI.StylePanel(frame, fill, edgeSize)
+    local e = edgeSize or 12
+    frame:SetBackdrop({
+        bgFile = WHITE, edgeFile = BORDER, edgeSize = e,
+        insets = { left = e / 4, right = e / 4, top = e / 4, bottom = e / 4 },
+    })
+    local c = fill or COLORS.surface
+    frame:SetBackdropColor(c[1], c[2], c[3], c[4] or 1)
+    frame:SetBackdropBorderColor(COLORS.accent[1], COLORS.accent[2], COLORS.accent[3], 0.55)
+end
+
 local function fmt(n)
     return BreakUpLargeNumbers and BreakUpLargeNumbers(n) or tostring(n)
 end
 
 -- ---------------------------------------------------------------------------
--- Summary tab (collection progress)
+-- Home section (collection progress; redesigned in part 2)
 -- ---------------------------------------------------------------------------
 local function createSummary(parent)
     local p = CreateFrame("Frame", nil, parent)
@@ -113,18 +144,60 @@ local function refreshSummary(p)
     end
 end
 
+-- Placeholder for sections that arrive in later parts.
+local function createPlaceholder(parent)
+    local p = CreateFrame("Frame", nil, parent)
+    p:SetAllPoints()
+    local t = fs(p, "GameFontHighlight", COLORS.muted)
+    t:SetPoint("CENTER")
+    t:SetJustifyH("CENTER")
+    t:SetText(L["COMING_SOON"])
+    return p
+end
+
 -- ---------------------------------------------------------------------------
--- Window
+-- Sidebar
 -- ---------------------------------------------------------------------------
-local function tabButton(parent, text, onClick)
-    local b = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
-    b:SetHeight(22)
-    b:SetText(text)
-    b:SetWidth(b:GetFontString():GetStringWidth() + 28)
-    b:SetScript("OnClick", onClick)
+local function navButton(parent, section)
+    local b = CreateFrame("Button", nil, parent)
+    b:SetHeight(NAV_BUTTON_H)
+
+    b.selected = b:CreateTexture(nil, "BACKGROUND")
+    b.selected:SetAllPoints()
+    b.selected:SetColorTexture(COLORS.accent[1], COLORS.accent[2], COLORS.accent[3], 0.22)
+    b.bar = b:CreateTexture(nil, "ARTWORK")
+    b.bar:SetPoint("TOPLEFT")
+    b.bar:SetPoint("BOTTOMLEFT")
+    b.bar:SetWidth(3)
+    b.bar:SetColorTexture(unpack(COLORS.accent))
+
+    local hl = b:CreateTexture(nil, "HIGHLIGHT")
+    hl:SetAllPoints()
+    hl:SetColorTexture(1, 1, 1, 0.06)
+
+    b.icon = b:CreateTexture(nil, "ARTWORK")
+    b.icon:SetSize(18, 18)
+    b.icon:SetPoint("LEFT", 10, 0)
+    b.icon:SetTexture(section.icon)
+    b.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92) -- crop the icon border
+
+    b.badge = fs(b, "GameFontHighlightSmall", COLORS.success)
+    b.badge:SetPoint("RIGHT", -8, 0)
+    b.badge:SetJustifyH("RIGHT")
+
+    b.label = fs(b, "GameFontHighlight")
+    b.label:SetPoint("LEFT", b.icon, "RIGHT", 8, 0)
+    b.label:SetPoint("RIGHT", b.badge, "LEFT", -4, 0)
+    b.label:SetWordWrap(false)
+    b.label:SetText(L[section.label])
+
+    b:SetScript("OnClick", function() UI:SelectTab(section.key) end)
     return b
 end
 
+-- ---------------------------------------------------------------------------
+-- Window
+-- ---------------------------------------------------------------------------
 function UI:Create()
     if self.frame then return self.frame end
 
@@ -133,9 +206,7 @@ function UI:Create()
     f:SetFrameStrata("HIGH")
     f:SetToplevel(true)
     f:SetClampedToScreen(true)
-    f:SetBackdrop({ bgFile = WHITE, edgeFile = WHITE, edgeSize = 1 })
-    f:SetBackdropColor(unpack(COLORS.background))
-    f:SetBackdropBorderColor(COLORS.accent[1], COLORS.accent[2], COLORS.accent[3], 0.6)
+    UI.StylePanel(f, COLORS.background, 16)
     f:Hide()
 
     f:SetMovable(true)
@@ -150,38 +221,62 @@ function UI:Create()
     self:RestorePosition(f)
     tinsert(UISpecialFrames, f:GetName()) -- close with ESC
 
+    -- Header
     local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", 2, 2)
+    close:SetPoint("TOPRIGHT", -2, -2)
 
     local logo = f:CreateTexture(nil, "ARTWORK")
-    logo:SetSize(40, 40)
-    logo:SetPoint("TOPLEFT", 12, -10)
+    logo:SetSize(36, 36)
+    logo:SetPoint("TOPLEFT", PAD + 2, -PAD)
     logo:SetTexture("Interface\\AddOns\\AnimalitosPlanner\\Media\\icon")
 
     local title = fs(f, "GameFontNormalLarge", COLORS.accent)
-    title:SetPoint("TOPLEFT", logo, "TOPRIGHT", 8, -4)
+    title:SetPoint("TOPLEFT", logo, "TOPRIGHT", 8, -3)
     title:SetText(L["TITLE"])
 
     f.character = fs(f, "GameFontHighlightSmall", COLORS.muted)
-    f.character:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -4)
+    f.character:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -3)
 
-    -- Tabs
-    f.tabFarm = tabButton(f, L["TAB_FARM"], function() UI:SelectTab("farm") end)
-    f.tabFarm:SetPoint("TOPLEFT", logo, "BOTTOMLEFT", 0, -8)
-    f.tabSummary = tabButton(f, L["TAB_SUMMARY"], function() UI:SelectTab("summary") end)
-    f.tabSummary:SetPoint("LEFT", f.tabFarm, "RIGHT", 4, 0)
+    local divider = f:CreateTexture(nil, "ARTWORK")
+    divider:SetPoint("TOPLEFT", PAD, -HEADER_H)
+    divider:SetPoint("TOPRIGHT", -PAD, -HEADER_H)
+    divider:SetHeight(1)
+    divider:SetColorTexture(COLORS.accent[1], COLORS.accent[2], COLORS.accent[3], 0.35)
+
+    -- Sidebar
+    local sidebar = CreateFrame("Frame", nil, f, "BackdropTemplate")
+    sidebar:SetPoint("TOPLEFT", PAD, -(HEADER_H + PAD))
+    sidebar:SetPoint("BOTTOMLEFT", PAD, FOOTER_H)
+    sidebar:SetWidth(SIDEBAR_W)
+    UI.StylePanel(sidebar, { COLORS.surface[1], COLORS.surface[2], COLORS.surface[3], 0.6 })
 
     -- Content area
     local content = CreateFrame("Frame", nil, f)
-    content:SetPoint("TOPLEFT", f.tabFarm, "BOTTOMLEFT", 0, -8)
-    content:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -12, 40)
-    f.summary = createSummary(content)
-    f.farm = ns.FarmPanel:Create(content)
+    content:SetPoint("TOPLEFT", sidebar, "TOPRIGHT", PAD, 0)
+    content:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -PAD, FOOTER_H)
+
+    f.panels = {
+        farm = ns.FarmPanel:Create(content),
+        home = createSummary(content),
+        collection = createPlaceholder(content),
+        settings = createPlaceholder(content),
+    }
+    f.farm, f.summary = f.panels.farm, f.panels.home
+
+    f.nav = {}
+    local anchorY = -6
+    for _, section in ipairs(SECTIONS) do
+        local b = navButton(sidebar, section)
+        b:SetPoint("TOPLEFT", 4, anchorY)
+        b:SetPoint("TOPRIGHT", -4, anchorY)
+        anchorY = anchorY - NAV_BUTTON_H - 2
+        f.nav[section.key] = b
+    end
 
     -- Footer
     local refresh = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
     refresh:SetSize(100, 22)
-    refresh:SetPoint("BOTTOMRIGHT", -12, 10)
+    refresh:SetPoint("BOTTOMRIGHT", -PAD, 8)
     refresh:SetText(L["REFRESH"])
     refresh:SetScript("OnClick", function()
         ns.Collection:Scan()
@@ -190,7 +285,7 @@ function UI:Create()
     end)
 
     local dataset = fs(f, "GameFontDisableSmall")
-    dataset:SetPoint("BOTTOMLEFT", 14, 16)
+    dataset:SetPoint("BOTTOMLEFT", PAD + 4, 14)
     if ns.Data and ns.Data.sources then
         dataset:SetFormattedText(L["DATASET_LOADED"], #ns.Data.sources, ns.Data.version.client)
     else
@@ -199,24 +294,23 @@ function UI:Create()
 
     f:SetScript("OnShow", function() UI:Refresh() end)
     self.frame = f
-    self:SelectTab(ns.Storage.db.ui.tab or "farm")
+    self:SelectTab(DEFAULT_SECTION)
     return f
 end
 
 function UI:SelectTab(tab)
     local f = self.frame
+    if tab == "summary" then tab = "home" end -- pre-redesign name
+    if not f.panels[tab] then tab = DEFAULT_SECTION end
     ns.Storage.db.ui.tab = tab
-    f.summary:SetShown(tab == "summary")
-    f.farm:SetShown(tab == "farm")
-    -- Selected tab stays enabled and highlighted (a disabled look read as "inactive").
-    for button, name in pairs({ [f.tabFarm] = "farm", [f.tabSummary] = "summary" }) do
-        if name == tab then
-            button:LockHighlight()
-            button:GetFontString():SetTextColor(1, 1, 1)
-        else
-            button:UnlockHighlight()
-            button:GetFontString():SetTextColor(0.7, 0.68, 0.76)
-        end
+    for key, panel in pairs(f.panels) do
+        local on = key == tab
+        panel:SetShown(on)
+        local b = f.nav[key]
+        b.selected:SetShown(on)
+        b.bar:SetShown(on)
+        local c = on and { 1, 1, 1 } or COLORS.muted
+        b.label:SetTextColor(c[1], c[2], c[3])
     end
     self:Refresh()
 end
@@ -240,14 +334,19 @@ end
 function UI:Refresh()
     local f = self.frame
     if not f or not f:IsShown() then return end
-    f.character:SetText(UnitName("player") .. " · " .. (UnitLevel("player") or ""))
+    local className = UnitClass("player")
+    f.character:SetText(("%s · %s · %s"):format(UnitName("player"), UnitLevel("player") or "", className or ""))
     local readyCount = ns.FarmPanel:Refresh(f.farm, f.farm:IsShown())
-    f.tabFarm:SetText(L["TAB_FARM_COUNT"]:format(readyCount or 0))
-    f.tabFarm:SetWidth(f.tabFarm:GetFontString():GetStringWidth() + 28)
+    f.nav.farm.badge:SetText(readyCount and readyCount > 0 and tostring(readyCount) or "")
     if f.summary:IsShown() then refreshSummary(f.summary) end
 end
 
 function UI:Toggle()
     local f = self:Create()
-    f:SetShown(not f:IsShown())
+    if f:IsShown() then
+        f:Hide()
+    else
+        self:SelectTab(DEFAULT_SECTION) -- every open starts on "Farmable now"
+        f:Show()
+    end
 end

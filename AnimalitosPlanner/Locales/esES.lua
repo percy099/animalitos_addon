@@ -63,3 +63,10 @@ L["BTN_HIDE"] = "Ocultar"
 L["BTN_UNHIDE"] = "Mostrar ocultas (%d)"
 L["FARM_EMPTY"] = "Nada farmeable ahora con este personaje. Revisa la lista de lockouts abajo o prueba con otro personaje."
 L["NAV_OTHER_CONTINENT"] = "El destino está en %s. La flecha aparece cuando llegues a ese continente; el pin está en el mapa del mundo."
+
+-- Rediseño de la UI: secciones de la barra lateral
+L["NAV_FARM"] = "Farmeable ahora"
+L["NAV_HOME"] = "Inicio"
+L["NAV_COLLECTION"] = "Colección"
+L["NAV_SETTINGS"] = "Ajustes"
+L["COMING_SOON"] = "Próximamente."

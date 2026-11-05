@@ -30,7 +30,7 @@ function FarmPanel:Create(parent)
     scroll:SetPoint("TOPLEFT", 0, 0)
     scroll:SetPoint("BOTTOMRIGHT", -24, 0)
     local child = CreateFrame("Frame", nil, scroll)
-    child:SetSize(ns.UI.WIDTH - 24 - 24, 1)
+    child:SetSize(ns.UI.CONTENT_WIDTH - 24, 1) -- 24 = scroll bar
     scroll:SetScrollChild(child)
 
     p.scroll, p.child = scroll, child

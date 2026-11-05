@@ -61,3 +61,10 @@ L["BTN_HIDE"] = "Hide"
 L["BTN_UNHIDE"] = "Show hidden (%d)"
 L["FARM_EMPTY"] = "Nothing farmable right now with this character. Check the locked-out list below or try another character."
 L["NAV_OTHER_CONTINENT"] = "The destination is on %s. The arrow appears once you are on that continent; the pin is on the world map."
+
+-- UI redesign: sidebar sections
+L["NAV_FARM"] = "Farmable now"
+L["NAV_HOME"] = "Home"
+L["NAV_COLLECTION"] = "Collection"
+L["NAV_SETTINGS"] = "Settings"
+L["COMING_SOON"] = "Coming soon."
