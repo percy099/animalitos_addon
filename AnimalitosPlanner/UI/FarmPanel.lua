@@ -83,25 +83,9 @@ local function acquire(pool, index, factory, p)
 end
 
 -- Refresh ---------------------------------------------------------------------
---- Rebuilds the list. Returns the number of missing mounts farmable now
---- (excluding hidden instances), used for the tab label.
-function FarmPanel:Refresh(p, visible)
-    local entries = ns.FarmList:Build()
-    local readyMounts, hiddenCount = {}, 0
-    for _, e in ipairs(entries) do
-        if e.readyCount > 0 then
-            if e.hidden then
-                hiddenCount = hiddenCount + 1
-            else
-                for id, m in pairs(e.mounts) do
-                    if #m.ready > 0 then readyMounts[id] = true end
-                end
-            end
-        end
-    end
-    local readyTotal = 0
-    for _ in pairs(readyMounts) do readyTotal = readyTotal + 1 end
-    if not visible then return readyTotal end
+--- Rebuilds the list. entries/sum come from FarmList:Build() and FarmList:Summarize().
+function FarmPanel:Refresh(p, entries, sum)
+    local hiddenCount = sum.hidden
 
     for _, c in ipairs(p.cards) do c:Hide() end
     for _, l in ipairs(p.lines) do l:Hide() end
@@ -206,5 +190,4 @@ function FarmPanel:Refresh(p, visible)
     end
 
     p.child:SetHeight(math.max(y, 1))
-    return readyTotal
 end

@@ -18,7 +18,6 @@ UI.COLORS = {
 local COLORS = UI.COLORS
 local WHITE = "Interface\\Buttons\\WHITE8x8"
 local BORDER = "Interface\\Tooltips\\UI-Tooltip-Border" -- client texture with softly rounded corners
-local MAX_SOURCE_ROWS = 8
 
 -- Layout
 UI.WIDTH, UI.HEIGHT = 720, 500
@@ -59,89 +58,27 @@ function UI.StylePanel(frame, fill, edgeSize)
     frame:SetBackdropBorderColor(COLORS.accent[1], COLORS.accent[2], COLORS.accent[3], 0.55)
 end
 
-local function fmt(n)
-    return BreakUpLargeNumbers and BreakUpLargeNumbers(n) or tostring(n)
+local CIRCLE = "Interface\\CharacterFrame\\TempPortraitAlphaMask" -- white disc on transparent
+
+--- Filled circle tinted with `color` (used for rings, discs and badges).
+function UI.Circle(parent, layer, size, color, sublevel)
+    local t = parent:CreateTexture(nil, layer, nil, sublevel or 0)
+    t:SetSize(size, size)
+    t:SetTexture(CIRCLE)
+    t:SetVertexColor(color[1], color[2], color[3], color[4] or 1)
+    return t
 end
 
--- ---------------------------------------------------------------------------
--- Home section (collection progress; redesigned in part 2)
--- ---------------------------------------------------------------------------
-local function createSummary(parent)
-    local p = CreateFrame("Frame", nil, parent)
-    p:SetAllPoints()
-
-    local subtitle = fs(p, "GameFontHighlightSmall", COLORS.muted)
-    subtitle:SetPoint("TOPLEFT", 4, -4)
-    subtitle:SetText(L["COLLECTION_PROGRESS"])
-
-    p.big = fs(p, "GameFontHighlightHuge")
-    p.big:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -8)
-
-    local bar = CreateFrame("StatusBar", nil, p)
-    bar:SetPoint("TOPLEFT", p.big, "BOTTOMLEFT", 0, -8)
-    bar:SetPoint("RIGHT", p, "RIGHT", -4, 0)
-    bar:SetHeight(10)
-    bar:SetStatusBarTexture(WHITE)
-    bar:SetStatusBarColor(unpack(COLORS.accent))
-    bar:SetMinMaxValues(0, 1)
-    local barBg = bar:CreateTexture(nil, "BACKGROUND")
-    barBg:SetAllPoints()
-    barBg:SetColorTexture(unpack(COLORS.surface))
-    p.bar = bar
-
-    p.visible = fs(p, "GameFontHighlight")
-    p.visible:SetPoint("TOPLEFT", bar, "BOTTOMLEFT", 0, -12)
-
-    p.hidden = fs(p, "GameFontHighlightSmall", COLORS.muted)
-    p.hidden:SetPoint("TOPLEFT", p.visible, "BOTTOMLEFT", 0, -4)
-    p.hidden:SetPoint("RIGHT", p, "RIGHT", -4, 0)
-
-    local sourcesHeader = fs(p, "GameFontNormal", COLORS.accent)
-    sourcesHeader:SetPoint("TOPLEFT", p.hidden, "BOTTOMLEFT", 0, -14)
-    sourcesHeader:SetText(L["MISSING_BY_SOURCE"])
-
-    p.rows = {}
-    local anchor = sourcesHeader
-    for i = 1, MAX_SOURCE_ROWS do
-        local label = fs(p, "GameFontHighlightSmall")
-        label:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, i == 1 and -6 or -3)
-        local value = fs(p, "GameFontHighlightSmall", COLORS.success)
-        value:SetPoint("RIGHT", p, "RIGHT", -4, 0)
-        value:SetPoint("TOP", label, "TOP")
-        value:SetJustifyH("RIGHT")
-        p.rows[i] = { label = label, value = value }
-        anchor = label
-    end
-
-    local note = fs(p, "GameFontDisableSmall")
-    note:SetPoint("BOTTOMLEFT", 4, 4)
-    note:SetPoint("RIGHT", p, "RIGHT", -4, 0)
-    note:SetText(L["NOTE_TOTALS"])
-    return p
-end
-
-local function refreshSummary(p)
-    local s = ns.Collection.summary or ns.Collection:Scan()
-    if not s or s.total == 0 then
-        p.big:SetText("—")
-        p.bar:SetValue(0)
-        p.visible:SetText(L["JOURNAL_NOT_READY"])
-        p.hidden:SetText("")
-        for _, row in ipairs(p.rows) do row.label:SetText(""); row.value:SetText("") end
-        return
-    end
-    -- Headline matches Blizzard's Mount Journal (mounts visible for this character).
-    local pct = s.visibleTotal > 0 and (s.collectedVisible / s.visibleTotal) or 0
-    p.big:SetFormattedText("%s / %s  |cffa88ad7(%.1f%%)|r", fmt(s.collectedVisible), fmt(s.visibleTotal), pct * 100)
-    p.bar:SetValue(pct)
-    p.visible:SetFormattedText("%s: %s", L["MISSING_FOR_CHAR"], fmt(s.missingVisible))
-    p.hidden:SetFormattedText(L["ACCOUNT_LINE"], fmt(s.collected), fmt(s.collectedHidden), fmt(s.missingHidden))
-    local sources = ns.Collection:GetMissingBySourceSorted()
-    for i, row in ipairs(p.rows) do
-        local src = sources[i]
-        row.label:SetText(src and src.label or "")
-        row.value:SetText(src and fmt(src.count) or "")
-    end
+--- Small numbered disc (1, 2, 3...). Set the number with badge.text:SetText(n).
+function UI.NumberBadge(parent, size)
+    local b = CreateFrame("Frame", nil, parent)
+    b:SetSize(size, size)
+    local disc = UI.Circle(b, "ARTWORK", size, COLORS.accent)
+    disc:SetPoint("CENTER")
+    b.text = fs(b, "GameFontHighlightSmall")
+    b.text:SetPoint("CENTER", 0, 0)
+    b.text:SetJustifyH("CENTER")
+    return b
 end
 
 -- Placeholder for sections that arrive in later parts.
@@ -257,7 +194,7 @@ function UI:Create()
 
     f.panels = {
         farm = ns.FarmPanel:Create(content),
-        home = createSummary(content),
+        home = ns.HomePanel:Create(content),
         collection = createPlaceholder(content),
         settings = createPlaceholder(content),
     }
@@ -336,9 +273,11 @@ function UI:Refresh()
     if not f or not f:IsShown() then return end
     local className = UnitClass("player")
     f.character:SetText(("%s · %s · %s"):format(UnitName("player"), UnitLevel("player") or "", className or ""))
-    local readyCount = ns.FarmPanel:Refresh(f.farm, f.farm:IsShown())
-    f.nav.farm.badge:SetText(readyCount and readyCount > 0 and tostring(readyCount) or "")
-    if f.summary:IsShown() then refreshSummary(f.summary) end
+    local entries = ns.FarmList:Build()
+    local sum = ns.FarmList:Summarize(entries)
+    f.nav.farm.badge:SetText(sum.ready > 0 and tostring(sum.ready) or "")
+    if f.farm:IsShown() then ns.FarmPanel:Refresh(f.farm, entries, sum) end
+    if f.summary:IsShown() then ns.HomePanel:Refresh(f.summary, entries, sum) end
 end
 
 function UI:Toggle()

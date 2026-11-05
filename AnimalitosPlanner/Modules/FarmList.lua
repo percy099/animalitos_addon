@@ -90,6 +90,51 @@ function FarmList:Build()
     return entries, counts
 end
 
+--- Unique-mount totals for the UI (Home tiles, sidebar badge, farm list).
+--- ready   = farmable now in a visible (not hidden) instance
+--- locked  = locked out everywhere it is listed (never also ready)
+--- verify  = needs verification (neither ready nor locked)
+--- instances / hidden = instances with something ready, visible / hidden
+function FarmList:Summarize(entries)
+    local ready, locked, verify = {}, {}, {}
+    local instances, hidden = 0, 0
+    for _, e in ipairs(entries) do
+        if e.readyCount > 0 then
+            if e.hidden then
+                hidden = hidden + 1
+            else
+                instances = instances + 1
+                for id, m in pairs(e.mounts) do
+                    if #m.ready > 0 then ready[id] = true end
+                end
+            end
+        end
+        for id, m in pairs(e.mounts) do
+            if #m.ready == 0 then
+                if #m.locked > 0 then
+                    locked[id] = true
+                elseif #m.verify > 0 then
+                    verify[id] = true
+                end
+            end
+        end
+    end
+    local function count(set, exclude1, exclude2)
+        local n = 0
+        for id in pairs(set) do
+            if not (exclude1 and exclude1[id]) and not (exclude2 and exclude2[id]) then n = n + 1 end
+        end
+        return n
+    end
+    return {
+        ready = count(ready),
+        locked = count(locked, ready),
+        verify = count(verify, ready, locked),
+        instances = instances,
+        hidden = hidden,
+    }
+end
+
 -- Hide until reset (persists across reloads and characters; docs/03 §5).
 local function hiddenTable()
     return ns.Storage.db.farmList.hidden

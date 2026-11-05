@@ -52,6 +52,14 @@ function Lockouts:Get(instanceMapID, difficultyID)
     return m and m[difficultyID]
 end
 
+--- Seconds until the daily and weekly resets (nil when the client cannot tell).
+function Lockouts:GetResetTimes()
+    local daily = (C_DateAndTime.GetSecondsUntilDailyReset and C_DateAndTime.GetSecondsUntilDailyReset())
+        or GetQuestResetTime()
+    local weekly = C_DateAndTime.GetSecondsUntilWeeklyReset and C_DateAndTime.GetSecondsUntilWeeklyReset()
+    return daily, weekly
+end
+
 --- All records for an instance map (any difficulty).
 function Lockouts:ForMap(instanceMapID)
     return self.byMap[instanceMapID] or {}
