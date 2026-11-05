@@ -102,6 +102,20 @@ local function printFarmList()
         end
     end
 
+    -- Name the mounts that need verification (with the reason) so they can be checked.
+    local verifyShown = 0
+    for _, e in ipairs(entries) do
+        for id, m in pairs(e.mounts) do
+            if #m.verify > 0 and #m.ready == 0 and verifyShown < MAX_LOCKED_LINES then
+                verifyShown = verifyShown + 1
+                if verifyShown == 1 then print("  " .. L["NOW_VERIFY_HEADER"]) end
+                local v = m.verify[1]
+                print(("    |cff999999%s|r — %s (%s): %s"):format(mountName(id), ns.FarmList:InstanceName(e.jid),
+                    ns.FarmList:DifficultyName(v.difficulty), v.reason))
+            end
+        end
+    end
+
     print("  " .. L["NOW_FOOTER"]:format(counts[S.VERIFY] or 0, counts[S.COLLECTED] or 0,
         counts[S.UNAVAILABLE] or 0, counts[S.OUT_OF_SCOPE] or 0))
     if #printed > 0 then print("  " .. L["NOW_GO_HINT"]) end
