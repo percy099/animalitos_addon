@@ -70,9 +70,8 @@ local function printFarmList()
     local S = ns.Eligibility.STATES
     if not ns.Lockouts.loaded then ns:Print(L["NOW_LOCKOUTS_LOADING"]) end
 
-    local printed, readyMounts = {}, 0
-    for _, e in ipairs(entries) do if e.readyCount > 0 then readyMounts = readyMounts + e.readyCount end end
-    ns:Print(L["NOW_HEADER"]:format(readyMounts))
+    local printed = {}
+    ns:Print(L["NOW_HEADER"]:format(counts[S.READY] or 0))
 
     for _, e in ipairs(entries) do
         if e.readyCount == 0 or #printed >= MAX_READY_LINES then break end
@@ -103,7 +102,8 @@ local function printFarmList()
         end
     end
 
-    print("  " .. L["NOW_FOOTER"]:format(counts[S.VERIFY] or 0, counts[S.COLLECTED] or 0, counts[S.UNAVAILABLE] or 0))
+    print("  " .. L["NOW_FOOTER"]:format(counts[S.VERIFY] or 0, counts[S.COLLECTED] or 0,
+        counts[S.UNAVAILABLE] or 0, counts[S.OUT_OF_SCOPE] or 0))
     if #printed > 0 then print("  " .. L["NOW_GO_HINT"]) end
 end
 
@@ -127,6 +127,10 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
         local list = ns.FarmList.lastPrinted
         if not list then printFarmList() list = ns.FarmList.lastPrinted end
         if list and list[n] then ns.Navigation:GoToInstance(list[n]) else ns:Print(L["NOW_BAD_INDEX"]) end
+    elseif cmd:match("^maxtier%s+%d+$") then
+        local tier = tonumber(cmd:match("%d+"))
+        ns.Storage.db.settings.maxTier = tier
+        ns:Print(L["MAXTIER_SET"]:format(tier, (EJ_GetTierInfo(tier)) or "?"))
     elseif cmd == "nav tomtom" or cmd == "nav native" then
         ns.Navigation:SetMode(cmd:match("nav (%a+)"))
     elseif cmd == "scan" then

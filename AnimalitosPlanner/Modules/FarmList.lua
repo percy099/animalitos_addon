@@ -23,14 +23,15 @@ end
 --- Builds the list. Returns:
 ---   entries  = array of { jid, inst, mounts = { [mountID] = { ready = {diff...}, locked = {diff...}, resetAt } },
 ---                         readyCount, near = 0|1|2 }
----   counts   = { [state] = number of (source, difficulty) pairs }
+---   counts   = { [state] = number of unique mounts in that state }
 function FarmList:Build()
     local S = ns.Eligibility.STATES
-    local byInstance, counts = {}, {}
+    local byInstance, counts, mountStates = {}, {}, {}
     for _, src in ipairs(ns.Data.sources) do
         for _, d in ipairs(src.difficulties) do
             local state, reason, resetAt = ns.Eligibility:Evaluate(src, d)
-            counts[state] = (counts[state] or 0) + 1
+            mountStates[state] = mountStates[state] or {}
+            mountStates[state][src.mountID] = true
             if state == S.READY or state == S.LOCKED_OUT or state == S.VERIFY then
                 local jid = src.journalInstanceID
                 local e = byInstance[jid]
@@ -72,6 +73,12 @@ function FarmList:Build()
         if a.inst.tier ~= b.inst.tier then return a.inst.tier < b.inst.tier end
         return a.jid < b.jid
     end)
+    -- counts = unique mounts per state (a mount can have several sources)
+    for state, set in pairs(mountStates) do
+        local n = 0
+        for _ in pairs(set) do n = n + 1 end
+        counts[state] = n
+    end
     self.entries, self.counts = entries, counts
     return entries, counts
 end
@@ -80,6 +87,13 @@ function FarmList:InstanceName(jid)
     return (EJ_GetInstanceInfo(jid)) or ("#" .. jid)
 end
 
+-- Compact, language-neutral difficulty labels for lists.
+local SHORT = {
+    [1] = "N", [2] = "H", [23] = "M",
+    [3] = "10N", [4] = "25N", [5] = "10H", [6] = "25H", [9] = "40",
+    [14] = "N", [15] = "H", [16] = "M", [7] = "LFR", [17] = "LFR",
+}
+
 function FarmList:DifficultyName(d)
-    return (GetDifficultyInfo(d)) or tostring(d)
+    return SHORT[d] or (GetDifficultyInfo(d)) or tostring(d)
 end

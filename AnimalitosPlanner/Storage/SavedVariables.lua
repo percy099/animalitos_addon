@@ -12,6 +12,7 @@ local function defaults()
         settings = {
             plannerMode = "hybrid",
             navigation = "native", -- "native" | "tomtom"
+            maxTier = 10,          -- newest EJ tier in "farmable now" (10 = Dragonflight)
         },
         plans = {},
         characterData = {}, -- [characterKey] = { level, faction, class, lastSeen }

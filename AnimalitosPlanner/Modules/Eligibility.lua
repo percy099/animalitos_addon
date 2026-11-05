@@ -52,6 +52,9 @@ function Eligibility:Evaluate(src, difficultyID)
     if not inst or inst.worldBoss or not inst.legacy then
         return S.OUT_OF_SCOPE, L["REASON_OUT_OF_SCOPE"]
     end
+    if inst.tier > (ns.Storage.db.settings.maxTier or 10) then
+        return S.OUT_OF_SCOPE, L["REASON_TOO_RECENT"]
+    end
 
     if not ns.Lockouts.loaded then
         return S.VERIFY, L["REASON_LOCKOUTS_LOADING"]
