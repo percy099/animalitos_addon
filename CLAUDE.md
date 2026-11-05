@@ -1,0 +1,112 @@
+# CLAUDE.md — AnimalitosPlanner
+
+Contexto para quien continúe el proyecto, sea una persona del equipo o Claude. Léelo entero antes de cambiar código. Si una decisión de aquí choca con lo que te piden, pregunta antes de actuar.
+
+## 1. Qué es
+Addon de WoW **retail** para farmear monturas. Se hizo con un grupo de amigos; el repo es `percy099/animalitos_addon` (público, licencia **MIT**). Antes se llamaba **Mount Planner**: la carpeta raíz local sigue siendo `F:\WowAddons\MountPlanner` y los `.docx` originales usan ese nombre.
+
+**MVP:** con cualquier personaje, mostrar qué **raids y mazmorras legacy** se pueden hacer **ahora** para conseguir monturas que le faltan a la **cuenta**, qué está en lockout y cuándo se reinicia, y poner un waypoint en la entrada.
+
+La especificación vigente es `docs/` (v1.2, en español). El documento más útil es `docs/05-mvp-y-roadmap.md`, con el MVP, los criterios de aceptación AC-01..AC-16, los entregables por versión y la tabla de validación técnica.
+
+## 2. Estado (2026-11-05)
+| Versión | Estado |
+|---|---|
+| v0.1 Foundation (SavedVariables, Mount Journal, ventana, probe) | ✅ validada en el cliente |
+| v0.2 Dataset desde el scan en el juego + pipeline | ✅ 67 fuentes, 66 monturas, 50 instancias |
+| v0.3 Lockouts + elegibilidad + `/aplan now` / `go` / `why` | ✅ validada en el cliente (Dragon Soul, Firelands, ICC, Ulduar, Utgarde Pinnacle) |
+| v0.4 Pestaña "Farmeable ahora" (tarjetas, Ir, Ocultar hasta el reset) | 🟡 funciona; **pendiente**: la flecha del waypoint nativo no se vio (diagnosticar con `/aplan navdebug`, ver §9) y reordenar a mano |
+| v0.5 Colección virtualizada, Detalle de montura, Ajustes (Ace3/LibDBIcon) | ⏳ |
+| v0.6 Cobertura legacy completa y curación | ⏳ |
+| v1.0 Release (CurseForge/Wago) | ⏳ |
+
+## 3. Entorno
+- Cliente objetivo: **12.1.5.70783**, `## Interface: 120105`, cliente en **enUS** (los locales esES y esMX existen, pero no se han probado en el juego).
+- WoW instalado en `C:\World of Warcraft\_retail_`. La carpeta del addon es un **junction**: `AddOns\AnimalitosPlanner` → `F:\WowAddons\MountPlanner\AnimalitosPlanner`. Lo que se edite en el repo se ve con `/reload`, pero un addon nuevo o renombrado requiere reiniciar el juego.
+- Desde WSL: `/mnt/c/...` y `/mnt/f/...`. SavedVariables en `C:\World of Warcraft\_retail_\WTF\Account\309771233#1\SavedVariables\AnimalitosPlanner.lua`.
+- No hay intérprete de Lua local, así que la sintaxis se valida en el juego. Al menos revisa que los bloques estén balanceados (`function/if/do` contra `end`).
+- Git: el push funciona con el Git Credential Manager de Windows, configurado solo en este repo. Autor: `percy099 <percy.quezada@pucp.pe>`.
+
+## 4. Arquitectura del addon (`AnimalitosPlanner/`)
+El orden de carga está en el `.toc` y **importa**:
+
+| Archivo | Rol |
+|---|---|
+| `Core.lua` | Namespace `ns`, `ns.L` (fallback a la clave), bus de eventos `ns:On(event, fn)` tolerante a eventos inexistentes, `ns:Debounce`, `ns:GetCharacterKey` |
+| `Locales/enUS, esES, esMX` | enUS es la base; esES se aplica también a esMX; esMX solo sobrescribe lo que difiere |
+| `Data/Dataset.lua` | **GENERADO**, no se edita a mano. `ns.Data = { version, instances[jid], sources[] }` |
+| `Storage/SavedVariables.lua` | `AnimalitosPlannerDB` (por cuenta), versión de esquema, `migrations[n]` y `fillDefaults` |
+| `Integrations/MountJournal.lua` | Único lugar con llamadas a `C_MountJournal` |
+| `Integrations/Lockouts.lua` | Instancias guardadas → `byMap[instanceMapID][difficultyID] = { killed[bossName], resetAt }` |
+| `Modules/Collection.lua` | Totales; el número principal coincide con el diario de Blizzard (visibles para el personaje) |
+| `Modules/Eligibility.lua` | Estado por (fuente, dificultad): `ready`, `lockedOut`, `verificationRequired`, `unavailable`, `collected`, `outOfScope` |
+| `Modules/FarmList.lua` | Agrupa por instancia, ordena (zona actual → continente → número de monturas → expansión) y oculta hasta el reset |
+| `Integrations/Navigation.lua` | Waypoint nativo (`C_Map.SetUserWaypoint` + `C_SuperTrack`) o TomTom; aviso si el destino está en otro continente; `Debug()` |
+| `Modules/Probe.lua` | `/aplan probe`: firmas de API, EJ, mapa, lockouts y TomTom → `AnimalitosPlannerDB.diagnostics` |
+| `Modules/DevScan.lua` | `/aplan scan`: construye el dataset en bruto desde el cliente → `AnimalitosPlannerDB.scan` |
+| `UI/FarmPanel.lua`, `UI/MainFrame.lua` | Ventana: cabecera, pestañas *Farmeable ahora* / *Resumen*, pie |
+| `Bootstrap.lua` | Se carga al final: eventos, comandos `/aplan` y `/animalitos`, AddonCompartment |
+
+**Reglas de producto que no se rompen:**
+- Lo desconocido **nunca** es Ready.
+- La elegibilidad se evalúa **por fuente y por dificultad**.
+- La colección es por cuenta; la elegibilidad, del personaje activo.
+- Nada de datos de combate protegidos (Secret Values de Midnight); `ENCOUNTER_END`/`BOSS_KILL` solo disparan `RequestRaidInfo()`.
+- El addon no hace llamadas de red.
+- No se pisa un waypoint sin una acción explícita del jugador.
+
+## 5. Conocimiento validado en el cliente (no lo re-descubras)
+- `GetMountInfoByID` devuelve **13** valores; los 12 primeros siguen el orden documentado (`[10]` shouldHideOnChar, `[11]` isCollected, `[12]` mountID).
+- `shouldHideOnChar` = true también en monturas **no obtenibles**, no solo de otra facción o clase. El contador del diario de Blizzard excluye las ocultas, por eso el addon muestra 372 y no 389.
+- `GetMountInfoExtraByID`: el 3.º valor es `sourceText` con formato `|cFFFFD200Drop:|r … Location: …`; las monturas retiradas dicen `Legacy`.
+- `sourceType` ↔ `_G["BATTLE_PET_SOURCE_"..n]` (1 Drop … 12 Trading Post; 0 = desconocido).
+- **Encounter Journal:** después de `EJ_SetDifficulty`, el botín se reconstruye **de forma asíncrona**; hay que esperar unos 0,3 s antes de leer. `GetMountFromItem` devuelve nil si el objeto no está en caché: hay que pedirlo con `C_Item.RequestLoadItemDataByID` y releer.
+- El EJ trae pseudoinstancias de world bosses (Pandaria 322, Draenor 557, Broken Isles 822, Invasion Points 959, Azeroth 1028, Shadowlands 1192, Dragon Isles 1205, Khaz Algar 1278, Midnight 1312), un tier "Current Season" duplicado y "Keystone Dungeons" 1319.
+- `GetDungeonEntrancesForMap(uiMapID)` → `{areaPoiID, name, journalInstanceID, position}`. La misma entrada aparece cerca del borde de mapas vecinos; el pipeline elige la más alejada del borde.
+- `GetSavedInstanceInfo` devuelve 14 valores: `[3]` segundos hasta el reset, `[4]` difficultyID, `[5]` locked, `[14]` **mapID de la instancia = `mapID` del EJ** (así se cruzan). `GetSavedInstanceEncounterInfo(i,j)` → `(bossName, fileDataID, isKilled, …)`.
+- **Lockouts:**
+  - Es por boss: estar guardado en la raid no bloquea a los bosses que siguen vivos.
+  - En raids legacy, **10N/25N/10H/25H (dificultades 3–6) son UN solo lockout**. Validado: Ultraxion, muerto en DS 25H, seguía muerto en 25N. El juego solo registra la dificultad en la que se jugó, así que la regla está en `Eligibility.lua`.
+  - Las dificultades flex (14/15/16) y las de mazmorra (1/2/23) tienen lockouts separados.
+  - Las mazmorras heroicas legacy se reinician a diario.
+- Waypoints: la flecha nativa y la de TomTom **solo se ven en el mismo continente** que el destino.
+- En los textos de chat, `|t` inicia un código de textura: no escribas `native|tomtom`, usa `/`.
+
+## 6. Dataset y pipeline
+```
+En el juego:  /aplan scan  (Guía de aventuras cerrada, fuera de combate, ~5–8 min)  →  /reload
+python3 pipeline/build_dataset.py "/mnt/c/World of Warcraft/_retail_/WTF/Account/309771233#1/SavedVariables/AnimalitosPlanner.lua"
+   → data/raw/scan-<build>.json         snapshot normalizado (se versiona)
+   → AnimalitosPlanner/Data/Dataset.lua  generado
+   → data/reports/dataset-report.md     huecos a curar
+Sin el juego:  python3 pipeline/build_dataset.py --from-raw data/raw/scan-12.1.5.70783.json
+```
+- Las correcciones van en `data/curated/overrides.json`, **siempre con `reason`**: pseudoinstancias, `entranceOverrides`, `lockoutModels` y `currentExpansionTier`.
+- **Huecos actuales:**
+  - 5 instancias sin entrada: Throne of the Four Winds, Magisters' Terrace viejo (249, posiblemente reemplazado por la versión de Midnight 1300), Return to Karazhan, Ny'alotha y Stratholme Service Entrance.
+  - 2 entradas dudosas: Vortex Pinnacle (Uldum, probablemente bien) y Nerub-ar Palace.
+- Datos de terceros: **no importar** Rarity, SimpleArmory ni HandyNotes sin revisar su licencia (somos MIT). Wowhead solo para verificar a mano; nunca scraping.
+- `pipeline/savedvars.py` parsea SavedVariables. Ojo: el cliente escribe `nil,` como relleno en los arrays.
+
+## 7. Ciclo de validación con el jugador
+Claude no puede ejecutar el juego. Para validar algo:
+1. Se agrega un diagnóstico (probe, scan, why, navdebug).
+2. El jugador lo corre y hace `/reload`, que escribe las SavedVariables.
+3. Se lee el archivo con `pipeline/savedvars.py`, o el jugador manda capturas.
+
+Personajes de prueba: **Pennyus** (druida 90, con lockouts en FL H, ICC 25H, Ulduar N, UP H y DS 25H 5/8) y Aetana (sacerdote 82).
+
+## 8. Convenciones
+- Código, identificadores y comentarios del código en **inglés**; docs y conversación con el equipo en **español**.
+- Textos del jugador siempre vía `ns.L["KEY"]`, con la clave agregada en `enUS.lua` **y** en `esES.lua`.
+- Toda llamada nueva a una API de Blizzard va en un adaptador de `Integrations/`. Las listas no crean un frame por montura (se usan pools). Nada en `OnUpdate`.
+- Al cambiar el esquema de SavedVariables: subir `SCHEMA_VERSION` y agregar `migrations[n]`; nunca editar una migración ya publicada.
+- Subir `## Version` en el `.toc` en cada entrega. Los commits terminan con la línea `Co-Authored-By` de Claude.
+- **Ícono:** `AnimalitosPlanner/Media/icon.tga` está en `.gitignore` porque usa a Plim Plim (personaje con copyright) y fotos del equipo. **No lo subas al repo público.** Para regenerarlo: `python3 pipeline/png2tga.py C:\Users\User\Desktop\animalitos_caras.png` (128×128). Si algún día se publica en CurseForge, hace falta otro ícono.
+
+## 9. Próximos pasos
+1. **Flecha del waypoint nativo:** no se vio en Eastern Kingdoms. Pedir `/aplan navdebug` y revisar la opción `showInGameNavigation`, si `IsSuperTrackingUserWaypoint` está activo y la distancia de `C_Navigation`. Alternativa: `/aplan nav tomtom`.
+2. Terminar la v0.4: reordenar la lista a mano (AC-09) y probar Ocultar y "Mostrar ocultas" entre reinicios del juego.
+3. Curar los huecos del reporte (entradas) y validar la lista en esES/esMX.
+4. v0.5: Colección virtualizada, Detalle de montura (fuentes y explicación por dificultad, como `/aplan why`) y Ajustes (Ace3: AceDB, AceConfig; LibDBIcon).
+5. Preguntas abiertas: reparto de roles en el equipo, nombre público, publicar en CurseForge, en Wago o en ambos.
