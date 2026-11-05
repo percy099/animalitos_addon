@@ -18,12 +18,12 @@ local function create()
     f:SetPoint("TOPLEFT", main, "TOPRIGHT", 4, 0)
     f:SetClampedToScreen(true)
     f:EnableMouse(true)
-    ns.UI.StylePanel(f, C.background, 16)
+    ns.UI.StylePanel(f, C.background, { border = { C.accent[1], C.accent[2], C.accent[3], 0.45 }, noSheen = true })
 
-    local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", -2, -2)
+    local close = ns.UI.CloseButton(f)
+    close:SetPoint("TOPRIGHT", -6, -6)
 
-    f.title = ns.UI.fs(f, "GameFontNormalLarge", C.accent)
+    f.title = ns.UI.fs(f, "GameFontNormalLarge")
     f.title:SetPoint("TOPLEFT", 12, -12)
     f.title:SetPoint("RIGHT", close, "LEFT", -4, 0)
     f.title:SetWordWrap(false)
@@ -64,11 +64,9 @@ local function create()
     f.source:SetWordWrap(true)
     f.source:SetMaxLines(5)
 
-    f.journal = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    f.journal:SetHeight(22)
-    f.journal:SetPoint("BOTTOM", 0, 10)
-    f.journal:SetText(L["BTN_OPEN_JOURNAL"])
-    f.journal:SetWidth(f.journal:GetFontString():GetStringWidth() + 28)
+    f.journal = ns.UI.Button(f, "primary")
+    ns.UI.SetButtonText(f.journal, L["BTN_OPEN_JOURNAL"], 160)
+    f.journal:SetPoint("BOTTOM", 0, 12)
     return f
 end
 

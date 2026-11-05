@@ -48,7 +48,7 @@ local function showMountTooltip(row)
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
     GameTooltip:AddLine(mountName(info.id), 1, 1, 1)
     GameTooltip:AddLine(("%s · %s"):format(ns.FarmList:BossName(m.source), ns.FarmList:InstanceName(info.jid)),
-        C.muted[1], C.muted[2], C.muted[3])
+        C.tipMuted[1], C.tipMuted[2], C.tipMuted[3])
     if #m.ready > 0 then
         GameTooltip:AddLine(L["TIP_READY"]:format(diffList(m.ready)), C.success[1], C.success[2], C.success[3])
     end
@@ -58,7 +58,7 @@ local function showMountTooltip(row)
     end
     for _, v in ipairs(m.verify) do
         GameTooltip:AddLine(("%s: %s"):format(ns.FarmList:DifficultyName(v.difficulty), v.reason),
-            C.muted[1], C.muted[2], C.muted[3], true)
+            C.tipMuted[1], C.tipMuted[2], C.tipMuted[3], true)
     end
     GameTooltip:AddLine(L["TIP_CLICK_PREVIEW"], C.accent[1], C.accent[2], C.accent[3])
     GameTooltip:Show()
@@ -73,14 +73,12 @@ local function newCard(p)
     c.badge = ns.UI.NumberBadge(c, 20)
     c.badge:SetPoint("TOPLEFT", 8, -9)
 
-    c.hide = CreateFrame("Button", nil, c, "UIPanelButtonTemplate")
-    c.hide:SetSize(62, 20)
-    c.hide:SetPoint("TOPRIGHT", -6, -8)
-    c.hide:SetText(L["BTN_HIDE"])
-    c.go = CreateFrame("Button", nil, c, "UIPanelButtonTemplate")
-    c.go:SetSize(50, 20)
-    c.go:SetPoint("RIGHT", c.hide, "LEFT", -2, 0)
-    c.go:SetText(L["BTN_GO"])
+    c.hide = ns.UI.Button(c, "secondary")
+    ns.UI.SetButtonText(c.hide, L["BTN_HIDE"], 62)
+    c.hide:SetPoint("TOPRIGHT", -8, -8)
+    c.go = ns.UI.Button(c, "primary")
+    ns.UI.SetButtonText(c.go, L["BTN_GO"], 50)
+    c.go:SetPoint("RIGHT", c.hide, "LEFT", -6, 0)
 
     c.title = ns.UI.fs(c, "GameFontNormal")
     c.title:SetPoint("TOPLEFT", c.badge, "TOPRIGHT", 8, 3)
@@ -96,6 +94,9 @@ end
 local function newRow(p)
     local r = CreateFrame("Button", nil, p.child)
     r:SetHeight(ROW_H)
+    r.zebra = r:CreateTexture(nil, "BACKGROUND")
+    r.zebra:SetAllPoints()
+    r.zebra:SetColorTexture(1, 1, 1, 0.03)
     local hl = r:CreateTexture(nil, "HIGHLIGHT")
     hl:SetAllPoints()
     hl:SetColorTexture(1, 1, 1, 0.07)
@@ -125,9 +126,9 @@ end
 local function newHeader(p)
     local h = CreateFrame("Frame", nil, p.child)
     h:SetHeight(20)
-    h.text = ns.UI.fs(h, "GameFontNormal", ns.UI.COLORS.accent)
+    h.text = ns.UI.SectionTitle(h)
     h.text:SetPoint("LEFT", 2, 0)
-    h.count = ns.UI.fs(h, "GameFontHighlightSmall", ns.UI.COLORS.muted)
+    h.count = ns.UI.fs(h, "small", ns.UI.COLORS.muted)
     h.count:SetPoint("RIGHT", -2, 0)
     h.count:SetJustifyH("RIGHT")
     local line = h:CreateTexture(nil, "ARTWORK")
@@ -232,8 +233,7 @@ function FarmPanel:Create(parent)
     p.pools, p.used = {}, {}
     for kind in pairs(FACTORIES) do p.pools[kind] = {} end
 
-    p.unhide = CreateFrame("Button", nil, child, "UIPanelButtonTemplate")
-    p.unhide:SetHeight(20)
+    p.unhide = ns.UI.Button(child, "secondary")
     p.unhide:SetScript("OnClick", function()
         ns.FarmList:UnhideAll()
         ns.UI:Refresh()
@@ -263,8 +263,9 @@ function FarmPanel:Refresh(p, entries, sum)
     end
 
     -- mode: "ready" (inside a card), "locked" or "verify" (section rows)
-    local function mountRow(anchor, x, rowY, rightInset, id, m, jid, mode)
+    local function mountRow(anchor, x, rowY, rightInset, id, m, jid, mode, zebra)
         local r = take(p, "rows")
+        r.zebra:SetShown(zebra or false)
         r:ClearAllPoints()
         r:SetPoint("TOPLEFT", anchor, "TOPLEFT", x, -rowY)
         r:SetPoint("RIGHT", anchor, "RIGHT", -rightInset, 0)
@@ -306,7 +307,7 @@ function FarmPanel:Refresh(p, entries, sum)
         h:ClearAllPoints()
         h:SetPoint("TOPLEFT", 0, -y)
         h:SetWidth(width)
-        local title = continentName(g.key)
+        local title = ns.UI.Upper(continentName(g.key))
         if g.key ~= 0 and g.key == playerContinent then
             title = ("%s  |cff8dd3a8%s|r"):format(title, L["GROUP_HERE"])
         end
@@ -345,8 +346,8 @@ function FarmPanel:Refresh(p, entries, sum)
             end
             table.sort(ids, function(a, b) return mountName(a) < mountName(b) end)
             local rowY = CARD_HEAD_H
-            for _, id in ipairs(ids) do
-                mountRow(c, ROW_INDENT, rowY, 8, id, e.mounts[id], jid, "ready")
+            for k, id in ipairs(ids) do
+                mountRow(c, ROW_INDENT, rowY, 8, id, e.mounts[id], jid, "ready", k % 2 == 1)
                 rowY = rowY + ROW_H
             end
             c:SetHeight(rowY + 6)
@@ -357,8 +358,7 @@ function FarmPanel:Refresh(p, entries, sum)
     if index == 0 then line(L["FARM_EMPTY"], C.muted) end
 
     if sum.hidden > 0 then
-        p.unhide:SetText(L["BTN_UNHIDE"]:format(sum.hidden))
-        p.unhide:SetWidth(p.unhide:GetFontString():GetStringWidth() + 28)
+        ns.UI.SetButtonText(p.unhide, L["BTN_UNHIDE"]:format(sum.hidden))
         p.unhide:ClearAllPoints()
         p.unhide:SetPoint("TOPLEFT", 0, -y)
         p.unhide:Show()
@@ -396,8 +396,8 @@ function FarmPanel:Refresh(p, entries, sum)
         s:Show()
         y = y + s:GetHeight() + 2
         if open then
-            for _, it in ipairs(items) do
-                mountRow(p.child, 8, y, RIGHT_MARGIN + 8, it.id, it.m, it.jid, mode)
+            for k, it in ipairs(items) do
+                mountRow(p.child, 8, y, RIGHT_MARGIN + 8, it.id, it.m, it.jid, mode, k % 2 == 1)
                 y = y + ROW_H
             end
         end

@@ -1,32 +1,21 @@
--- Main window (redesign, part 1): header, left sidebar navigation with four
--- sections (Home / Farmable now / Collection / Settings) and footer.
--- Native frames only; palette from the UX spec (docs/02-ux-ui.md §8).
+-- Main window: header with accent glow line, left sidebar navigation with
+-- four sections (Home / Farmable now / Collection / Settings) and footer.
+-- Look and widgets come from UI/Style.lua.
 local _, ns = ...
 local L = ns.L
 
-local UI = {}
-ns.UI = UI
-
-UI.COLORS = {
-    background = { 0.106, 0.094, 0.157, 0.96 }, -- #1B1828
-    surface    = { 0.188, 0.165, 0.251, 1 },    -- #302A40
-    accent     = { 0.659, 0.541, 0.843, 1 },    -- #A88AD7
-    success    = { 0.553, 0.827, 0.659, 1 },    -- #8DD3A8
-    warning    = { 0.878, 0.627, 0.251, 1 },    -- amber, Locked out
-    muted      = { 0.70, 0.68, 0.76, 1 },
-}
+local UI = ns.UI
 local COLORS = UI.COLORS
-local WHITE = "Interface\\Buttons\\WHITE8x8"
-local BORDER = "Interface\\Tooltips\\UI-Tooltip-Border" -- client texture with softly rounded corners
+local fs = UI.fs
 
 -- Layout
 UI.WIDTH, UI.HEIGHT = 720, 500
 local WIDTH, HEIGHT = UI.WIDTH, UI.HEIGHT
 local PAD = 10
-local HEADER_H = 52
-local FOOTER_H = 36
+local HEADER_H = 56
+local FOOTER_H = 38
 local SIDEBAR_W = 160
-local NAV_BUTTON_H = 30
+local NAV_BUTTON_H = 32
 UI.CONTENT_WIDTH = WIDTH - SIDEBAR_W - PAD * 3
 
 -- Sidebar sections, in display order. Icons are client icon files.
@@ -38,54 +27,14 @@ local SECTIONS = {
 }
 local DEFAULT_SECTION = "farm"
 
-function UI.fs(parent, template, color)
-    local f = parent:CreateFontString(nil, "OVERLAY", template or "GameFontHighlight")
-    if color then f:SetTextColor(color[1], color[2], color[3]) end
-    f:SetJustifyH("LEFT")
-    return f
-end
-local fs = UI.fs
+-- Text/icon alpha per nav state (selected / hover / normal).
+local NAV_ALPHA = { selected = 1, hover = 0.86, normal = 0.62 }
 
---- Applies the panel look: flat fill plus a tinted, softly rounded border.
-function UI.StylePanel(frame, fill, edgeSize)
-    local e = edgeSize or 12
-    frame:SetBackdrop({
-        bgFile = WHITE, edgeFile = BORDER, edgeSize = e,
-        insets = { left = e / 4, right = e / 4, top = e / 4, bottom = e / 4 },
-    })
-    local c = fill or COLORS.surface
-    frame:SetBackdropColor(c[1], c[2], c[3], c[4] or 1)
-    frame:SetBackdropBorderColor(COLORS.accent[1], COLORS.accent[2], COLORS.accent[3], 0.55)
-end
-
-local CIRCLE = "Interface\\CharacterFrame\\TempPortraitAlphaMask" -- white disc on transparent
-
---- Filled circle tinted with `color` (used for rings, discs and badges).
-function UI.Circle(parent, layer, size, color, sublevel)
-    local t = parent:CreateTexture(nil, layer, nil, sublevel or 0)
-    t:SetSize(size, size)
-    t:SetTexture(CIRCLE)
-    t:SetVertexColor(color[1], color[2], color[3], color[4] or 1)
-    return t
-end
-
---- Small numbered disc (1, 2, 3...). Set the number with badge.text:SetText(n).
-function UI.NumberBadge(parent, size)
-    local b = CreateFrame("Frame", nil, parent)
-    b:SetSize(size, size)
-    local disc = UI.Circle(b, "ARTWORK", size, COLORS.accent)
-    disc:SetPoint("CENTER")
-    b.text = fs(b, "GameFontHighlightSmall")
-    b.text:SetPoint("CENTER", 0, 0)
-    b.text:SetJustifyH("CENTER")
-    return b
-end
-
--- Placeholder for sections that arrive in later parts.
+-- Placeholder for sections that arrive later.
 local function createPlaceholder(parent, text)
     local p = CreateFrame("Frame", nil, parent)
     p:SetAllPoints()
-    local t = fs(p, "GameFontHighlight", COLORS.muted)
+    local t = fs(p, "GameFontHighlight", COLORS.dim)
     t:SetPoint("CENTER")
     t:SetWidth(UI.CONTENT_WIDTH - 80)
     t:SetJustifyH("CENTER")
@@ -96,40 +45,53 @@ end
 -- ---------------------------------------------------------------------------
 -- Sidebar
 -- ---------------------------------------------------------------------------
+local function paintNav(b)
+    local alpha = b.isSelected and NAV_ALPHA.selected or (b.isHover and NAV_ALPHA.hover) or NAV_ALPHA.normal
+    b.label:SetTextColor(1, 1, 1, alpha)
+    b.icon:SetAlpha(alpha)
+    b.selected:SetShown(b.isSelected)
+    b.bar:SetShown(b.isSelected)
+    b.hover:SetShown(b.isHover and not b.isSelected)
+end
+
 local function navButton(parent, section)
+    local a = COLORS.accent
     local b = CreateFrame("Button", nil, parent)
     b:SetHeight(NAV_BUTTON_H)
 
     b.selected = b:CreateTexture(nil, "BACKGROUND")
     b.selected:SetAllPoints()
-    b.selected:SetColorTexture(COLORS.accent[1], COLORS.accent[2], COLORS.accent[3], 0.22)
+    b.selected:SetColorTexture(1, 1, 1, 1)
+    b.selected:SetGradient("HORIZONTAL", CreateColor(a[1], a[2], a[3], 0.32), CreateColor(a[1], a[2], a[3], 0.02))
+    b.hover = b:CreateTexture(nil, "BACKGROUND", nil, 1)
+    b.hover:SetAllPoints()
+    b.hover:SetColorTexture(1, 1, 1, 0.04)
     b.bar = b:CreateTexture(nil, "ARTWORK")
     b.bar:SetPoint("TOPLEFT")
     b.bar:SetPoint("BOTTOMLEFT")
-    b.bar:SetWidth(3)
-    b.bar:SetColorTexture(unpack(COLORS.accent))
-
-    local hl = b:CreateTexture(nil, "HIGHLIGHT")
-    hl:SetAllPoints()
-    hl:SetColorTexture(1, 1, 1, 0.06)
+    b.bar:SetWidth(UI.px(2))
+    b.bar:SetColorTexture(a[1], a[2], a[3], 1)
 
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetSize(18, 18)
-    b.icon:SetPoint("LEFT", 10, 0)
+    b.icon:SetPoint("LEFT", 12, 0)
     b.icon:SetTexture(section.icon)
     b.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92) -- crop the icon border
 
-    b.badge = fs(b, "GameFontHighlightSmall", COLORS.success)
-    b.badge:SetPoint("RIGHT", -8, 0)
+    b.badge = fs(b, "small", COLORS.success)
+    b.badge:SetPoint("RIGHT", -10, 0)
     b.badge:SetJustifyH("RIGHT")
 
-    b.label = fs(b, "GameFontHighlight")
-    b.label:SetPoint("LEFT", b.icon, "RIGHT", 8, 0)
+    b.label = fs(b, "body")
+    b.label:SetPoint("LEFT", b.icon, "RIGHT", 10, 0)
     b.label:SetPoint("RIGHT", b.badge, "LEFT", -4, 0)
     b.label:SetWordWrap(false)
     b.label:SetText(L[section.label])
 
+    b:SetScript("OnEnter", function(self) self.isHover = true; paintNav(self) end)
+    b:SetScript("OnLeave", function(self) self.isHover = false; paintNav(self) end)
     b:SetScript("OnClick", function() UI:SelectTab(section.key) end)
+    paintNav(b)
     return b
 end
 
@@ -138,13 +100,14 @@ end
 -- ---------------------------------------------------------------------------
 function UI:Create()
     if self.frame then return self.frame end
+    local a = COLORS.accent
 
     local f = CreateFrame("Frame", "AnimalitosPlannerMainFrame", UIParent, "BackdropTemplate")
     f:SetSize(WIDTH, HEIGHT)
     f:SetFrameStrata("HIGH")
     f:SetToplevel(true)
     f:SetClampedToScreen(true)
-    UI.StylePanel(f, COLORS.background, 16)
+    UI.StylePanel(f, COLORS.background, { border = { a[1], a[2], a[3], 0.45 }, noSheen = true })
     f:Hide()
 
     f:SetMovable(true)
@@ -159,34 +122,36 @@ function UI:Create()
     self:RestorePosition(f)
     tinsert(UISpecialFrames, f:GetName()) -- close with ESC
 
-    -- Header
-    local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", -2, -2)
+    -- Header: darker band, logo, title, character line, accent glow line
+    local band = f:CreateTexture(nil, "BACKGROUND", nil, 1)
+    band:SetPoint("TOPLEFT", UI.px(1), -UI.px(1))
+    band:SetPoint("TOPRIGHT", -UI.px(1), -UI.px(1))
+    band:SetHeight(HEADER_H - 1)
+    band:SetColorTexture(0, 0, 0, 0.28)
+
+    local close = UI.CloseButton(f)
+    close:SetPoint("TOPRIGHT", -8, -8)
 
     local logo = f:CreateTexture(nil, "ARTWORK")
-    logo:SetSize(36, 36)
-    logo:SetPoint("TOPLEFT", PAD + 2, -PAD)
+    logo:SetSize(38, 38)
+    logo:SetPoint("TOPLEFT", PAD + 2, -9)
     logo:SetTexture("Interface\\AddOns\\AnimalitosPlanner\\Media\\icon")
 
-    local title = fs(f, "GameFontNormalLarge", COLORS.accent)
-    title:SetPoint("TOPLEFT", logo, "TOPRIGHT", 8, -3)
+    local title = fs(f, "large")
+    title:SetPoint("TOPLEFT", logo, "TOPRIGHT", 10, -3)
     title:SetText(L["TITLE"])
 
-    f.character = fs(f, "GameFontHighlightSmall", COLORS.muted)
-    f.character:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -3)
+    f.character = fs(f, "small", COLORS.dim)
+    f.character:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -4)
 
-    local divider = f:CreateTexture(nil, "ARTWORK")
-    divider:SetPoint("TOPLEFT", PAD, -HEADER_H)
-    divider:SetPoint("TOPRIGHT", -PAD, -HEADER_H)
-    divider:SetHeight(1)
-    divider:SetColorTexture(COLORS.accent[1], COLORS.accent[2], COLORS.accent[3], 0.35)
+    UI.GlowLine(f, -HEADER_H)
 
     -- Sidebar
     local sidebar = CreateFrame("Frame", nil, f, "BackdropTemplate")
     sidebar:SetPoint("TOPLEFT", PAD, -(HEADER_H + PAD))
     sidebar:SetPoint("BOTTOMLEFT", PAD, FOOTER_H)
     sidebar:SetWidth(SIDEBAR_W)
-    UI.StylePanel(sidebar, { COLORS.surface[1], COLORS.surface[2], COLORS.surface[3], 0.6 })
+    UI.StylePanel(sidebar, { 0, 0, 0, 0.25 })
 
     -- Content area
     local content = CreateFrame("Frame", nil, f)
@@ -205,25 +170,24 @@ function UI:Create()
     local anchorY = -6
     for _, section in ipairs(SECTIONS) do
         local b = navButton(sidebar, section)
-        b:SetPoint("TOPLEFT", 4, anchorY)
-        b:SetPoint("TOPRIGHT", -4, anchorY)
+        b:SetPoint("TOPLEFT", UI.px(1), anchorY)
+        b:SetPoint("TOPRIGHT", -UI.px(1), anchorY)
         anchorY = anchorY - NAV_BUTTON_H - 2
         f.nav[section.key] = b
     end
 
     -- Footer
-    local refresh = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    refresh:SetSize(100, 22)
-    refresh:SetPoint("BOTTOMRIGHT", -PAD, 8)
-    refresh:SetText(L["REFRESH"])
+    local refresh = UI.Button(f, "secondary")
+    UI.SetButtonText(refresh, L["REFRESH"], 96)
+    refresh:SetPoint("BOTTOMRIGHT", -PAD, 9)
     refresh:SetScript("OnClick", function()
         ns.Collection:Scan()
         ns.Lockouts:Request()
         UI:Refresh()
     end)
 
-    local dataset = fs(f, "GameFontDisableSmall")
-    dataset:SetPoint("BOTTOMLEFT", PAD + 4, 14)
+    local dataset = fs(f, "tiny", COLORS.muted)
+    dataset:SetPoint("BOTTOMLEFT", PAD + 4, 15)
     if ns.Data and ns.Data.sources then
         dataset:SetFormattedText(L["DATASET_LOADED"], #ns.Data.sources, ns.Data.version.client)
     else
@@ -248,10 +212,8 @@ function UI:SelectTab(tab)
         local on = key == tab
         panel:SetShown(on)
         local b = f.nav[key]
-        b.selected:SetShown(on)
-        b.bar:SetShown(on)
-        local c = on and { 1, 1, 1 } or COLORS.muted
-        b.label:SetTextColor(c[1], c[2], c[3])
+        b.isSelected = on
+        paintNav(b)
     end
     self:Refresh()
 end

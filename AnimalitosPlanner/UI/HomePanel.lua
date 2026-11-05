@@ -23,9 +23,9 @@ local function fmt(n)
     return BreakUpLargeNumbers and BreakUpLargeNumbers(n) or tostring(n)
 end
 
-local function panel(parent)
+local function panel(parent, opts)
     local f = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    ns.UI.StylePanel(f)
+    ns.UI.StylePanel(f, nil, opts)
     return f
 end
 
@@ -71,11 +71,9 @@ local function createGreeting(p)
     sub:SetText(L["HOME_SUBTITLE"])
 
     -- Ask the server for this character's lockouts again; UPDATE_INSTANCE_INFO refreshes the UI.
-    local update = CreateFrame("Button", nil, head, "UIPanelButtonTemplate")
-    update:SetHeight(22)
+    local update = ns.UI.Button(head, "secondary")
+    ns.UI.SetButtonText(update, L["BTN_UPDATE_LOCKOUTS"])
     update:SetPoint("TOPRIGHT", -8, -8)
-    update:SetText(L["BTN_UPDATE_LOCKOUTS"])
-    update:SetWidth(update:GetFontString():GetStringWidth() + 28)
     update:SetScript("OnClick", function()
         ns.Collection:Scan()
         ns.Lockouts:Request()
@@ -102,7 +100,7 @@ end
 
 local function createRingTile(p, top)
     local C = ns.UI.COLORS
-    local t = panel(p)
+    local t = panel(p, { noSheen = true }) -- flat, so the ring's center disc matches it
     t:SetPoint("TOPLEFT", 0, top)
     t:SetSize(RING_TILE_W, TILE_H)
 
@@ -136,11 +134,11 @@ local function createRingTile(p, top)
 
     withTooltip(t, function(tt)
         tt:AddLine(L["COLLECTION_PROGRESS"], 1, 1, 1)
-        tt:AddLine(L["NOTE_TOTALS"], C.muted[1], C.muted[2], C.muted[3], true)
+        tt:AddLine(L["NOTE_TOTALS"], C.tipMuted[1], C.tipMuted[2], C.tipMuted[3], true)
         local s = ns.Collection.summary
         if s then
             tt:AddLine(L["ACCOUNT_LINE"]:format(fmt(s.collected), fmt(s.collectedHidden), fmt(s.missingHidden)),
-                C.muted[1], C.muted[2], C.muted[3], true)
+                C.tipMuted[1], C.tipMuted[2], C.tipMuted[3], true)
         end
     end)
 end
@@ -165,7 +163,7 @@ local function createStatTiles(p, top)
         t.value = ns.UI.fs(t, "GameFontHighlightHuge", color)
         t.value:SetPoint("CENTER", 0, 12)
         t.value:SetJustifyH("CENTER")
-        t.label = ns.UI.fs(t, "GameFontHighlightSmall", C.muted)
+        t.label = ns.UI.fs(t, "GameFontHighlightSmall", C.dim)
         t.label:SetPoint("TOP", t.value, "BOTTOM", 0, -6)
         t.label:SetWidth(w - 12)
         t.label:SetJustifyH("CENTER")
@@ -192,11 +190,10 @@ local function createStart(p, top)
     box:SetPoint("TOPLEFT", 0, top)
     box:SetPoint("BOTTOMRIGHT", -(RESETS_W + GAP), 0)
 
-    local title = ns.UI.fs(box, "GameFontNormal", C.accent)
-    title:SetPoint("TOPLEFT", 10, -10)
-    title:SetText(L["HOME_START"])
+    local title = ns.UI.SectionTitle(box, L["HOME_START"])
+    title:SetPoint("TOPLEFT", 10, -11)
     p.startSummary = ns.UI.fs(box, "GameFontHighlightSmall", C.muted)
-    p.startSummary:SetPoint("TOPRIGHT", -10, -12)
+    p.startSummary:SetPoint("TOPRIGHT", -10, -11)
     p.startSummary:SetJustifyH("RIGHT")
 
     p.startRows = {}
@@ -213,10 +210,9 @@ local function createStart(p, top)
         r.badge:SetPoint("LEFT", 6, 0)
         r.badge.text:SetText(i)
 
-        r.go = CreateFrame("Button", nil, r, "UIPanelButtonTemplate")
-        r.go:SetSize(50, 20)
+        r.go = ns.UI.Button(r, "primary")
+        ns.UI.SetButtonText(r.go, L["BTN_GO"], 50)
         r.go:SetPoint("RIGHT", -6, 0)
-        r.go:SetText(L["BTN_GO"])
 
         r.count = ns.UI.fs(r, "GameFontHighlightSmall", C.success)
         r.count:SetPoint("RIGHT", r.go, "LEFT", -8, 0)
@@ -238,11 +234,9 @@ local function createStart(p, top)
     p.startEmpty:SetPoint("RIGHT", -10, 0)
     p.startEmpty:SetWordWrap(true)
 
-    local seeAll = CreateFrame("Button", nil, box, "UIPanelButtonTemplate")
-    seeAll:SetHeight(22)
+    local seeAll = ns.UI.Button(box, "secondary")
+    ns.UI.SetButtonText(seeAll, L["HOME_SEE_ALL"], 80)
     seeAll:SetPoint("BOTTOMRIGHT", -8, 8)
-    seeAll:SetText(L["HOME_SEE_ALL"])
-    seeAll:SetWidth(seeAll:GetFontString():GetStringWidth() + 28)
     seeAll:SetScript("OnClick", function() ns.UI:SelectTab("farm") end)
 end
 
@@ -268,9 +262,8 @@ local function createResets(p, top)
     box:SetPoint("BOTTOMRIGHT")
     box:SetWidth(RESETS_W)
 
-    local title = ns.UI.fs(box, "GameFontNormal", C.accent)
-    title:SetPoint("TOPLEFT", 10, -10)
-    title:SetText(L["HOME_RESETS"])
+    local title = ns.UI.SectionTitle(box, L["HOME_RESETS"])
+    title:SetPoint("TOPLEFT", 10, -11)
 
     p.daily = resetLine(box, -36, "RESET_DAILY")
     p.weekly = resetLine(box, -78, "RESET_WEEKLY")

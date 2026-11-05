@@ -18,7 +18,7 @@ function MinimapButton:Init()
     local dbicon = LibStub("LibDBIcon-1.0", true)
     if not (ldb and dbicon) then return false end
 
-    local muted = ns.UI.COLORS.muted
+    local muted = ns.UI.COLORS.tipMuted
     local launcher = ldb:NewDataObject(ADDON_NAME, {
         type = "launcher",
         text = L["TITLE"],

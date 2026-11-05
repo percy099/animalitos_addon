@@ -14,9 +14,8 @@ local function box(parent, titleKey, top, height)
     f:SetPoint("TOPLEFT", 0, top)
     f:SetPoint("TOPRIGHT", 0, top)
     f:SetHeight(height)
-    local t = ns.UI.fs(f, "GameFontNormal", ns.UI.COLORS.accent)
-    t:SetPoint("TOPLEFT", 10, -10)
-    t:SetText(L[titleKey])
+    local t = ns.UI.SectionTitle(f, L[titleKey])
+    t:SetPoint("TOPLEFT", 10, -11)
     return f
 end
 
@@ -47,10 +46,8 @@ local function note(parent, y, text)
 end
 
 local function smallButton(parent, text, onClick)
-    local b = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
-    b:SetHeight(22)
-    b:SetText(text)
-    b:SetWidth(math.max(28, b:GetFontString():GetStringWidth() + 24))
+    local b = ns.UI.Button(parent, "secondary")
+    ns.UI.SetButtonText(b, text, 28)
     b:SetScript("OnClick", onClick)
     return b
 end
