@@ -20,6 +20,12 @@ local function playerLocation()
     return ancestors, continent
 end
 
+--- Continent uiMapID the player is on (nil inside instances without a map).
+function FarmList:PlayerContinent()
+    local _, continent = playerLocation()
+    return continent
+end
+
 --- Builds the list. Returns:
 ---   entries  = array of { jid, inst, mounts = { [mountID] = { ready = {diff...}, locked = {diff...}, resetAt } },
 ---                         readyCount, near = 0|1|2 }

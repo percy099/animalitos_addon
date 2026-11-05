@@ -208,8 +208,16 @@ function UI:SelectTab(tab)
     ns.Storage.db.ui.tab = tab
     f.summary:SetShown(tab == "summary")
     f.farm:SetShown(tab == "farm")
-    f.tabFarm:SetEnabled(tab ~= "farm")
-    f.tabSummary:SetEnabled(tab ~= "summary")
+    -- Selected tab stays enabled and highlighted (a disabled look read as "inactive").
+    for button, name in pairs({ [f.tabFarm] = "farm", [f.tabSummary] = "summary" }) do
+        if name == tab then
+            button:LockHighlight()
+            button:GetFontString():SetTextColor(1, 1, 1)
+        else
+            button:UnlockHighlight()
+            button:GetFontString():SetTextColor(0.7, 0.68, 0.76)
+        end
+    end
     self:Refresh()
 end
 
