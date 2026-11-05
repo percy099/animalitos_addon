@@ -269,7 +269,8 @@ local function setReset(line, secs)
         line.left:SetText("")
         return
     end
-    local t = time() + secs
+    -- Round to the minute: the countdown lags a few seconds, so 16:00 showed as 15:59.
+    local t = math.floor((time() + secs + 30) / 60) * 60
     local day = _G["WEEKDAY_" .. WEEKDAYS[tonumber(date("%w", t)) + 1]] or date("%A", t)
     line.when:SetText(("%s %s"):format(day, date("%H:%M", t)))
     line.left:SetFormattedText(L["RESET_IN"], SecondsToTime(secs, true))
