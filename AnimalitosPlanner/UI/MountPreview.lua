@@ -56,7 +56,7 @@ local function create()
     f.desc:SetPoint("TOPLEFT", holder, "BOTTOMLEFT", 2, -20)
     f.desc:SetWidth(W - 24)
     f.desc:SetWordWrap(true)
-    f.desc:SetMaxLines(4)
+    f.desc:SetMaxLines(7)
 
     f.source = ns.UI.fs(f, "GameFontHighlightSmall")
     f.source:SetPoint("TOPLEFT", f.desc, "BOTTOMLEFT", 0, -8)
