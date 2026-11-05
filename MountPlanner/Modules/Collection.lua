@@ -10,7 +10,9 @@ Collection.summary = nil
 function Collection:Scan()
     local s = {
         total = 0,
-        collected = 0,
+        collected = 0,          -- account-wide, including mounts hidden for this character
+        collectedVisible = 0,   -- what Blizzard's Mount Journal counter shows
+        collectedHidden = 0,
         missing = 0,
         missingVisible = 0,
         missingHidden = 0,
@@ -21,6 +23,11 @@ function Collection:Scan()
         s.total = s.total + 1
         if m.isCollected then
             s.collected = s.collected + 1
+            if m.shouldHideOnChar then
+                s.collectedHidden = s.collectedHidden + 1
+            else
+                s.collectedVisible = s.collectedVisible + 1
+            end
         else
             s.missing = s.missing + 1
             if m.shouldHideOnChar then
@@ -36,6 +43,7 @@ function Collection:Scan()
         self.summary = nil
         return nil
     end
+    s.visibleTotal = s.collectedVisible + s.missingVisible
     self.summary = s
     return s
 end

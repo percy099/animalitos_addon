@@ -21,4 +21,5 @@ L["PROBE_DONE"] = "Diagnóstico guardado. Escribe /reload para que se escriba en
 L["PROBE_WAITING_RAID"] = "Diagnóstico: esperando datos de instancias guardadas..."
 L["HELP"] = "Comandos: /mplan (abrir/cerrar), /mplan probe (diagnóstico de API), /mplan scan (dev: dataset en bruto), /mplan reset (reiniciar posición)"
 L["RESET_POS"] = "Posición de la ventana reiniciada."
-L["NOTE_TOTALS"] = "Los totales vienen del diario de monturas y pueden diferir del conteo del logro de Blizzard."
+L["NOTE_TOTALS"] = "El número grande coincide con tu diario de monturas (visibles para este personaje)."
+L["ACCOUNT_LINE"] = "Total de la cuenta: %s conseguidas (%s ocultas para este personaje). Ocultas y faltantes: %s (otra facción, clase o no obtenibles)."

@@ -19,4 +19,5 @@ L["PROBE_DONE"] = "Diagnostics saved. Type /reload so they are written to SavedV
 L["PROBE_WAITING_RAID"] = "Diagnostics: waiting for saved-instance data..."
 L["HELP"] = "Commands: /mplan (toggle window), /mplan probe (API diagnostics), /mplan scan (dev: build raw dataset), /mplan reset (reset window position)"
 L["RESET_POS"] = "Window position reset."
-L["NOTE_TOTALS"] = "Totals come from the Mount Journal and may differ from Blizzard's achievement count."
+L["NOTE_TOTALS"] = "The headline matches your Mount Journal (mounts visible for this character)."
+L["ACCOUNT_LINE"] = "Account total: %s collected (%s hidden for this character). Hidden and missing: %s (other faction, class or unobtainable)."

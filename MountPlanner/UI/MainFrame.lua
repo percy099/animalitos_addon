@@ -15,7 +15,7 @@ local COLORS = {
 }
 local WHITE = "Interface\\Buttons\\WHITE8x8"
 local MAX_SOURCE_ROWS = 8
-local WIDTH, HEIGHT = 380, 380
+local WIDTH, HEIGHT = 380, 405
 
 local function fs(parent, template, r, g, b)
     local f = parent:CreateFontString(nil, "OVERLAY", template or "GameFontHighlight")
@@ -160,11 +160,12 @@ function UI:Refresh()
         return
     end
 
-    local pct = s.collected / s.total
-    f.big:SetFormattedText("%s / %s  |cffa88ad7(%.1f%%)|r", fmt(s.collected), fmt(s.total), pct * 100)
+    -- Headline matches Blizzard's Mount Journal (mounts visible for this character).
+    local pct = s.visibleTotal > 0 and (s.collectedVisible / s.visibleTotal) or 0
+    f.big:SetFormattedText("%s / %s  |cffa88ad7(%.1f%%)|r", fmt(s.collectedVisible), fmt(s.visibleTotal), pct * 100)
     f.bar:SetValue(pct)
     f.visible:SetFormattedText("%s: %s", L["MISSING_FOR_CHAR"], fmt(s.missingVisible))
-    f.hidden:SetFormattedText("%s: %s", L["HIDDEN_FOR_CHAR"], fmt(s.missingHidden))
+    f.hidden:SetFormattedText(L["ACCOUNT_LINE"], fmt(s.collected), fmt(s.collectedHidden), fmt(s.missingHidden))
 
     local sources = ns.Collection:GetMissingBySourceSorted()
     for i, row in ipairs(f.rows) do
