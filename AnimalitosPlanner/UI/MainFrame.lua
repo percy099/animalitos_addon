@@ -283,6 +283,17 @@ function UI:Refresh()
     if f.summary:IsShown() then ns.HomePanel:Refresh(f.summary, entries, sum) end
 end
 
+--- Shows the window on a given section (used by the minimap button).
+function UI:Open(tab)
+    local f = self:Create()
+    self:SelectTab(tab or DEFAULT_SECTION)
+    if f:IsShown() then
+        self:Refresh()
+    else
+        f:Show()
+    end
+end
+
 function UI:Toggle()
     local f = self:Create()
     if f:IsShown() then

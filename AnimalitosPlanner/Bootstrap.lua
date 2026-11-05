@@ -12,6 +12,7 @@ end)
 ns:On("PLAYER_LOGIN", function()
     ns.Storage:TouchCharacter()
     ns.Collection:Scan()
+    ns.MinimapButton:Init()
     ns:Print(L["LOADED"]:format(ns.VERSION))
 end)
 
