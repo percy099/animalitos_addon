@@ -37,20 +37,22 @@ Nivel, facción y clase del personaje; la colección del journal; las misiones c
 - No se infiere *Ready* por la ausencia de un bloqueo conocido.
 
 ## 4. Lockouts (requisito crítico del MVP)
-Cada fuente declara un `lockoutModel`. Los modelos candidatos son los siguientes; **la tabla se valida en el cliente** (ver la matriz de lockouts en [05](05-mvp-y-roadmap.md)):
 
-| Modelo | Significado | Cómo se detecta |
-|---|---|---|
-| `instance` | Una sola ID de instancia para la dificultad; una vez guardado, no hay más botín hasta el reset | `GetSavedInstanceInfo` con `locked = true` para (instancia, dificultad) |
-| `perBoss` | Botín por boss: cada boss se puede saquear una vez por reset | `GetSavedInstanceEncounterInfo(i, j)` con `isKilled` para el boss que da la montura |
-| `daily` | Mazmorra heroica con reset diario | `GetSavedInstanceInfo` + el reset diario |
-| `none` | Sin lockout de botín | — |
-| `unknown` | Todavía no está validado | → Verification Required |
+**Validado en 12.1.5** (probe del 2026-11-05 con 4 lockouts reales):
 
-**Detalles a resolver:**
-- Las dificultades legacy (10/25 normal o heroica frente a Normal/Heroic/Mythic flexibles) y si la ID se comparte entre tamaños.
-- Cómo relacionar el nombre o ID de la instancia guardada con su `journalInstanceID`.
-- Las entradas expiradas de la lista de instancias guardadas, que se deben ignorar.
+| Instancia | Dificultad (ID) | Reset | Observado |
+|---|---|---|---|
+| Firelands | Heroic (15) | semanal | `locked = true` con 1/7 bosses; los bosses vivos (Alysrazor, Ragnaros) siguen saqueables |
+| Icecrown Citadel | 25 Heroic (6) | semanal | 11/12 muertos, cada boss con su `isKilled` |
+| Ulduar | Normal (14) | semanal | Solo Yogg-Saron muerto |
+| Utgarde Pinnacle | Heroic (2) | ~20 h (diario) | Skadi muerto |
+
+**Regla implementada** (`Integrations/Lockouts.lua` + `Modules/Eligibility.lua`): una fuente (montura, boss, dificultad) está **Locked out** si existe un registro guardado vigente con el mismo `instanceMapID` (14.º valor de `GetSavedInstanceInfo`, igual al `mapID` del Encounter Journal) y la misma dificultad, y el boss de la montura aparece con `isKilled`. Si el registro existe pero el boss sigue vivo, la fuente está **Ready**. El boss se identifica por nombre (`EJ_GetEncounterInfo`), y ambos nombres vienen en el idioma del cliente.
+
+**Pendiente de validar:**
+- Raids de Cataclysm y MoP con tamaños 10/25 (dificultades 3–6): pueden compartir un lockout. Mientras no se valide, una muerte en el tamaño hermano produce **Verification Required**, no Ready.
+- Lockouts extendidos y comportamiento justo después del reset.
+- Mazmorras heroicas legacy: reset diario, observado en Utgarde Pinnacle.
 
 ## 5. Lista "farmeable ahora"
 1. Recorrer las monturas faltantes que tienen al menos una fuente en el dataset.
