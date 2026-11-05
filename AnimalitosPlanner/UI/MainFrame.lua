@@ -1,5 +1,5 @@
 -- Main window (redesign, part 1): header, left sidebar navigation with four
--- sections (Farmable now / Home / Collection / Settings) and footer.
+-- sections (Home / Farmable now / Collection / Settings) and footer.
 -- Native frames only; palette from the UX spec (docs/02-ux-ui.md §8).
 local _, ns = ...
 local L = ns.L
@@ -32,8 +32,8 @@ UI.CONTENT_WIDTH = WIDTH - SIDEBAR_W - PAD * 3
 
 -- Sidebar sections, in display order. Icons are client icon files.
 local SECTIONS = {
-    { key = "farm",       label = "NAV_FARM",       icon = "Interface\\Icons\\Ability_Mount_RidingHorse" },
     { key = "home",       label = "NAV_HOME",       icon = "Interface\\Icons\\INV_Misc_Map_01" },
+    { key = "farm",       label = "NAV_FARM",       icon = "Interface\\Icons\\Ability_Mount_RidingHorse" },
     { key = "collection", label = "NAV_COLLECTION", icon = "Interface\\Icons\\INV_Misc_Book_09" },
     { key = "settings",   label = "NAV_SETTINGS",   icon = "Interface\\Icons\\Trade_Engineering" },
 }
