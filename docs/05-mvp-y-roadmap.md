@@ -64,8 +64,8 @@ Son ~13 raids clásicas de monturas, elegidas para cubrir **varias expansiones y
 |---|---|---|---|
 | **v0.1** | Foundation | TOC, bus de eventos, SavedVariables y migraciones, adaptador del Mount Journal, ventana de totales, `/aplan probe` | ✅ validado en 12.1.5 (probe 2026-11-05) |
 | **v0.2** | Datos del piloto | Scan en el cliente → `pipeline/build_dataset.py` → `Data/Dataset.lua`; overrides curados; reporte de huecos | AC-03 · 🟡 dataset generado; faltan 5 entradas, 2 entradas dudosas y los lockout models |
-| **v0.3** | Elegibilidad y lockouts | `Lockouts.lua`, `Eligibility.lua`, `FarmList.lua`, `Navigation.lua`; comandos `/aplan now` y `/aplan go <n>` para probar | AC-04 a AC-07 · 🟡 implementado; falta probarlo en el cliente |
-| **v0.4** | Farmeable ahora y navegación | `FarmList.lua`, la pantalla, el waypoint nativo, el adaptador de TomTom y la persistencia de las ediciones | AC-08 a AC-12 |
+| **v0.3** | Elegibilidad y lockouts | `Lockouts.lua`, `Eligibility.lua`, `FarmList.lua`, `Navigation.lua`; `/aplan now`, `/aplan go`, `/aplan why` | AC-04 a AC-07 · ✅ validado en el cliente (Dragon Soul, Firelands, ICC, Ulduar, UP) |
+| **v0.4** | Farmeable ahora y navegación | Ventana con pestañas *Farmeable ahora* / *Resumen*; tarjetas por instancia con botones **Ir** (waypoint) y **Ocultar** (hasta el reset); secciones de lockout y verificación | AC-08 a AC-12 · 🟡 implementado; falta reordenar a mano y probarlo en el cliente |
 | **v0.5** | UI completa | Inicio, Colección virtualizada, Detalle de montura, Ajustes con Ace3 y LibDBIcon | AC-13, AC-15 |
 | **v0.6** | Cobertura legacy | Todas las raids y mazmorras legacy con montura; revisión de datos; localización completa | AC-14 |
 | **v1.0** | Release del MVP | Pruebas con 3 o más personajes de distintas facciones y niveles, empaquetado, CHANGELOG y publicación en CurseForge/Wago | AC-01 a AC-16 |

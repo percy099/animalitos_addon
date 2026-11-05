@@ -53,3 +53,12 @@ L["NOW_FOOTER"] = "Monturas — requieren verificación: %d · ya conseguidas: %
 L["MAXTIER_SET"] = "Farmeable ahora incluye contenido hasta el tier %d (%s)."
 L["NOW_VERIFY_HEADER"] = "Requiere verificación:"
 L["WHY_NOT_FOUND"] = "Ninguna fuente del dataset coincide con \"%s\"."
+
+-- v0.4 window
+L["TAB_FARM"] = "Farmeable ahora"
+L["TAB_FARM_COUNT"] = "Farmeable ahora (%d)"
+L["TAB_SUMMARY"] = "Resumen"
+L["BTN_GO"] = "Ir"
+L["BTN_HIDE"] = "Ocultar"
+L["BTN_UNHIDE"] = "Mostrar ocultas (%d)"
+L["FARM_EMPTY"] = "Nada farmeable ahora con este personaje. Revisa la lista de lockouts abajo o prueba con otro personaje."

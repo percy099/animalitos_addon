@@ -51,3 +51,12 @@ L["NOW_FOOTER"] = "Mounts — verification required: %d · already collected: %d
 L["MAXTIER_SET"] = "Farmable now includes content up to tier %d (%s)."
 L["NOW_VERIFY_HEADER"] = "Needs verification:"
 L["WHY_NOT_FOUND"] = "No dataset source matches \"%s\"."
+
+-- v0.4 window
+L["TAB_FARM"] = "Farmable now"
+L["TAB_FARM_COUNT"] = "Farmable now (%d)"
+L["TAB_SUMMARY"] = "Summary"
+L["BTN_GO"] = "Go"
+L["BTN_HIDE"] = "Hide"
+L["BTN_UNHIDE"] = "Show hidden (%d)"
+L["FARM_EMPTY"] = "Nothing farmable right now with this character. Check the locked-out list below or try another character."

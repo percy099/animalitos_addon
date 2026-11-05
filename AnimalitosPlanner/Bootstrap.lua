@@ -48,6 +48,11 @@ local function afterBossKill()
     ns:Debounce("raidinfo", 3, function() ns.Lockouts:Request() end)
 end
 ns:On("BOSS_KILL", afterBossKill)
+
+-- Highlight the current zone in the list (never reorders saved edits).
+ns:On("ZONE_CHANGED_NEW_AREA", function()
+    ns:Debounce("zone", 1, function() ns.UI:Refresh() end)
+end)
 ns:On("ENCOUNTER_END", afterBossKill)
 
 -- "/aplan now": print the farmable-now list to chat (v0.3 test surface; the
@@ -75,6 +80,7 @@ local function printFarmList()
 
     for _, e in ipairs(entries) do
         if e.readyCount == 0 or #printed >= MAX_READY_LINES then break end
+        if not e.hidden then
         printed[#printed + 1] = e.jid
         local parts = {}
         for id, m in pairs(e.mounts) do
@@ -86,6 +92,7 @@ local function printFarmList()
         local near = e.near == 2 and " |cffa88ad7*|r" or ""
         print(("  %d. |cffffd200%s|r [%s]%s — %s"):format(#printed, ns.FarmList:InstanceName(e.jid),
             zone and zone.name or "?", near, table.concat(parts, "; ")))
+        end
     end
     ns.FarmList.lastPrinted = printed
 

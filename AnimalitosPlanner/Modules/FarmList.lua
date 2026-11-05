@@ -62,6 +62,7 @@ function FarmList:Build()
         for _, m in pairs(e.mounts) do
             if #m.ready > 0 then e.readyCount = e.readyCount + 1 end
         end
+        e.hidden = FarmList:IsHidden(e.jid)
         local ent = e.inst.entrance
         e.near = (ent and ancestors[ent.uiMapID] and 2) or (ent and ent.continent == continent and 1) or 0
         entries[#entries + 1] = e
@@ -81,6 +82,34 @@ function FarmList:Build()
     end
     self.entries, self.counts = entries, counts
     return entries, counts
+end
+
+-- Hide until reset (persists across reloads and characters; docs/03 §5).
+local function hiddenTable()
+    return ns.Storage.db.farmList.hidden
+end
+
+function FarmList:IsHidden(jid)
+    local untilTime = hiddenTable()[jid]
+    if not untilTime then return false end
+    if untilTime > time() then return true end
+    hiddenTable()[jid] = nil -- expired
+    return false
+end
+
+function FarmList:Hide(jid, isRaid)
+    local secs
+    if isRaid then
+        secs = C_DateAndTime.GetSecondsUntilWeeklyReset()
+    else
+        secs = (C_DateAndTime.GetSecondsUntilDailyReset and C_DateAndTime.GetSecondsUntilDailyReset())
+            or GetQuestResetTime()
+    end
+    hiddenTable()[jid] = time() + (secs or 86400)
+end
+
+function FarmList:UnhideAll()
+    wipe(hiddenTable())
 end
 
 function FarmList:InstanceName(jid)

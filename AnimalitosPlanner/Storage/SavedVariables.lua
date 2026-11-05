@@ -15,6 +15,7 @@ local function defaults()
             maxTier = 10,          -- newest EJ tier in "farmable now" (10 = Dragonflight)
         },
         plans = {},
+        farmList = { hidden = {} }, -- [journalInstanceID] = hidden until (epoch)
         characterData = {}, -- [characterKey] = { level, faction, class, lastSeen }
         userData = {
             favorites = {},
