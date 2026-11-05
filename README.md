@@ -1,43 +1,46 @@
-# AnimalitosPlanner — código fuente
+# AnimalitosPlanner
 
-Estado: **Foundation v0.1** (esqueleto). La documentación de producto y técnica (v1.2) está en [`docs/`](docs/README.md).
+Addon de World of Warcraft retail (12.1.5) para **farmear monturas**. Te dice:
+- qué raids y mazmorras legacy puedes hacer **ahora** con tu personaje para conseguir monturas que le faltan a tu cuenta;
+- qué ya hiciste esta semana y cuándo se reinicia;
+- y te pone un waypoint en la entrada.
 
-## Estructura
+Estado: **v0.4** (en desarrollo). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
+
+## Instalación
+1. Copia (o enlaza) la carpeta `AnimalitosPlanner/` en `World of Warcraft\_retail_\Interface\AddOns\`.
+2. **El ícono no está en el repo** (es arte local). Pídeselo al equipo y ponlo en `AnimalitosPlanner\Media\icon.tga`, o genera uno desde cualquier PNG:
+   ```
+   python3 pipeline/png2tga.py ruta/a/imagen.png
+   ```
+   Sin ícono, el addon funciona igual; solo el logo queda vacío.
+3. Reinicia el juego: un addon nuevo no se detecta con `/reload`.
+
+### Para desarrollar (Windows)
+Enlaza la carpeta en lugar de copiarla; así los cambios se ven con `/reload`:
 ```
-AnimalitosPlanner/            <- carpeta del addon (enlazada a WoW con un junction)
-  AnimalitosPlanner.toc       Interface 120105 (12.1.5)
-  Core.lua               namespace, bus de eventos tolerante a eventos inexistentes, helpers
-  Locales/               enUS (base), esES, esMX (hereda esES)
-  Storage/               SavedVariables con versión de esquema y migraciones secuenciales
-  Integrations/          adaptador del Mount Journal (único lugar con llamadas a C_MountJournal)
-  Modules/Collection.lua totales account-wide (la fuente de verdad es el journal; nada se cachea)
-  Modules/Probe.lua      /aplan probe: valida las APIs del diseño en el cliente real
-  UI/MainFrame.lua       ventana mínima con los totales (paleta del doc 02)
-  Bootstrap.lua          eventos y slash commands; se carga al final
+mklink /J "C:\World of Warcraft\_retail_\Interface\AddOns\AnimalitosPlanner" "<ruta al repo>\AnimalitosPlanner"
 ```
 
-## Instalación para desarrollo
-`C:\World of Warcraft\_retail_\Interface\AddOns\AnimalitosPlanner` es un **junction** que apunta a
-`F:\WowAddons\MountPlanner\AnimalitosPlanner`. Lo que se edita en F: se ve en el juego con `/reload`.
-La primera vez hay que reiniciar el cliente para que detecte el addon nuevo.
+## Uso
+| Comando | Qué hace |
+|---|---|
+| `/aplan` (o `/animalitos`, o el menú de addons del minimapa) | Abre la ventana, con las pestañas **Farmeable ahora** y **Resumen** |
+| `/aplan now` | Muestra la lista "farmeable ahora" en el chat |
+| `/aplan go <n>` | Pone un waypoint en la entrada de la instancia número *n* de la lista |
+| `/aplan why <montura>` | Explica, dificultad por dificultad, por qué una montura está o no disponible |
+| `/aplan nav native` · `/aplan nav tomtom` | Elige entre el waypoint nativo de Blizzard y la flecha de TomTom |
+| `/aplan maxtier <n>` | Define hasta qué expansión entra en la lista (por defecto 10 = Dragonflight) |
+| `/aplan navdebug` | Diagnóstico para cuando no se ve el waypoint |
+| `/aplan probe` · `/aplan scan` | Herramientas de desarrollo (ver CLAUDE.md) |
 
-## Comandos
-- `/aplan`: abre o cierra la ventana (también desde el menú de addons del minimapa).
-- `/aplan probe`: diagnóstico de APIs. Se guarda en `AnimalitosPlannerDB.diagnostics`.
-- `/aplan reset`: reinicia la posición de la ventana.
+## Estructura del repo
+```
+AnimalitosPlanner/   el addon (lo que se instala)
+pipeline/            scripts Python: parser de SavedVariables, generador del dataset, conversor de ícono
+data/                snapshot del scan, correcciones curadas y reporte de huecos
+docs/                documentación de producto y técnica (v1.2, en español)
+CLAUDE.md            contexto completo para quien continúe el proyecto (personas o Claude)
+```
 
-## Ciclo de validación con el probe
-1. En el juego: `/aplan probe`, esperar el mensaje "Diagnostics saved" y luego `/reload`.
-2. El resultado queda en
-   `C:\World of Warcraft\_retail_\WTF\Account\<CUENTA>\SavedVariables\AnimalitosPlanner.lua`.
-3. Claude lee ese archivo y contrasta firmas, el Encounter Journal, las entradas a instancias,
-   los lockouts y TomTom con lo que asumen los documentos.
-
-Tip: corre el probe estando en una zona con entradas a mazmorras o raids (por ejemplo Tanaris o
-Icecrown) y con algún lockout activo, para que haya datos de entradas y de instancias guardadas.
-
-## Decisiones de v0.1 (revisables)
-- Sin librerías externas todavía. Ace3 entra en v0.2 junto con la pantalla de Ajustes; el
-  esquema de SavedVariables es pequeño, así que migrar a AceDB después es barato.
-- Botón en el menú de addons del minimapa (AddonCompartment) en lugar de LibDBIcon.
-- No hay dataset estático todavía: los totales salen al 100% del Mount Journal.
+Licencia: [MIT](LICENSE).
