@@ -14,6 +14,8 @@ ns.DevScan = Scan
 local TICK = 0.05            -- seconds between work units
 local MAX_UIMAP_ID = 3000    -- upper bound for the map sweep
 local MAPS_PER_TICK = 40
+local MAX_ATTEMPTS = 5       -- loot passes per instance-difficulty while items load
+local RETRY_PAUSE_TICKS = 60 -- ~3 s between retry rounds
 local DIFFICULTIES = {
     1, 2, 23,                -- dungeon: normal, heroic, mythic
     3, 4, 5, 6, 9,           -- legacy raid: 10N, 25N, 10H, 25H, 40-player
@@ -64,6 +66,13 @@ local function resetLootFilters()
     if C_EncounterJournal.ResetSlotFilter then C_EncounterJournal.ResetSlotFilter() end
 end
 
+local function isCached(itemID)
+    if C_Item and C_Item.IsItemDataCachedByID then
+        return C_Item.IsItemDataCachedByID(itemID)
+    end
+    return GetItemInfo(itemID) ~= nil
+end
+
 -- One work unit: one instance x one difficulty.
 local function scanLoot(job)
     EJ_SelectInstance(job.jid)
@@ -75,11 +84,15 @@ local function scanLoot(job)
 
     local inst = out.instances[job.jid]
     local numLoot = EJ_GetNumLoot() or 0
-    local mounts, incomplete = {}, false
+    local mounts, uncached = {}, 0
     for i = 1, numLoot do
         local info = C_EncounterJournal.GetLootInfoByIndex(i)
         if not info or not info.itemID then
-            incomplete = true
+            uncached = uncached + 1
+        elseif not isCached(info.itemID) then
+            -- GetMountFromItem returns nil for items the client has not cached yet.
+            uncached = uncached + 1
+            C_Item.RequestLoadItemDataByID(info.itemID)
         else
             local mountID = C_MountJournal.GetMountFromItem(info.itemID)
             if mountID then
@@ -89,7 +102,7 @@ local function scanLoot(job)
                     encounterID = info.encounterID,
                 }
                 if info.encounterID and not out.encounters[info.encounterID] then
-                    local name, _, journalEncounterID, _, _, journalInstanceID, dungeonEncounterID, instanceID =
+                    local name, _, _, _, _, journalInstanceID, dungeonEncounterID, instanceID =
                         EJ_GetEncounterInfo(info.encounterID)
                     out.encounters[info.encounterID] = {
                         name = name,
@@ -102,10 +115,11 @@ local function scanLoot(job)
             end
         end
     end
-    if incomplete and not job.retried then
-        return false -- item data not cached yet; retry later
+    job.attempts = (job.attempts or 0) + 1
+    if uncached > 0 and job.attempts < MAX_ATTEMPTS then
+        return false -- retry in a later round, once item data has loaded
     end
-    inst.difficulties[job.difficulty] = { numLoot = numLoot, mounts = mounts, incomplete = incomplete or nil }
+    inst.difficulties[job.difficulty] = { numLoot = numLoot, mounts = mounts, uncached = uncached > 0 and uncached or nil }
     return true
 end
 
@@ -124,7 +138,7 @@ end
 local function scanMaps(fromID, toID)
     for uiMapID = fromID, toID do
         local info = C_Map.GetMapInfo(uiMapID)
-        if info and (info.mapType == Enum.UIMapType.Zone or info.mapType == Enum.UIMapType.Continent) then
+        if info and info.mapType and info.mapType >= Enum.UIMapType.Continent then
             local entrances = C_EncounterJournal.GetDungeonEntrancesForMap(uiMapID)
             if entrances and #entrances > 0 then
                 for _, e in ipairs(entrances) do
@@ -201,10 +215,11 @@ function Scan:Run()
     local total = #queue
     msg(("scanning %d instance-difficulty combinations, then maps. Keep the Adventure Guide closed."):format(total))
 
-    local index, mapCursor, phase = 1, 1, "loot"
+    local index, mapCursor, phase, pause = 1, 1, "loot", 0
     local ticker
     ticker = C_Timer.NewTicker(TICK, function()
         if InCombatLockdown() then return end -- pause during combat
+        if pause > 0 then pause = pause - 1 return end
         if phase == "loot" then
             local job = queue[index]
             if job then
@@ -213,7 +228,6 @@ function Scan:Run()
                     out.errors = out.errors or {}
                     out.errors[#out.errors + 1] = ("%d/%d: %s"):format(job.jid, job.difficulty, tostring(done))
                 elseif not done then
-                    job.retried = true
                     retries[#retries + 1] = job
                 end
                 index = index + 1
@@ -221,7 +235,8 @@ function Scan:Run()
             elseif #retries > 0 then
                 queue, retries, index = retries, {}, 1
                 total = #queue
-                msg(("retrying %d combinations with uncached items"):format(total))
+                pause = RETRY_PAUSE_TICKS
+                msg(("waiting for item data, then retrying %d combinations"):format(total))
             else
                 phase = "maps"
                 msg("loot done, sweeping maps...")
