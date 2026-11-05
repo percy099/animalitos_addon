@@ -91,7 +91,7 @@ Se completa con los resultados de `/aplan probe` en el cliente 12.1.5.70783.
 | `GetDungeonEntrancesForMap`: devuelve `areaPoiID`, `name`, `journalInstanceID` y `position` (0–1) | ✅ |
 | El EJ muestra las monturas en el botín legacy | ✅ el scan encontró 66 monturas en 50 instancias, con las 13 del piloto completas |
 | `GetSavedInstanceInfo`: 14 valores; `[14]` = mapID de la instancia (= `mapID` del EJ); los encuentros tienen `isKilled` por boss | ✅ 4 lockouts reales |
-| Matriz de lockouts | 🟡 regla por boss validada (FL, ICC, Ulduar, UP); falta el caso 10/25 compartido de Cata/MoP |
+| Matriz de lockouts | ✅ regla por boss (FL, ICC, Ulduar, UP, DS) y lockout compartido entre 10/25 Normal/Heroic legacy (DS) |
 | Waypoint nativo: `CanSetUserWaypointOnMap` = true en Silvermoon; falta probar el comportamiento con un waypoint existente | 🟡 (v0.4) |
 | TomTom `AddWaypoint` | ✅ firma verificada en el código de v4.3.13 y cargado en el cliente |
 | `IsAccountWideReputation` y `IsQuestFlaggedCompletedOnAccount` existen | ✅ (falta probar su comportamiento) |

@@ -50,7 +50,7 @@ Nivel, facción y clase del personaje; la colección del journal; las misiones c
 **Regla implementada** (`Integrations/Lockouts.lua` + `Modules/Eligibility.lua`): una fuente (montura, boss, dificultad) está **Locked out** si existe un registro guardado vigente con el mismo `instanceMapID` (14.º valor de `GetSavedInstanceInfo`, igual al `mapID` del Encounter Journal) y la misma dificultad, y el boss de la montura aparece con `isKilled`. Si el registro existe pero el boss sigue vivo, la fuente está **Ready**. El boss se identifica por nombre (`EJ_GetEncounterInfo`), y ambos nombres vienen en el idioma del cliente.
 
 **Pendiente de validar:**
-- **Tamaños 10/25 (dificultades 3–6): comparten lockout** por modo, según el conocimiento del equipo. Una muerte en 25N bloquea también 10N, y una en 25H bloquea 10H; el addon lo marca **Locked out**. Falta confirmar en el probe si Normal y Heroic también comparten lockout en las raids de Cata y MoP (prueba en Dragon Soul 25H).
+- **Dificultades legacy 10/25 Normal/Heroic (3–6) forman un solo lockout:** un boss muerto en cualquiera de ellas queda bloqueado en las cuatro. ✅ Validado el 2026-11-05: Ultraxion, muerto en Dragon Soul 25H, seguía muerto al reentrar en 25 Normal. Que 10 y 25 comparten lockout lo confirmó el equipo. El juego solo registra la dificultad en la que se hizo la raid (`GetSavedInstanceInfo` mostró solo 25H), así que la regla vive en el addon. Las dificultades flex (14/15/16) y las de mazmorra (1/2/23) tienen lockouts separados.
 - Lockouts extendidos y comportamiento justo después del reset.
 - Mazmorras heroicas legacy: reset diario, observado en Utgarde Pinnacle.
 

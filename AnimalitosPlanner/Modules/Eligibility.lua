@@ -18,11 +18,19 @@ local S = {
 }
 Eligibility.STATES = S
 
--- Legacy 10/25-player difficulties share one lockout per mode (team knowledge,
--- 2026-11-05): a kill on 25N also locks 10N, and 25H also locks 10H.
--- Whether Normal and Heroic share a lockout in Cata/MoP raids is still being
--- validated (Dragon Soul probe).
-local SIZE_SIBLINGS = { [3] = { 4 }, [4] = { 3 }, [5] = { 6 }, [6] = { 5 } }
+-- Legacy 10/25-player raid difficulties (3 = 10N, 4 = 25N, 5 = 10H, 6 = 25H)
+-- form ONE lockout: a boss killed in any of them is locked in all four.
+-- Validated 2026-11-05: Ultraxion killed in Dragon Soul 25H stayed dead when
+-- re-entering on 25 Normal; 10/25 sharing confirmed by the team.
+-- Flex difficulties (14/15/16) and dungeons (1/2/23) keep separate lockouts.
+local SHARED_LEGACY = { 3, 4, 5, 6 }
+local SIZE_SIBLINGS = {}
+for _, d in ipairs(SHARED_LEGACY) do
+    SIZE_SIBLINGS[d] = {}
+    for _, other in ipairs(SHARED_LEGACY) do
+        if other ~= d then table.insert(SIZE_SIBLINGS[d], other) end
+    end
+end
 
 local encounterNameCache = {}
 local function encounterName(journalEncounterID)
