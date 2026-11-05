@@ -8,3 +8,5 @@ __pycache__/
 # editor
 .vscode/
 .idea/
+# Local-only art (copyrighted character / personal photos) - not for the public repo
+AnimalitosPlanner/Media/icon.tga
