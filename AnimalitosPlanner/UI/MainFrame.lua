@@ -229,7 +229,10 @@ function UI:Create()
         dataset:SetText(L["DATASET_NONE"])
     end
 
-    f:SetScript("OnShow", function() UI:Refresh() end)
+    f:SetScript("OnShow", function()
+        ns.Lockouts:Request() -- fresh lockouts on every open; UPDATE_INSTANCE_INFO refreshes again
+        UI:Refresh()
+    end)
     self.frame = f
     self:SelectTab(DEFAULT_SECTION)
     return f

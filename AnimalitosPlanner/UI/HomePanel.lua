@@ -69,6 +69,21 @@ local function createGreeting(p)
     local sub = ns.UI.fs(head, "GameFontHighlightSmall", C.muted)
     sub:SetPoint("TOPLEFT", p.greeting, "BOTTOMLEFT", 0, -3)
     sub:SetText(L["HOME_SUBTITLE"])
+
+    -- Ask the server for this character's lockouts again; UPDATE_INSTANCE_INFO refreshes the UI.
+    local update = CreateFrame("Button", nil, head, "UIPanelButtonTemplate")
+    update:SetHeight(22)
+    update:SetPoint("TOPRIGHT", -8, -8)
+    update:SetText(L["BTN_UPDATE_LOCKOUTS"])
+    update:SetWidth(update:GetFontString():GetStringWidth() + 28)
+    update:SetScript("OnClick", function()
+        ns.Collection:Scan()
+        ns.Lockouts:Request()
+        p.updated:SetText(L["LOCKOUTS_UPDATING"])
+    end)
+    p.updated = ns.UI.fs(head, "GameFontHighlightSmall", C.muted)
+    p.updated:SetPoint("TOPRIGHT", update, "BOTTOMRIGHT", 0, -3)
+    p.updated:SetJustifyH("RIGHT")
 end
 
 -- Collection ring -------------------------------------------------------------
@@ -298,6 +313,8 @@ end
 function HomePanel:Refresh(p, entries, sum)
     SetPortraitTexture(p.portrait, "player")
     p.greeting:SetFormattedText(L["HOME_GREETING"], UnitName("player"))
+    local at = ns.Lockouts.updatedAt
+    p.updated:SetText(at and L["LOCKOUTS_UPDATED"]:format(date("%H:%M", at)) or L["LOCKOUTS_UPDATING"])
 
     local s = ns.Collection.summary or ns.Collection:Scan()
     if s and s.visibleTotal and s.visibleTotal > 0 then
