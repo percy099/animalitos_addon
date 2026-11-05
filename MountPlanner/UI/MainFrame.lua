@@ -15,7 +15,7 @@ local COLORS = {
 }
 local WHITE = "Interface\\Buttons\\WHITE8x8"
 local MAX_SOURCE_ROWS = 8
-local WIDTH, HEIGHT = 380, 360
+local WIDTH, HEIGHT = 380, 380
 
 local function fs(parent, template, r, g, b)
     local f = parent:CreateFontString(nil, "OVERLAY", template or "GameFontHighlight")
@@ -86,6 +86,7 @@ function UI:Create()
 
     local hidden = fs(f, "GameFontHighlightSmall", unpack(COLORS.muted))
     hidden:SetPoint("TOPLEFT", visible, "BOTTOMLEFT", 0, -4)
+    hidden:SetWidth(WIDTH - 32)
     f.hidden = hidden
 
     local sourcesHeader = fs(f, "GameFontNormal", unpack(COLORS.accent))

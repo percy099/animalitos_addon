@@ -19,7 +19,9 @@ local API_PATHS = {
     -- Encounter Journal
     "EJ_GetNumTiers", "EJ_GetTierInfo", "EJ_SelectTier", "EJ_GetCurrentTier",
     "EJ_GetInstanceByIndex", "EJ_SelectInstance", "EJ_GetInstanceInfo",
-    "EJ_GetEncounterInfoByIndex", "EJ_SetDifficulty", "EJ_GetNumLoot",
+    "EJ_GetEncounterInfoByIndex", "EJ_GetEncounterInfo", "EJ_SetDifficulty", "EJ_GetDifficulty",
+    "EJ_IsValidInstanceDifficulty", "EJ_GetNumLoot", "EJ_ResetLootFilter",
+    "C_EncounterJournal.ResetSlotFilter", "C_Map.GetMapChildrenInfo",
     "C_EncounterJournal.GetLootInfoByIndex",
     "C_EncounterJournal.GetDungeonEntrancesForMap",
     "C_EncounterJournal.GetInstanceForGameMap",
@@ -105,22 +107,25 @@ local function probeMountJournal(d)
     local ids = C_MountJournal.GetMountIDs()
     mj.count = ids and #ids or 0
     mj.samples = {}
-    -- 5 first mounts + up to 5 uncollected, with full return lists.
-    local taken, missingTaken = 0, 0
+    -- Up to 4 samples per bucket: collected / missing+visible / missing+hidden,
+    -- with full return lists (validates signatures and sourceText formats).
+    local buckets = { collected = 0, missingVisible = 0, missingHidden = 0 }
     for i = 1, mj.count do
         local id = ids[i]
         local info = pack(C_MountJournal.GetMountInfoByID(id))
-        local collected = info[11] == true
-        if taken < 5 or (not collected and missingTaken < 5) then
-            taken = taken + 1
-            if not collected then missingTaken = missingTaken + 1 end
+        local bucket = (info[11] == true and "collected")
+            or (info[10] == true and "missingHidden")
+            or "missingVisible"
+        if buckets[bucket] < 4 then
+            buckets[bucket] = buckets[bucket] + 1
             mj.samples[#mj.samples + 1] = {
+                bucket = bucket,
                 mountID = id,
                 info = info,
                 extra = pack(C_MountJournal.GetMountInfoExtraByID(id)),
             }
         end
-        if taken >= 5 and missingTaken >= 5 then break end
+        if buckets.collected >= 4 and buckets.missingVisible >= 4 and buckets.missingHidden >= 4 then break end
     end
     -- sourceType histogram (all mounts), with the localized label used by the UI.
     mj.sourceTypes = {}

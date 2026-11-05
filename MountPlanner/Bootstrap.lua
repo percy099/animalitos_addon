@@ -46,6 +46,8 @@ SlashCmdList.MOUNTPLANNER = function(msg)
         ns.UI:Toggle()
     elseif cmd == "probe" then
         ns.Probe:Run()
+    elseif cmd == "scan" then
+        ns.DevScan:Run()
     elseif cmd == "reset" then
         ns.UI:ResetPosition()
     else

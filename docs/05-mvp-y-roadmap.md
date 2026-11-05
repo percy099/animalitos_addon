@@ -62,7 +62,7 @@ Son ~13 raids clásicas de monturas, elegidas para cubrir **varias expansiones y
 
 | Versión | Entregable | Contenido | Hecho cuando |
 |---|---|---|---|
-| **v0.1** | Foundation | TOC, bus de eventos, SavedVariables y migraciones, adaptador del Mount Journal, ventana de totales, `/mplan probe` | ✅ código · ⏳ **pendiente de validar en el cliente** |
+| **v0.1** | Foundation | TOC, bus de eventos, SavedVariables y migraciones, adaptador del Mount Journal, ventana de totales, `/mplan probe` | ✅ validado en 12.1.5 (probe 2026-11-05) |
 | **v0.2** | Datos del piloto | Pipeline en Python (wago.tools → JSON normalizado → `Data/*.lua`), JSON curado de las 13 raids, adaptador del Encounter Journal, comparación del dataset con el EJ en el probe | AC-03 |
 | **v0.3** | Elegibilidad y lockouts | Matriz de lockouts validada, `Lockouts.lua`, `Eligibility.lua` con los 5 estados | AC-04 a AC-07 |
 | **v0.4** | Farmeable ahora y navegación | `FarmList.lua`, la pantalla, el waypoint nativo, el adaptador de TomTom y la persistencia de las ediciones | AC-08 a AC-12 |
@@ -81,16 +81,20 @@ Se completa con los resultados de `/mplan probe` en el cliente 12.1.5.70783.
 
 | Ítem | Estado |
 |---|---|
-| Firmas de `GetMountInfoByID` y `GetMountInfoExtraByID` | ⏳ |
-| `sourceType` del journal ↔ `BATTLE_PET_SOURCE_n` | ⏳ |
-| El EJ lista todas las raids del piloto | ⏳ |
-| El EJ muestra las monturas en el botín legacy | ⏳ (v0.2) |
-| `GetDungeonEntrancesForMap`: formato y coordenadas | ⏳ |
-| `GetSavedInstanceInfo`: valores de retorno y relación con `journalInstanceID` | ⏳ |
+| Las 52 APIs del diseño existen; 0 eventos desconocidos; 0 errores | ✅ probe del 2026-11-05 |
+| `GetMountInfoByID` devuelve **13** valores: los 12 documentados más un booleano extra al final (probablemente *isSteadyFlight*); el orden de los 12 coincide | ✅ |
+| `GetMountInfoExtraByID` devuelve 9 valores; el 3.º (`sourceText`) se puede parsear (`Vendor:`, `Zone:`, `Cost:`); las retiradas dicen `Legacy` | ✅ |
+| `shouldHideOnChar` = true también en monturas **no obtenibles** (p. ej. Gray Wolf, White Stallion), no solo de otra facción | ✅ se corrigió el texto de la UI |
+| `sourceType` ↔ `BATTLE_PET_SOURCE_n` (1 Drop … 12 Trading Post; 0 = desconocido, 44 monturas) | ✅ |
+| El EJ lista las 13 raids del piloto (IDs: 745, 749, 760, 759, 758, 74, 78, 187, 317, 362, 369, 669, 946) | ✅ |
+| El EJ incluye pseudoinstancias de world bosses (Pandaria 322, Draenor 557, Broken Isles 822, Azeroth 1028…), un tier "Current Season" duplicado y "Keystone Dungeons" 1319 | ✅ hay que filtrarlas o deduplicarlas |
+| `GetDungeonEntrancesForMap`: devuelve `areaPoiID`, `name`, `journalInstanceID` y `position` (0–1) | ✅ |
+| El EJ muestra las monturas en el botín legacy | ⏳ `/mplan scan` (v0.1.1) |
+| `GetSavedInstanceInfo`: valores de retorno y relación con `journalInstanceID` | ⏳ el personaje del probe no tenía lockouts |
 | Matriz de lockouts por raid del piloto | ⏳ (v0.3) |
-| Waypoint nativo: mapas permitidos y comportamiento con un waypoint existente | ⏳ (v0.4) |
-| TomTom `AddWaypoint` | ✅ firma verificada en el código de v4.3.13 |
-| `IsAccountWideReputation` y `IsQuestFlaggedCompletedOnAccount` | ⏳ |
+| Waypoint nativo: `CanSetUserWaypointOnMap` = true en Silvermoon; falta probar el comportamiento con un waypoint existente | 🟡 (v0.4) |
+| TomTom `AddWaypoint` | ✅ firma verificada en el código de v4.3.13 · ⚠️ estaba instalado pero **no cargado** en el probe |
+| `IsAccountWideReputation` y `IsQuestFlaggedCompletedOnAccount` existen | ✅ (falta probar su comportamiento) |
 
 ## Preguntas abiertas
 1. **Reparto de roles en el equipo:** pipeline (Python), motor (Lua), UI (Lua) y curación de datos.
