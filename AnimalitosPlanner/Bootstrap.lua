@@ -121,6 +121,36 @@ local function printFarmList()
     if #printed > 0 then print("  " .. L["NOW_GO_HINT"]) end
 end
 
+-- "/aplan why <mountID | part of the name>": per-difficulty state and reason.
+local function explainMount(query)
+    local wanted = tonumber(query)
+    local needle = not wanted and query:lower() or nil
+    local found = 0
+    for _, src in ipairs(ns.Data.sources) do
+        local m = ns.MountJournal:GetMount(src.mountID)
+        local name = m and m.name or ("#" .. src.mountID)
+        if src.mountID == wanted or (needle and name:lower():find(needle, 1, true)) then
+            found = found + 1
+            local rec = ns.Data.instances[src.journalInstanceID]
+            ns:Print(("%s (mountID %d) — %s, %s"):format(name, src.mountID,
+                ns.FarmList:InstanceName(src.journalInstanceID), EJ_GetEncounterInfo(src.journalEncounterID) or "?"))
+            for _, d in ipairs(src.difficulties) do
+                local state, reason, resetAt = ns.Eligibility:Evaluate(src, d)
+                local left = resetAt and (" — " .. L["NOW_RESETS_IN"]:format(SecondsToTime(math.max(0, resetAt - time())))) or ""
+                print(("    %s: |cffffd200%s|r — %s%s"):format(ns.FarmList:DifficultyName(d), state, reason or "", left))
+            end
+            local saved = rec and rec.mapID and ns.Lockouts:ForMap(rec.mapID) or {}
+            for d, r in pairs(saved) do
+                local killed = {}
+                for boss in pairs(r.killed) do killed[#killed + 1] = boss end
+                print(("    saved: %s (%d) %d/%d — %s"):format(r.difficultyName or "?", d, r.encounterProgress or 0,
+                    r.numEncounters or 0, table.concat(killed, ", ")))
+            end
+        end
+    end
+    if found == 0 then ns:Print(L["WHY_NOT_FOUND"]:format(query)) end
+end
+
 ns:On("PLAYER_LEVEL_UP", function()
     ns.Storage:TouchCharacter()
 end)
@@ -134,6 +164,8 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
         ns.UI:Toggle()
     elseif cmd == "probe" then
         ns.Probe:Run()
+    elseif cmd:match("^why%s+.+") then
+        explainMount(strtrim(msg):match("^%S+%s+(.+)$"))
     elseif cmd == "now" then
         printFarmList()
     elseif cmd:match("^go%s+%d+$") then
