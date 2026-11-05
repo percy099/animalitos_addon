@@ -1,0 +1,25 @@
+## Interface: 120105
+## Title: Mount Planner
+## Notes: Mount collection and farming planner.
+## Notes-esES: Planificador de colección y farmeo de monturas.
+## Notes-esMX: Planificador de colección y farmeo de monturas.
+## Author: Mount Planner Team
+## Version: 0.1.0
+## Category: Collections
+## IconTexture: Interface\Icons\Ability_Mount_RidingHorse
+## SavedVariables: MountPlannerDB
+## AddonCompartmentFunc: MountPlanner_OnAddonCompartmentClick
+
+Core.lua
+
+Locales\enUS.lua
+Locales\esES.lua
+Locales\esMX.lua
+
+Storage\SavedVariables.lua
+Integrations\MountJournal.lua
+Modules\Collection.lua
+Modules\Probe.lua
+UI\MainFrame.lua
+
+Bootstrap.lua
