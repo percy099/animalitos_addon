@@ -9,8 +9,8 @@
 
 ## 2. Estructura del repo
 ```
-MountPlanner/                  <- carpeta del addon (lo que se distribuye)
-  MountPlanner.toc             Interface 120105
+AnimalitosPlanner/                  <- carpeta del addon (lo que se distribuye)
+  AnimalitosPlanner.toc             Interface 120105
   Core.lua                     namespace, bus de eventos, helpers
   Locales/                     enUS, esES, esMX
   Storage/SavedVariables.lua   schema + migraciones
@@ -24,16 +24,16 @@ MountPlanner/                  <- carpeta del addon (lo que se distribuye)
     Collection.lua             totales account-wide
     Eligibility.lua            (v0.3)
     FarmList.lua               (v0.4) lista "farmeable ahora"
-    Probe.lua                  /mplan probe (diagnóstico)
+    Probe.lua                  /aplan probe (diagnóstico)
   UI/                          MainFrame + pantallas + Widgets
   Bootstrap.lua                eventos + slash commands (se carga al final)
   Libs/                        (v0.5) Ace3 y librerías relacionadas, empaquetadas
-pipeline/                      (v0.2) scripts Python que generan MountPlanner/Data/
+pipeline/                      (v0.2) scripts Python que generan AnimalitosPlanner/Data/
 data/curated/                  (v0.2) JSON curado a mano, con procedencia
 docs/                          esta documentación
 ```
 
-## 3. APIs (candidatas; se confirman con `/mplan probe`)
+## 3. APIs (candidatas; se confirman con `/aplan probe`)
 
 | Capacidad | API |
 |---|---|
@@ -73,21 +73,21 @@ docs/                          esta documentación
 2. **Relacionar:** montura → ítem que la enseña → botín del encuentro (JournalEncounterItem) → encuentro → instancia, incluyendo dificultades.
 3. **Combinar con el JSON curado:** lockoutModel, requisitos, entradas y drop rates.
 4. **Validar:** detectar duplicados, campos faltantes y fuentes sin entrada; generar un reporte.
-5. **Generar** `MountPlanner/Data/*.lua` y `DataVersion.lua` (build, fecha y hash).
-6. **Comprobar en el juego:** `/mplan probe` contrasta el dataset con el Encounter Journal y reporta discrepancias.
+5. **Generar** `AnimalitosPlanner/Data/*.lua` y `DataVersion.lua` (build, fecha y hash).
+6. **Comprobar en el juego:** `/aplan probe` contrasta el dataset con el Encounter Journal y reporta discrepancias.
 
 **Cada dato curado lleva:** `confidence` (`verified` | `estimated` | `community_reported` | `unknown`), `provenance` (URL o descripción), `reviewedAt` y `reviewedBy`.
 
-## 6. SavedVariables (`MountPlannerDB`, por cuenta)
+## 6. SavedVariables (`AnimalitosPlannerDB`, por cuenta)
 ```lua
-MountPlannerDB = {
+AnimalitosPlannerDB = {
   version = 1,                      -- schema; migraciones secuenciales
   settings = { navigation = "native" },
   characterData = { ["Nombre-Reino-US"] = { level, faction, class, lastSeen } },
   farmList = { order = {}, hidden = {}, done = {}, manualAdds = {} }, -- v0.4
   userData = { favorites = {}, excludedMounts = {} },
   ui = { point = {...} },
-  diagnostics = { ... },            -- /mplan probe
+  diagnostics = { ... },            -- /aplan probe
 }
 ```
 - **Fuera de las SavedVariables:** la colección (se lee del journal) y los lockouts (se leen del juego; como mucho se guardan en caché para mostrarlos).
@@ -106,7 +106,7 @@ MountPlannerDB = {
 ## 9. Riesgos
 | Riesgo | Mitigación |
 |---|---|
-| Cambios de API entre builds | Adaptadores, registro tolerante de eventos y `/mplan probe` |
+| Cambios de API entre builds | Adaptadores, registro tolerante de eventos y `/aplan probe` |
 | Lockouts mal interpretados | Un `lockoutModel` por fuente; `unknown` → Verification Required; pruebas con personajes reales |
 | El Encounter Journal no muestra todo el botín legacy | Usar las tablas DB2 como base y el JSON curado para los huecos |
 | Licencias de datos de terceros | No importarlos; solo verificación manual |

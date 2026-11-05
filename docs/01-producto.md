@@ -1,12 +1,12 @@
 # 01 — Producto (PRD) · v1.2
 
 ## 1. Visión
-Mount Planner es un planificador de colección y farmeo de monturas que funciona dentro de World of Warcraft retail. Combina el catálogo de la cuenta, la elegibilidad del personaje activo, una lista de actividades que se pueden hacer ahora y la navegación con waypoints.
+AnimalitosPlanner es un planificador de colección y farmeo de monturas que funciona dentro de World of Warcraft retail. Combina el catálogo de la cuenta, la elegibilidad del personaje activo, una lista de actividades que se pueden hacer ahora y la navegación con waypoints.
 
 > *"Sabe qué puedes conseguir. Planea cómo conseguirlo."*
 
 ## 2. Problema
-Las herramientas actuales explican de dónde sale una montura, pero mandan al jugador a contenido al que todavía no puede acceder, o que ya hizo esta semana. Mount Planner distingue **lo que se puede farmear ahora** de **lo que requiere desbloqueo** y de **lo que no está disponible**.
+Las herramientas actuales explican de dónde sale una montura, pero mandan al jugador a contenido al que todavía no puede acceder, o que ya hizo esta semana. AnimalitosPlanner distingue **lo que se puede farmear ahora** de **lo que requiere desbloqueo** y de **lo que no está disponible**.
 
 ## 3. Principios
 1. **Lo accionable primero**: priorizar lo que el personaje activo realmente puede intentar.

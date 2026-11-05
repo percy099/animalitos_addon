@@ -1,4 +1,4 @@
-# Documentación — Mount Planner v1.2
+# Documentación — AnimalitosPlanner v1.2
 
 Línea base consolidada de producto y técnica. **Reemplaza** a los paquetes v1.0 y v1.1 (`.docx`), cuyos cambios estaban añadidos como secciones "BASELINE UPDATE" encima del texto anterior. Aquí hay un solo texto vigente.
 
@@ -25,4 +25,4 @@ Los vision boards originales (PNG) **no se suben al repo** porque contienen el l
 
 ## Convenciones
 - Los documentos están en español; el código, los identificadores y los comentarios del código, en inglés.
-- Todo nombre de API o evento es un **candidato** hasta que `/mplan probe` lo confirme en el cliente objetivo. Las confirmaciones se anotan en [05-mvp-y-roadmap.md](05-mvp-y-roadmap.md#validación-técnica).
+- Todo nombre de API o evento es un **candidato** hasta que `/aplan probe` lo confirme en el cliente objetivo. Las confirmaciones se anotan en [05-mvp-y-roadmap.md](05-mvp-y-roadmap.md#validación-técnica).

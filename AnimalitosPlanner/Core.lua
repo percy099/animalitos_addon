@@ -1,4 +1,4 @@
--- Mount Planner - Core
+-- AnimalitosPlanner - Core
 -- Shared namespace, localization table and a small event bus.
 -- Other files receive the same `ns` table through the addon vararg.
 
@@ -56,7 +56,7 @@ end)
 -- Helpers
 -- ---------------------------------------------------------------------------
 function ns:Print(msg)
-    print("|cffa88ad7Mount Planner|r: " .. tostring(msg))
+    print("|cffa88ad7AnimalitosPlanner|r: " .. tostring(msg))
 end
 
 --- Run `fn` once after `delay` seconds; repeated calls with the same key

@@ -21,7 +21,7 @@ local function defaults()
             customTargets = {},
         },
         ui = {},
-        diagnostics = nil, -- filled by /mplan probe
+        diagnostics = nil, -- filled by /aplan probe
     }
 end
 
@@ -59,15 +59,15 @@ local function migrate(db)
 end
 
 function Storage:Init()
-    if type(MountPlannerDB) ~= "table" then
-        MountPlannerDB = defaults()
+    if type(AnimalitosPlannerDB) ~= "table" then
+        AnimalitosPlannerDB = defaults()
     else
-        if (tonumber(MountPlannerDB.version) or 0) < Storage.SCHEMA_VERSION then
-            migrate(MountPlannerDB)
+        if (tonumber(AnimalitosPlannerDB.version) or 0) < Storage.SCHEMA_VERSION then
+            migrate(AnimalitosPlannerDB)
         end
-        fillDefaults(MountPlannerDB, defaults())
+        fillDefaults(AnimalitosPlannerDB, defaults())
     end
-    self.db = MountPlannerDB
+    self.db = AnimalitosPlannerDB
     return self.db
 end
 

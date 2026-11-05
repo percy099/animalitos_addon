@@ -1,10 +1,10 @@
--- /mplan scan: developer tool that builds the raw instance/mount dataset
+-- /aplan scan: developer tool that builds the raw instance/mount dataset
 -- straight from the client:
 --   1. Encounter Journal: every instance x difficulty, loot items that teach
 --      a mount (C_MountJournal.GetMountFromItem), with encounter info.
 --   2. Dungeon entrances: every zone/continent map, entrance coordinates by
 --      journalInstanceID, plus the continent each map belongs to.
--- Output goes to MountPlannerDB.scan (written on /reload or logout) and is
+-- Output goes to AnimalitosPlannerDB.scan (written on /reload or logout) and is
 -- consumed by the offline pipeline. Not meant for end users.
 local _, ns = ...
 
@@ -14,8 +14,8 @@ ns.DevScan = Scan
 local TICK = 0.05            -- seconds between work units
 local MAX_UIMAP_ID = 3000    -- upper bound for the map sweep
 local MAPS_PER_TICK = 40
-local MAX_ATTEMPTS = 5       -- loot passes per instance-difficulty while items load
-local RETRY_PAUSE_TICKS = 60 -- ~3 s between retry rounds
+local SETTLE = 0.3           -- seconds to wait after selecting before reading loot
+local MAX_ATTEMPTS = 8       -- reads per instance-difficulty while items load
 local DIFFICULTIES = {
     1, 2, 23,                -- dungeon: normal, heroic, mythic
     3, 4, 5, 6, 9,           -- legacy raid: 10N, 25N, 10H, 25H, 40-player
@@ -24,7 +24,7 @@ local DIFFICULTIES = {
 }
 
 local running = false
-local queue, retries = {}, {}
+local queue = {}
 local out
 
 local function msg(text) ns:Print("|cff8dd3a8scan|r " .. text) end
@@ -73,16 +73,21 @@ local function isCached(itemID)
     return GetItemInfo(itemID) ~= nil
 end
 
--- One work unit: one instance x one difficulty.
-local function scanLoot(job)
+-- One work unit = one instance x one difficulty, in two steps:
+--   select: point the Encounter Journal at it (the loot list rebuilds asynchronously)
+--   read:   after SETTLE seconds, read the loot; if items are still missing or
+--           uncached, request them and read again later (up to MAX_ATTEMPTS).
+local function selectJob(job)
     EJ_SelectInstance(job.jid)
     if EJ_IsValidInstanceDifficulty and not EJ_IsValidInstanceDifficulty(job.difficulty) then
-        return true
+        return false
     end
     EJ_SetDifficulty(job.difficulty)
     resetLootFilters()
+    return true
+end
 
-    local inst = out.instances[job.jid]
+local function readJob(job)
     local numLoot = EJ_GetNumLoot() or 0
     local mounts, uncached = {}, 0
     for i = 1, numLoot do
@@ -96,11 +101,7 @@ local function scanLoot(job)
         else
             local mountID = C_MountJournal.GetMountFromItem(info.itemID)
             if mountID then
-                mounts[#mounts + 1] = {
-                    itemID = info.itemID,
-                    mountID = mountID,
-                    encounterID = info.encounterID,
-                }
+                mounts[#mounts + 1] = { itemID = info.itemID, mountID = mountID, encounterID = info.encounterID }
                 if info.encounterID and not out.encounters[info.encounterID] then
                     local name, _, _, _, _, journalInstanceID, dungeonEncounterID, instanceID =
                         EJ_GetEncounterInfo(info.encounterID)
@@ -116,10 +117,15 @@ local function scanLoot(job)
         end
     end
     job.attempts = (job.attempts or 0) + 1
-    if uncached > 0 and job.attempts < MAX_ATTEMPTS then
-        return false -- retry in a later round, once item data has loaded
+    if (uncached > 0 or numLoot == 0) and job.attempts < MAX_ATTEMPTS then
+        return false
     end
-    inst.difficulties[job.difficulty] = { numLoot = numLoot, mounts = mounts, uncached = uncached > 0 and uncached or nil }
+    out.instances[job.jid].difficulties[job.difficulty] = {
+        numLoot = numLoot,
+        mounts = mounts,
+        uncached = uncached > 0 and uncached or nil,
+        attempts = job.attempts,
+    }
     return true
 end
 
@@ -194,14 +200,14 @@ function Scan:Run()
         startedAt = date("%Y-%m-%d %H:%M:%S"),
         instances = {}, encounters = {}, entrances = {}, maps = {},
     }
-    MountPlannerDB.scan = out
+    AnimalitosPlannerDB.scan = out
 
     local state = {
         prevTier = EJ_GetCurrentTier and EJ_GetCurrentTier(),
         prevDifficulty = EJ_GetDifficulty and EJ_GetDifficulty(),
     }
 
-    queue, retries = {}, {}
+    queue = {}
     for _, inst in ipairs(collectInstances()) do
         out.instances[inst.jid] = {
             name = inst.name, isRaid = inst.isRaid, tier = inst.tier, tierName = inst.tierName,
@@ -215,32 +221,39 @@ function Scan:Run()
     local total = #queue
     msg(("scanning %d instance-difficulty combinations, then maps. Keep the Adventure Guide closed."):format(total))
 
-    local index, mapCursor, phase, pause = 1, 1, "loot", 0
+    local index, mapCursor, phase = 1, 1, "loot"
     local ticker
     ticker = C_Timer.NewTicker(TICK, function()
         if InCombatLockdown() then return end -- pause during combat
-        if pause > 0 then pause = pause - 1 return end
         if phase == "loot" then
             local job = queue[index]
-            if job then
-                local ok, done = pcall(scanLoot, job)
-                if not ok then
-                    out.errors = out.errors or {}
-                    out.errors[#out.errors + 1] = ("%d/%d: %s"):format(job.jid, job.difficulty, tostring(done))
-                elseif not done then
-                    retries[#retries + 1] = job
-                end
-                index = index + 1
-                if index % 100 == 0 then msg(("%d/%d"):format(index, total)) end
-            elseif #retries > 0 then
-                queue, retries, index = retries, {}, 1
-                total = #queue
-                pause = RETRY_PAUSE_TICKS
-                msg(("waiting for item data, then retrying %d combinations"):format(total))
-            else
+            if not job then
                 phase = "maps"
                 msg("loot done, sweeping maps...")
+                return
             end
+            local ok, result
+            if not job.selectedAt then
+                ok, result = pcall(selectJob, job)
+                if ok and result then
+                    job.selectedAt = GetTime()
+                    return
+                end
+            elseif GetTime() - job.selectedAt >= SETTLE then
+                ok, result = pcall(readJob, job)
+                if ok and not result then
+                    job.selectedAt = GetTime() -- wait and read again
+                    return
+                end
+            else
+                return
+            end
+            if not ok then
+                out.errors = out.errors or {}
+                out.errors[#out.errors + 1] = ("%d/%d: %s"):format(job.jid, job.difficulty, tostring(result))
+            end
+            index = index + 1
+            if index % 50 == 0 then msg(("%d/%d"):format(index, total)) end
         elseif phase == "maps" then
             local to = math.min(mapCursor + MAPS_PER_TICK - 1, MAX_UIMAP_ID)
             local ok, err = pcall(scanMaps, mapCursor, to)

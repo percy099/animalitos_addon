@@ -31,7 +31,7 @@ end
 function UI:Create()
     if self.frame then return self.frame end
 
-    local f = CreateFrame("Frame", "MountPlannerMainFrame", UIParent, "BackdropTemplate")
+    local f = CreateFrame("Frame", "AnimalitosPlannerMainFrame", UIParent, "BackdropTemplate")
     f:SetSize(WIDTH, HEIGHT)
     f:SetFrameStrata("HIGH")
     f:SetToplevel(true)
@@ -57,8 +57,13 @@ function UI:Create()
     local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
     close:SetPoint("TOPRIGHT", 2, 2)
 
+    local logo = f:CreateTexture(nil, "ARTWORK")
+    logo:SetSize(40, 40)
+    logo:SetPoint("TOPLEFT", 12, -10)
+    logo:SetTexture("Interface\\AddOns\\AnimalitosPlanner\\Media\\icon")
+
     local title = fs(f, "GameFontNormalLarge", unpack(COLORS.accent))
-    title:SetPoint("TOPLEFT", 16, -14)
+    title:SetPoint("TOPLEFT", logo, "TOPRIGHT", 8, -4)
     title:SetText(L["TITLE"])
 
     local subtitle = fs(f, "GameFontHighlightSmall", unpack(COLORS.muted))
@@ -66,7 +71,7 @@ function UI:Create()
     subtitle:SetText(L["COLLECTION_PROGRESS"])
 
     local big = fs(f, "GameFontHighlightHuge")
-    big:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -10)
+    big:SetPoint("TOPLEFT", logo, "BOTTOMLEFT", 4, -10)
     f.big = big
 
     local bar = CreateFrame("StatusBar", nil, f)

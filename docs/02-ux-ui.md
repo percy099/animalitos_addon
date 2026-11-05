@@ -16,7 +16,7 @@ La interfaz responde rápido a tres preguntas:
 | **Detalle de montura** | Todas las fuentes de la montura, con sus requisitos, lockout, confianza del dato y acciones |
 | **Ajustes** | Navegación (nativa o TomTom), filtros por defecto y datos del dataset |
 
-Se abre con `/mplan` o desde el menú de addons del minimapa (AddonCompartment). La ventana se puede mover y cerrar con ESC.
+Se abre con `/aplan` o desde el menú de addons del minimapa (AddonCompartment). La ventana se puede mover y cerrar con ESC.
 
 ## 3. Inicio
 - Monturas conseguidas de la cuenta / total del journal, con su porcentaje y una barra de progreso.

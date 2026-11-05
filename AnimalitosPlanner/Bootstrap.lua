@@ -38,9 +38,9 @@ ns:On("PLAYER_LEVEL_UP", function()
 end)
 
 -- Slash commands
-SLASH_MOUNTPLANNER1 = "/mplan"
-SLASH_MOUNTPLANNER2 = "/mountplanner"
-SlashCmdList.MOUNTPLANNER = function(msg)
+SLASH_ANIMALITOSPLANNER1 = "/aplan"
+SLASH_ANIMALITOSPLANNER2 = "/animalitos"
+SlashCmdList.ANIMALITOSPLANNER = function(msg)
     local cmd = strtrim(msg or ""):lower()
     if cmd == "" or cmd == "show" then
         ns.UI:Toggle()
@@ -56,6 +56,6 @@ SlashCmdList.MOUNTPLANNER = function(msg)
 end
 
 -- Addon compartment (minimap addon menu) entry declared in the TOC.
-function MountPlanner_OnAddonCompartmentClick()
+function AnimalitosPlanner_OnAddonCompartmentClick()
     ns.UI:Toggle()
 end

@@ -12,7 +12,7 @@ function MJ:IsAvailable()
 end
 
 --- Returns a normalized record for a mountID, or nil.
---- Field order follows GetMountInfoByID as of 12.x; validated by /mplan probe.
+--- Field order follows GetMountInfoByID as of 12.x; validated by /aplan probe.
 function MJ:GetMount(mountID)
     local name, spellID, icon, _, isUsable, sourceType, isFavorite,
           isFactionSpecific, faction, shouldHideOnChar, isCollected, id =

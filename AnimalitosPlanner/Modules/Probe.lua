@@ -1,5 +1,5 @@
--- /mplan probe: records API availability, return signatures and sample data
--- into MountPlannerDB.diagnostics so the team can validate the design
+-- /aplan probe: records API availability, return signatures and sample data
+-- into AnimalitosPlannerDB.diagnostics so the team can validate the design
 -- assumptions against the real client build (read the SavedVariables file
 -- after /reload or logout).
 local _, ns = ...
@@ -211,7 +211,7 @@ end
 local waitingForRaidInfo = false
 
 local function captureSavedInstances()
-    local d = MountPlannerDB.diagnostics
+    local d = AnimalitosPlannerDB.diagnostics
     if not d then return end
     local out = { count = GetNumSavedInstances(), instances = {} }
     for i = 1, out.count do
@@ -237,14 +237,14 @@ function Probe:Init()
     ns:On("UPDATE_INSTANCE_INFO", function()
         if not waitingForRaidInfo then return end
         waitingForRaidInfo = false
-        section(MountPlannerDB.diagnostics, "savedInstances", captureSavedInstances)
+        section(AnimalitosPlannerDB.diagnostics, "savedInstances", captureSavedInstances)
         ns:Print(ns.L["PROBE_DONE"])
     end)
 end
 
 function Probe:Run()
     local d = { errors = {}, ranAt = date("%Y-%m-%d %H:%M:%S") }
-    MountPlannerDB.diagnostics = d
+    AnimalitosPlannerDB.diagnostics = d
     section(d, "environment", function() probeEnvironment(d) end)
     section(d, "apis", function() probeApis(d) end)
     section(d, "mountJournal", function() probeMountJournal(d) end)

@@ -1,7 +1,7 @@
 # 05 — MVP, entregables y roadmap · v1.2
 
 ## Definición del MVP (v1.0)
-> Un jugador abre Mount Planner con cualquier personaje y ve **qué raids y mazmorras legacy puede hacer ahora mismo para conseguir monturas que le faltan a la cuenta**, agrupadas por zona. Pone un waypoint a la entrada con un clic y la lista se actualiza sola cuando consigue la montura o queda guardado en la instancia.
+> Un jugador abre AnimalitosPlanner con cualquier personaje y ve **qué raids y mazmorras legacy puede hacer ahora mismo para conseguir monturas que le faltan a la cuenta**, agrupadas por zona. Pone un waypoint a la entrada con un clic y la lista se actualiza sola cuando consigue la montura o queda guardado en la instancia.
 
 ### Incluido
 - El catálogo completo del journal, con el progreso de la cuenta.
@@ -62,7 +62,7 @@ Son ~13 raids clásicas de monturas, elegidas para cubrir **varias expansiones y
 
 | Versión | Entregable | Contenido | Hecho cuando |
 |---|---|---|---|
-| **v0.1** | Foundation | TOC, bus de eventos, SavedVariables y migraciones, adaptador del Mount Journal, ventana de totales, `/mplan probe` | ✅ validado en 12.1.5 (probe 2026-11-05) |
+| **v0.1** | Foundation | TOC, bus de eventos, SavedVariables y migraciones, adaptador del Mount Journal, ventana de totales, `/aplan probe` | ✅ validado en 12.1.5 (probe 2026-11-05) |
 | **v0.2** | Datos del piloto | Pipeline en Python (wago.tools → JSON normalizado → `Data/*.lua`), JSON curado de las 13 raids, adaptador del Encounter Journal, comparación del dataset con el EJ en el probe | AC-03 |
 | **v0.3** | Elegibilidad y lockouts | Matriz de lockouts validada, `Lockouts.lua`, `Eligibility.lua` con los 5 estados | AC-04 a AC-07 |
 | **v0.4** | Farmeable ahora y navegación | `FarmList.lua`, la pantalla, el waypoint nativo, el adaptador de TomTom y la persistencia de las ediciones | AC-08 a AC-12 |
@@ -77,7 +77,7 @@ Son ~13 raids clásicas de monturas, elegidas para cubrir **varias expansiones y
 4. **Fase 5:** optimización entre personajes y grafo de viajes.
 
 ## Validación técnica
-Se completa con los resultados de `/mplan probe` en el cliente 12.1.5.70783.
+Se completa con los resultados de `/aplan probe` en el cliente 12.1.5.70783.
 
 | Ítem | Estado |
 |---|---|
@@ -89,7 +89,7 @@ Se completa con los resultados de `/mplan probe` en el cliente 12.1.5.70783.
 | El EJ lista las 13 raids del piloto (IDs: 745, 749, 760, 759, 758, 74, 78, 187, 317, 362, 369, 669, 946) | ✅ |
 | El EJ incluye pseudoinstancias de world bosses (Pandaria 322, Draenor 557, Broken Isles 822, Azeroth 1028…), un tier "Current Season" duplicado y "Keystone Dungeons" 1319 | ✅ hay que filtrarlas o deduplicarlas |
 | `GetDungeonEntrancesForMap`: devuelve `areaPoiID`, `name`, `journalInstanceID` y `position` (0–1) | ✅ |
-| El EJ muestra las monturas en el botín legacy | ⏳ `/mplan scan` (v0.1.1) |
+| El EJ muestra las monturas en el botín legacy | ⏳ `/aplan scan` (v0.1.1) |
 | `GetSavedInstanceInfo`: valores de retorno y relación con `journalInstanceID` | ⏳ el personaje del probe no tenía lockouts |
 | Matriz de lockouts por raid del piloto | ⏳ (v0.3) |
 | Waypoint nativo: `CanSetUserWaypointOnMap` = true en Silvermoon; falta probar el comportamiento con un waypoint existente | 🟡 (v0.4) |
@@ -99,6 +99,6 @@ Se completa con los resultados de `/mplan probe` en el cliente 12.1.5.70783.
 ## Preguntas abiertas
 1. **Reparto de roles en el equipo:** pipeline (Python), motor (Lua), UI (Lua) y curación de datos.
 2. ¿Sumamos 2 o 3 mazmorras al piloto para cubrir el modelo `daily`?
-3. Nombre público: ¿"Mount Planner" u otro? El repo se llama `animalitos_addon`.
+3. Nombre público: ¿"AnimalitosPlanner" u otro? El repo se llama `animalitos_addon`.
 4. ¿Dónde se publica: CurseForge, Wago o ambos? ¿Desde qué versión?
 5. API key de Battle.net para validación cruzada: ¿quién la gestiona?
