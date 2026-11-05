@@ -184,6 +184,8 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
         local tier = tonumber(cmd:match("%d+"))
         ns.Storage.db.settings.maxTier = tier
         ns:Print(L["MAXTIER_SET"]:format(tier, (EJ_GetTierInfo(tier)) or "?"))
+    elseif cmd == "navdebug" then
+        ns.Navigation:Debug()
     elseif cmd == "nav tomtom" or cmd == "nav native" then
         ns.Navigation:SetMode(cmd:match("nav (%a+)"))
     elseif cmd == "scan" then

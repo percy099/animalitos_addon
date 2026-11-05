@@ -58,6 +58,37 @@ function Navigation:WarnIfOtherContinent(e)
     end
 end
 
+--- /aplan navdebug: why a waypoint might not be visible.
+function Navigation:Debug()
+    local function yn(v) return v and "|cff8dd3a8yes|r" or "|cffff5555no|r" end
+    local mapID = C_Map.GetBestMapForUnit("player")
+    local map = mapID and C_Map.GetMapInfo(mapID)
+    local continent = ns.FarmList:PlayerContinent()
+    local cont = continent and C_Map.GetMapInfo(continent)
+    ns:Print(("navdebug — mode: %s · you: %s (%s) · continent: %s (%s)"):format(self:Mode(),
+        map and map.name or "?", tostring(mapID), cont and cont.name or "?", tostring(continent)))
+    print("  In-game navigation setting (showInGameNavigation): " .. yn(GetCVarBool("showInGameNavigation")))
+    local has = C_Map.HasUserWaypoint()
+    print("  User waypoint set: " .. yn(has))
+    if has then
+        local wp = C_Map.GetUserWaypoint()
+        local wmap = wp and C_Map.GetMapInfo(wp.uiMapID)
+        local x, y = 0, 0
+        if wp and wp.position then x, y = wp.position:GetXY() end
+        print(("  Waypoint: %s (%s) %.1f, %.1f"):format(wmap and wmap.name or "?", wp and tostring(wp.uiMapID) or "?", x * 100, y * 100))
+    end
+    print("  Super-tracking the waypoint: " .. yn(C_SuperTrack.IsSuperTrackingUserWaypoint()))
+    if C_SuperTrack.GetHighestPrioritySuperTrackingType then
+        print("  Highest-priority super-track type: " .. tostring(C_SuperTrack.GetHighestPrioritySuperTrackingType()))
+    end
+    if C_Navigation and C_Navigation.GetDistance then
+        print("  Navigation distance (yards): " .. tostring(C_Navigation.GetDistance()))
+    end
+    if C_Navigation and C_Navigation.GetFrame then
+        print("  Navigation frame available: " .. yn(C_Navigation.GetFrame() ~= nil))
+    end
+end
+
 function Navigation:SetMode(mode)
     if mode == "tomtom" and not tomtomAvailable() then
         ns:Print(L["NAV_TOMTOM_MISSING"])
