@@ -127,7 +127,11 @@ function UI:Create()
 
     local dataset = fs(f, "GameFontDisableSmall")
     dataset:SetPoint("BOTTOMLEFT", 16, 14)
-    dataset:SetText(L["DATASET_NONE"])
+    if ns.Data and ns.Data.sources then
+        dataset:SetFormattedText(L["DATASET_LOADED"], #ns.Data.sources, ns.Data.version.client)
+    else
+        dataset:SetText(L["DATASET_NONE"])
+    end
 
     f:SetScript("OnShow", function() UI:Refresh() end)
 

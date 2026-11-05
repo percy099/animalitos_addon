@@ -19,7 +19,7 @@ AnimalitosPlanner/                  <- carpeta del addon (lo que se distribuye)
     EncounterJournal.lua       (v0.2) instancias, encuentros, entradas
     Lockouts.lua               (v0.3) instancias guardadas
     Navigation.lua             (v0.4) waypoint nativo + adaptador TomTom
-  Data/                        (v0.2) archivos .lua GENERADOS por el pipeline, no editar
+  Data/Dataset.lua             GENERADO por el pipeline, no editar
   Modules/
     Collection.lua             totales account-wide
     Eligibility.lua            (v0.3)
@@ -28,8 +28,8 @@ AnimalitosPlanner/                  <- carpeta del addon (lo que se distribuye)
   UI/                          MainFrame + pantallas + Widgets
   Bootstrap.lua                eventos + slash commands (se carga al final)
   Libs/                        (v0.5) Ace3 y librerías relacionadas, empaquetadas
-pipeline/                      (v0.2) scripts Python que generan AnimalitosPlanner/Data/
-data/curated/                  (v0.2) JSON curado a mano, con procedencia
+pipeline/                      savedvars.py (parser) y build_dataset.py (generador)
+data/raw/ data/curated/ data/reports/   snapshot del scan, correcciones a mano y reporte
 docs/                          esta documentación
 ```
 
@@ -58,25 +58,32 @@ docs/                          esta documentación
 
 ## 5. Pipeline de datos
 
-**Fuentes:**
+**Fuente principal: el propio cliente.** `/aplan scan` (herramienta de desarrollo) recorre todas las instancias del Encounter Journal en todas sus dificultades, guarda los objetos del botín que enseñan una montura (`C_MountJournal.GetMountFromItem`) con su boss, y barre todos los mapas para obtener las entradas a instancias. El resultado queda en `AnimalitosPlannerDB.scan`.
 
-| Fuente | Uso | Licencia / condiciones |
+```
+/aplan scan + /reload  ──>  SavedVariables/AnimalitosPlanner.lua
+python3 pipeline/build_dataset.py <SavedVariables>
+   ├─> data/raw/scan-<build>.json          snapshot normalizado (se versiona; reproducible)
+   ├─ + data/curated/overrides.json        correcciones a mano, cada una con su motivo
+   ├─> AnimalitosPlanner/Data/Dataset.lua  GENERADO, no se edita a mano
+   └─> data/reports/dataset-report.md      huecos a curar (entradas, lockouts)
+python3 pipeline/build_dataset.py --from-raw data/raw/scan-<build>.json   # regenerar sin el juego
+```
+
+| Fuente | Uso | Condiciones |
 |---|---|---|
-| wago.tools (DB2 en CSV) | Mount, JournalInstance, JournalEncounter, JournalEncounterItem, ItemEffect/ItemXMount, UiMap, Map | Datos del juego; se citan como fuente |
-| Blizzard Game Data API | Validación cruzada de monturas y del journal | Requiere API key gratuita |
-| JSON curado (`data/curated/`) | lockoutModel, requisitos, ajustes de coordenadas, drop rates con procedencia | Nuestro (MIT) |
-| Rarity / SimpleArmory / HandyNotes | **No se importan** mientras no se revise la licencia de cada uno y su compatibilidad con MIT (o se pida permiso a sus autores) | Por ahora solo como referencia de verificación manual |
+| **Scan en el cliente** | Montura → objeto → boss → dificultades → instancia; entradas y continente | Datos del juego leídos por API |
+| `data/curated/overrides.json` | Pseudoinstancias de world bosses, entradas faltantes o ambiguas, `lockoutModel` | Nuestro (MIT) |
+| wago.tools / Blizzard Game Data API | Solo validación cruzada (opcional) | API key para Blizzard |
+| Rarity / SimpleArmory / HandyNotes | **No se importan** mientras no se revise la licencia de cada uno y su compatibilidad con MIT | Por ahora solo como referencia manual |
 | Wowhead | Solo verificación manual; prohibido el scraping | Términos de uso de Wowhead |
 
-**Pasos:**
-1. **Extraer:** descargar los CSV de las tablas DB2 del build objetivo, con versión fija (`12.1.5.70783`).
-2. **Relacionar:** montura → ítem que la enseña → botín del encuentro (JournalEncounterItem) → encuentro → instancia, incluyendo dificultades.
-3. **Combinar con el JSON curado:** lockoutModel, requisitos, entradas y drop rates.
-4. **Validar:** detectar duplicados, campos faltantes y fuentes sin entrada; generar un reporte.
-5. **Generar** `AnimalitosPlanner/Data/*.lua` y `DataVersion.lua` (build, fecha y hash).
-6. **Comprobar en el juego:** `/aplan probe` contrasta el dataset con el Encounter Journal y reporta discrepancias.
+**Detalles del scan** (aprendidos en el cliente 12.1.5):
+- Después de `EJ_SetDifficulty`, la lista de botín se reconstruye de forma asíncrona: hay que esperar unos 0,3 s antes de leerla.
+- `GetMountFromItem` devuelve nil si el objeto no está en caché: hay que pedirlo con `C_Item.RequestLoadItemDataByID` y releer.
+- El mismo punto de entrada aparece cerca del borde de mapas vecinos; se elige el más alejado del borde y los casos dudosos se reportan.
 
-**Cada dato curado lleva:** `confidence` (`verified` | `estimated` | `community_reported` | `unknown`), `provenance` (URL o descripción), `reviewedAt` y `reviewedBy`.
+**Cada dato curado lleva** un motivo (`reason`). Los drop rates, cuando se agreguen, llevarán `confidence` (`verified` | `estimated` | `community_reported` | `unknown`), `provenance` y `reviewedAt`.
 
 ## 6. SavedVariables (`AnimalitosPlannerDB`, por cuenta)
 ```lua

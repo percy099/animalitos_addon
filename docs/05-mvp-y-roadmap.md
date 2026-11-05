@@ -63,7 +63,7 @@ Son ~13 raids clásicas de monturas, elegidas para cubrir **varias expansiones y
 | Versión | Entregable | Contenido | Hecho cuando |
 |---|---|---|---|
 | **v0.1** | Foundation | TOC, bus de eventos, SavedVariables y migraciones, adaptador del Mount Journal, ventana de totales, `/aplan probe` | ✅ validado en 12.1.5 (probe 2026-11-05) |
-| **v0.2** | Datos del piloto | Pipeline en Python (wago.tools → JSON normalizado → `Data/*.lua`), JSON curado de las 13 raids, adaptador del Encounter Journal, comparación del dataset con el EJ en el probe | AC-03 |
+| **v0.2** | Datos del piloto | Scan en el cliente → `pipeline/build_dataset.py` → `Data/Dataset.lua`; overrides curados; reporte de huecos | AC-03 · 🟡 dataset generado; faltan 5 entradas, 2 entradas dudosas y los lockout models |
 | **v0.3** | Elegibilidad y lockouts | Matriz de lockouts validada, `Lockouts.lua`, `Eligibility.lua` con los 5 estados | AC-04 a AC-07 |
 | **v0.4** | Farmeable ahora y navegación | `FarmList.lua`, la pantalla, el waypoint nativo, el adaptador de TomTom y la persistencia de las ediciones | AC-08 a AC-12 |
 | **v0.5** | UI completa | Inicio, Colección virtualizada, Detalle de montura, Ajustes con Ace3 y LibDBIcon | AC-13, AC-15 |
@@ -89,7 +89,7 @@ Se completa con los resultados de `/aplan probe` en el cliente 12.1.5.70783.
 | El EJ lista las 13 raids del piloto (IDs: 745, 749, 760, 759, 758, 74, 78, 187, 317, 362, 369, 669, 946) | ✅ |
 | El EJ incluye pseudoinstancias de world bosses (Pandaria 322, Draenor 557, Broken Isles 822, Azeroth 1028…), un tier "Current Season" duplicado y "Keystone Dungeons" 1319 | ✅ hay que filtrarlas o deduplicarlas |
 | `GetDungeonEntrancesForMap`: devuelve `areaPoiID`, `name`, `journalInstanceID` y `position` (0–1) | ✅ |
-| El EJ muestra las monturas en el botín legacy | ⏳ `/aplan scan` (v0.1.1) |
+| El EJ muestra las monturas en el botín legacy | ✅ el scan encontró 66 monturas en 50 instancias, con las 13 del piloto completas |
 | `GetSavedInstanceInfo`: valores de retorno y relación con `journalInstanceID` | ⏳ el personaje del probe no tenía lockouts |
 | Matriz de lockouts por raid del piloto | ⏳ (v0.3) |
 | Waypoint nativo: `CanSetUserWaypointOnMap` = true en Silvermoon; falta probar el comportamiento con un waypoint existente | 🟡 (v0.4) |

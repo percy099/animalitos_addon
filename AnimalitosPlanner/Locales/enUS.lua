@@ -21,3 +21,4 @@ L["HELP"] = "Commands: /aplan (toggle window), /aplan probe (API diagnostics), /
 L["RESET_POS"] = "Window position reset."
 L["NOTE_TOTALS"] = "The headline matches your Mount Journal (mounts visible for this character)."
 L["ACCOUNT_LINE"] = "Account total: %s collected (%s hidden for this character). Hidden and missing: %s (other faction, class or unobtainable)."
+L["DATASET_LOADED"] = "Dataset: %d mount sources (client %s)"

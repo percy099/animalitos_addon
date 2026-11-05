@@ -23,3 +23,4 @@ L["HELP"] = "Comandos: /aplan (abrir/cerrar), /aplan probe (diagnóstico de API)
 L["RESET_POS"] = "Posición de la ventana reiniciada."
 L["NOTE_TOTALS"] = "El número grande coincide con tu diario de monturas (visibles para este personaje)."
 L["ACCOUNT_LINE"] = "Total de la cuenta: %s conseguidas (%s ocultas para este personaje). Ocultas y faltantes: %s (otra facción, clase o no obtenibles)."
+L["DATASET_LOADED"] = "Dataset: %d fuentes de monturas (cliente %s)"

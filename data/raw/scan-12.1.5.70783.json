@@ -1,0 +1,9151 @@
+{
+ "client": "12.1.5.70783",
+ "encounters": {
+  "111": {
+   "dungeonEncounterID": 1059,
+   "instanceID": 725,
+   "journalInstanceID": 67,
+   "name": "Slabhide"
+  },
+  "115": {
+   "dungeonEncounterID": 1041,
+   "instanceID": 657,
+   "journalInstanceID": 68,
+   "name": "Altairus"
+  },
+  "1262": {
+   "dungeonEncounterID": null,
+   "instanceID": null,
+   "journalInstanceID": 557,
+   "name": "Rukhmar"
+  },
+  "1438": {
+   "dungeonEncounterID": 1799,
+   "instanceID": 1448,
+   "journalInstanceID": 669,
+   "name": "Archimonde"
+  },
+  "155": {
+   "dungeonEncounterID": 1034,
+   "instanceID": 754,
+   "journalInstanceID": 74,
+   "name": "Al'Akir"
+  },
+  "1553": {
+   "dungeonEncounterID": 652,
+   "instanceID": 532,
+   "journalInstanceID": 745,
+   "name": "Attumen the Huntsman"
+  },
+  "1576": {
+   "dungeonEncounterID": 733,
+   "instanceID": 550,
+   "journalInstanceID": 749,
+   "name": "Kael'thas Sunstrider"
+  },
+  "1597": {
+   "dungeonEncounterID": 1126,
+   "instanceID": 624,
+   "journalInstanceID": 753,
+   "name": "Archavon the Stone Watcher"
+  },
+  "1616": {
+   "dungeonEncounterID": 1090,
+   "instanceID": 615,
+   "journalInstanceID": 755,
+   "name": "Sartharion"
+  },
+  "1617": {
+   "dungeonEncounterID": 1094,
+   "instanceID": 616,
+   "journalInstanceID": 756,
+   "name": "Malygos"
+  },
+  "1636": {
+   "dungeonEncounterID": 1106,
+   "instanceID": 631,
+   "journalInstanceID": 758,
+   "name": "The Lich King"
+  },
+  "1649": {
+   "dungeonEncounterID": 1143,
+   "instanceID": 603,
+   "journalInstanceID": 759,
+   "name": "Yogg-Saron"
+  },
+  "1651": {
+   "dungeonEncounterID": 1084,
+   "instanceID": 249,
+   "journalInstanceID": 760,
+   "name": "Onyxia"
+  },
+  "1737": {
+   "dungeonEncounterID": 1866,
+   "instanceID": 1530,
+   "journalInstanceID": 786,
+   "name": "Gul'dan"
+  },
+  "176": {
+   "dungeonEncounterID": 1179,
+   "instanceID": 859,
+   "journalInstanceID": 76,
+   "name": "Bloodlord Mandokir"
+  },
+  "181": {
+   "dungeonEncounterID": 1180,
+   "instanceID": 859,
+   "journalInstanceID": 76,
+   "name": "High Priestess Kilnara"
+  },
+  "1835": {
+   "dungeonEncounterID": 1960,
+   "instanceID": 1651,
+   "journalInstanceID": 860,
+   "name": "Attumen the Huntsman"
+  },
+  "1861": {
+   "dungeonEncounterID": 2037,
+   "instanceID": 1676,
+   "journalInstanceID": 875,
+   "name": "Mistress Sassz'ine"
+  },
+  "194": {
+   "dungeonEncounterID": 1206,
+   "instanceID": 720,
+   "journalInstanceID": 78,
+   "name": "Alysrazor"
+  },
+  "198": {
+   "dungeonEncounterID": 1203,
+   "instanceID": 720,
+   "journalInstanceID": 78,
+   "name": "Ragnaros"
+  },
+  "1987": {
+   "dungeonEncounterID": 2074,
+   "instanceID": 1712,
+   "journalInstanceID": 946,
+   "name": "Felhounds of Sargeras"
+  },
+  "2031": {
+   "dungeonEncounterID": 2092,
+   "instanceID": 1712,
+   "journalInstanceID": 946,
+   "name": "Argus the Unmaker"
+  },
+  "2095": {
+   "dungeonEncounterID": 2096,
+   "instanceID": 1754,
+   "journalInstanceID": 1001,
+   "name": "Harlan Sweete"
+  },
+  "2158": {
+   "dungeonEncounterID": 2123,
+   "instanceID": 1841,
+   "journalInstanceID": 1022,
+   "name": "Unbound Abomination"
+  },
+  "2172": {
+   "dungeonEncounterID": 2143,
+   "instanceID": 1762,
+   "journalInstanceID": 1041,
+   "name": "Dazar, The First King"
+  },
+  "2210": {
+   "dungeonEncounterID": null,
+   "instanceID": null,
+   "journalInstanceID": 1028,
+   "name": "Dunegorger Kraulok"
+  },
+  "2334": {
+   "dungeonEncounterID": 2276,
+   "instanceID": 2070,
+   "journalInstanceID": 1176,
+   "name": "High Tinker Mekkatorque"
+  },
+  "2343": {
+   "dungeonEncounterID": 2281,
+   "instanceID": 2070,
+   "journalInstanceID": 1176,
+   "name": "Lady Jaina Proudmoore"
+  },
+  "2355": {
+   "dungeonEncounterID": 2291,
+   "instanceID": 2097,
+   "journalInstanceID": 1178,
+   "name": "HK-8 Aerial Oppression Unit"
+  },
+  "2375": {
+   "dungeonEncounterID": 2344,
+   "instanceID": 2217,
+   "journalInstanceID": 1180,
+   "name": "N'Zoth the Corruptor"
+  },
+  "2396": {
+   "dungeonEncounterID": 2390,
+   "instanceID": 2286,
+   "journalInstanceID": 1182,
+   "name": "Nalthor the Rimebinder"
+  },
+  "2439": {
+   "dungeonEncounterID": 2429,
+   "instanceID": 2450,
+   "journalInstanceID": 1193,
+   "name": "The Nine"
+  },
+  "2441": {
+   "dungeonEncounterID": 2435,
+   "instanceID": 2450,
+   "journalInstanceID": 1193,
+   "name": "Sylvanas Windrunner"
+  },
+  "2455": {
+   "dungeonEncounterID": 2442,
+   "instanceID": 2441,
+   "journalInstanceID": 1194,
+   "name": "So'leah"
+  },
+  "2464": {
+   "dungeonEncounterID": 2537,
+   "instanceID": 2481,
+   "journalInstanceID": 1195,
+   "name": "The Jailer"
+  },
+  "2519": {
+   "dungeonEncounterID": 2677,
+   "instanceID": 2549,
+   "journalInstanceID": 1207,
+   "name": "Fyrakk the Blazing"
+  },
+  "2561": {
+   "dungeonEncounterID": 2788,
+   "instanceID": 2651,
+   "journalInstanceID": 1210,
+   "name": "The Darkness"
+  },
+  "2602": {
+   "dungeonEncounterID": 2922,
+   "instanceID": 2657,
+   "journalInstanceID": 1273,
+   "name": "Queen Ansurek"
+  },
+  "2646": {
+   "dungeonEncounterID": 3016,
+   "instanceID": 2769,
+   "journalInstanceID": 1296,
+   "name": "Chrome King Gallywix"
+  },
+  "2658": {
+   "dungeonEncounterID": 3059,
+   "instanceID": 2805,
+   "journalInstanceID": 1299,
+   "name": "The Restless Heart"
+  },
+  "2662": {
+   "dungeonEncounterID": 3074,
+   "instanceID": 2811,
+   "journalInstanceID": 1300,
+   "name": "Degentrius"
+  },
+  "2691": {
+   "dungeonEncounterID": 3135,
+   "instanceID": 2810,
+   "journalInstanceID": 1302,
+   "name": "Dimensius, the All-Devouring"
+  },
+  "2740": {
+   "dungeonEncounterID": 3183,
+   "instanceID": 2913,
+   "journalInstanceID": 1308,
+   "name": "Midnight Falls"
+  },
+  "2880": {
+   "dungeonEncounterID": 3458,
+   "instanceID": 2993,
+   "journalInstanceID": 1322,
+   "name": "Zul'jan"
+  },
+  "2895": {
+   "dungeonEncounterID": 3492,
+   "instanceID": 3004,
+   "journalInstanceID": 1320,
+   "name": "Ula'tek"
+  },
+  "331": {
+   "dungeonEncounterID": 1297,
+   "instanceID": 967,
+   "journalInstanceID": 187,
+   "name": "Ultraxion"
+  },
+  "333": {
+   "dungeonEncounterID": 1299,
+   "instanceID": 967,
+   "journalInstanceID": 187,
+   "name": "Madness of Deathwing"
+  },
+  "456": {
+   "dungeonEncounterID": 484,
+   "instanceID": 329,
+   "journalInstanceID": 1292,
+   "name": "Lord Aurius Rivendare"
+  },
+  "533": {
+   "dungeonEncounterID": 1894,
+   "instanceID": 585,
+   "journalInstanceID": 249,
+   "name": "Kael'thas Sunstrider"
+  },
+  "542": {
+   "dungeonEncounterID": 1904,
+   "instanceID": 556,
+   "journalInstanceID": 252,
+   "name": "Anzu"
+  },
+  "643": {
+   "dungeonEncounterID": 2029,
+   "instanceID": 575,
+   "journalInstanceID": 286,
+   "name": "Skadi the Ruthless"
+  },
+  "691": {
+   "dungeonEncounterID": null,
+   "instanceID": null,
+   "journalInstanceID": 322,
+   "name": "Sha of Anger"
+  },
+  "725": {
+   "dungeonEncounterID": null,
+   "instanceID": null,
+   "journalInstanceID": 322,
+   "name": "Salyis's Warband"
+  },
+  "726": {
+   "dungeonEncounterID": 1500,
+   "instanceID": 1008,
+   "journalInstanceID": 317,
+   "name": "Elegon"
+  },
+  "814": {
+   "dungeonEncounterID": null,
+   "instanceID": null,
+   "journalInstanceID": 322,
+   "name": "Nalak, The Storm Lord"
+  },
+  "819": {
+   "dungeonEncounterID": 1575,
+   "instanceID": 1098,
+   "journalInstanceID": 362,
+   "name": "Horridon"
+  },
+  "826": {
+   "dungeonEncounterID": null,
+   "instanceID": null,
+   "journalInstanceID": 322,
+   "name": "Oondasta"
+  },
+  "828": {
+   "dungeonEncounterID": 1573,
+   "instanceID": 1098,
+   "journalInstanceID": 362,
+   "name": "Ji-Kun"
+  },
+  "869": {
+   "dungeonEncounterID": 1623,
+   "instanceID": 1136,
+   "journalInstanceID": 369,
+   "name": "Garrosh Hellscream"
+  },
+  "959": {
+   "dungeonEncounterID": 1704,
+   "instanceID": 1205,
+   "journalInstanceID": 457,
+   "name": "Blackhand"
+  }
+ },
+ "entrances": {
+  "1001": [
+   {
+    "areaPoiID": 5834,
+    "continent": 876,
+    "mapType": 3,
+    "uiMapID": 895,
+    "x": 0.8456790447235107,
+    "y": 0.7878137826919556
+   }
+  ],
+  "1002": [
+   {
+    "areaPoiID": 5831,
+    "continent": 876,
+    "mapType": 3,
+    "uiMapID": 1169,
+    "x": 0.3892010152339935,
+    "y": 0.6976988911628723
+   }
+  ],
+  "1012": [
+   {
+    "areaPoiID": 5837,
+    "continent": 875,
+    "mapType": 3,
+    "uiMapID": 862,
+    "x": 0.3930224180221558,
+    "y": 0.7154837250709534
+   }
+  ],
+  "1022": [
+   {
+    "areaPoiID": 5841,
+    "continent": 875,
+    "mapType": 3,
+    "uiMapID": 863,
+    "x": 0.5125759243965149,
+    "y": 0.6464816927909851
+   }
+  ],
+  "1023": [
+   {
+    "areaPoiID": 5833,
+    "continent": 876,
+    "mapType": 3,
+    "uiMapID": 895,
+    "x": 0.7563663721084595,
+    "y": 0.245008796453476
+   },
+   {
+    "areaPoiID": 5833,
+    "continent": 876,
+    "mapType": 3,
+    "uiMapID": 1161,
+    "x": 0.7559889554977417,
+    "y": 0.1953999698162079
+   }
+  ],
+  "1030": [
+   {
+    "areaPoiID": 5840,
+    "continent": 875,
+    "mapType": 3,
+    "uiMapID": 864,
+    "x": 0.5192667245864868,
+    "y": 0.2546663284301758
+   }
+  ],
+  "1031": [
+   {
+    "areaPoiID": 5842,
+    "continent": 875,
+    "mapType": 3,
+    "uiMapID": 863,
+    "x": 0.5414875149726868,
+    "y": 0.6302037835121155
+   }
+  ],
+  "1041": [
+   {
+    "areaPoiID": 5839,
+    "continent": 875,
+    "mapType": 3,
+    "uiMapID": 862,
+    "x": 0.3759227395057678,
+    "y": 0.3948169052600861
+   }
+  ],
+  "1176": [
+   {
+    "areaPoiID": 6013,
+    "continent": 876,
+    "mapType": 3,
+    "uiMapID": 895,
+    "x": 0.7438889145851135,
+    "y": 0.2837671637535095
+   },
+   {
+    "areaPoiID": 6013,
+    "continent": 876,
+    "mapType": 3,
+    "uiMapID": 1161,
+    "x": 0.7044126391410828,
+    "y": 0.35556560754776
+   }
+  ],
+  "1178": [
+   {
+    "areaPoiID": 6129,
+    "continent": 876,
+    "mapType": 3,
+    "uiMapID": 1462,
+    "x": 0.7293819189071655,
+    "y": 0.3649032115936279
+   }
+  ],
+  "1182": [
+   {
+    "areaPoiID": 6582,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1533,
+    "x": 0.4014957249164581,
+    "y": 0.5521236658096313
+   }
+  ],
+  "1183": [
+   {
+    "areaPoiID": 6585,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1536,
+    "x": 0.5939996242523193,
+    "y": 0.6501767039299011
+   }
+  ],
+  "1184": [
+   {
+    "areaPoiID": 6586,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1565,
+    "x": 0.3548864424228668,
+    "y": 0.5413632988929749
+   }
+  ],
+  "1185": [
+   {
+    "areaPoiID": 6588,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1525,
+    "x": 0.78473961353302,
+    "y": 0.4907592833042145
+   }
+  ],
+  "1186": [
+   {
+    "areaPoiID": 6583,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1533,
+    "x": 0.5855449438095093,
+    "y": 0.2857290208339691
+   }
+  ],
+  "1187": [
+   {
+    "areaPoiID": 6584,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1536,
+    "x": 0.5311166048049927,
+    "y": 0.5291635394096375
+   }
+  ],
+  "1188": [
+   {
+    "areaPoiID": 6587,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1565,
+    "x": 0.6866410970687866,
+    "y": 0.6660882830619812
+   }
+  ],
+  "1189": [
+   {
+    "areaPoiID": 6589,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1525,
+    "x": 0.5107239484786987,
+    "y": 0.3012060225009918
+   }
+  ],
+  "1190": [
+   {
+    "areaPoiID": 6590,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1525,
+    "x": 0.4642113149166107,
+    "y": 0.4149161279201508
+   }
+  ],
+  "1193": [
+   {
+    "areaPoiID": 6994,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1543,
+    "x": 0.6974517107009888,
+    "y": 0.3201806247234345
+   }
+  ],
+  "1194": [
+   {
+    "areaPoiID": 8374,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2371,
+    "x": 0.6358197331428528,
+    "y": 0.702157735824585
+   },
+   {
+    "areaPoiID": 8374,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2472,
+    "x": 0.3632465600967407,
+    "y": 0.1209109500050545
+   }
+  ],
+  "1195": [
+   {
+    "areaPoiID": 7021,
+    "continent": 1550,
+    "mapType": 3,
+    "uiMapID": 1970,
+    "x": 0.8049179911613464,
+    "y": 0.5340253710746765
+   }
+  ],
+  "1196": [
+   {
+    "areaPoiID": 7209,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2024,
+    "x": 0.1151595711708069,
+    "y": 0.4885194897651672
+   }
+  ],
+  "1197": [
+   {
+    "areaPoiID": 7216,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 15,
+    "x": 0.4112324416637421,
+    "y": 0.1030044108629227
+   }
+  ],
+  "1198": [
+   {
+    "areaPoiID": 7215,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2023,
+    "x": 0.6084631681442261,
+    "y": 0.3898259103298187
+   }
+  ],
+  "1199": [
+   {
+    "areaPoiID": 7211,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2022,
+    "x": 0.2571989893913269,
+    "y": 0.5631104111671448
+   }
+  ],
+  "1200": [
+   {
+    "areaPoiID": 7048,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2025,
+    "x": 0.7485053539276123,
+    "y": 0.5511441826820374
+   }
+  ],
+  "1201": [
+   {
+    "areaPoiID": 7213,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2025,
+    "x": 0.5827367901802063,
+    "y": 0.4235185384750366
+   }
+  ],
+  "1202": [
+   {
+    "areaPoiID": 7212,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2022,
+    "x": 0.6008214354515076,
+    "y": 0.7571439146995544
+   }
+  ],
+  "1203": [
+   {
+    "areaPoiID": 7214,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2024,
+    "x": 0.3889598250389099,
+    "y": 0.6459357738494873
+   }
+  ],
+  "1204": [
+   {
+    "areaPoiID": 7210,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2025,
+    "x": 0.5921164155006409,
+    "y": 0.6057678461074829
+   }
+  ],
+  "1207": [
+   {
+    "areaPoiID": 7631,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2200,
+    "x": 0.2731495499610901,
+    "y": 0.3104269504547119
+   }
+  ],
+  "1208": [
+   {
+    "areaPoiID": 7491,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2133,
+    "x": 0.4845370054244995,
+    "y": 0.1191797256469727
+   }
+  ],
+  "1209": [
+   {
+    "areaPoiID": 7525,
+    "continent": 1978,
+    "mapType": 3,
+    "uiMapID": 2025,
+    "x": 0.611417293548584,
+    "y": 0.8446341156959534
+   }
+  ],
+  "1210": [
+   {
+    "areaPoiID": 7821,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2214,
+    "x": 0.554587721824646,
+    "y": 0.2162641435861588
+   },
+   {
+    "areaPoiID": 7821,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2215,
+    "x": 0.9697640538215637,
+    "y": 0.3883106410503388
+   }
+  ],
+  "1267": [
+   {
+    "areaPoiID": 7858,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2215,
+    "x": 0.4132141172885895,
+    "y": 0.4933792948722839
+   }
+  ],
+  "1268": [
+   {
+    "areaPoiID": 7655,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2248,
+    "x": 0.4523352384567261,
+    "y": 0.410827100276947
+   },
+   {
+    "areaPoiID": 7655,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2339,
+    "x": 0.3189266920089722,
+    "y": 0.3565643131732941
+   }
+  ],
+  "1269": [
+   {
+    "areaPoiID": 7820,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2214,
+    "x": 0.427029550075531,
+    "y": 0.08565781265497208
+   }
+  ],
+  "1270": [
+   {
+    "areaPoiID": 7892,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2215,
+    "x": 0.5490599274635315,
+    "y": 0.6313521862030029
+   }
+  ],
+  "1271": [
+   {
+    "areaPoiID": 7545,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2213,
+    "x": 0.5216842293739319,
+    "y": 0.4580551981925964
+   },
+   {
+    "areaPoiID": 7545,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2216,
+    "x": 0.5216842293739319,
+    "y": 0.4580551981925964
+   },
+   {
+    "areaPoiID": 7545,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2255,
+    "x": 0.4953015744686127,
+    "y": 0.8100748658180237
+   },
+   {
+    "areaPoiID": 7545,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2256,
+    "x": 0.4953015744686127,
+    "y": 0.8100748658180237
+   }
+  ],
+  "1272": [
+   {
+    "areaPoiID": 7857,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2248,
+    "x": 0.7658039331436157,
+    "y": 0.4378281831741333
+   }
+  ],
+  "1273": [
+   {
+    "areaPoiID": 7546,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2213,
+    "x": 0.3504621386528015,
+    "y": 0.7242934703826904
+   },
+   {
+    "areaPoiID": 7546,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2216,
+    "x": 0.3504621386528015,
+    "y": 0.7242934703826904
+   },
+   {
+    "areaPoiID": 7546,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2255,
+    "x": 0.4355838894844055,
+    "y": 0.902931809425354
+   },
+   {
+    "areaPoiID": 7546,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2256,
+    "x": 0.4355838894844055,
+    "y": 0.902931809425354
+   }
+  ],
+  "1274": [
+   {
+    "areaPoiID": 7548,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2213,
+    "x": 0.4417263567447662,
+    "y": 0.1188813894987106
+   },
+   {
+    "areaPoiID": 7548,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2216,
+    "x": 0.4417263567447662,
+    "y": 0.1188813894987106
+   },
+   {
+    "areaPoiID": 7548,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2255,
+    "x": 0.4674144089221954,
+    "y": 0.6917799115180969
+   },
+   {
+    "areaPoiID": 7548,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2256,
+    "x": 0.4674144089221954,
+    "y": 0.6917799115180969
+   }
+  ],
+  "1296": [
+   {
+    "areaPoiID": 8240,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2346,
+    "x": 0.4155485033988953,
+    "y": 0.4877675175666809
+   }
+  ],
+  "1298": [
+   {
+    "areaPoiID": 8162,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2214,
+    "x": 0.4208308160305023,
+    "y": 0.39488685131073
+   },
+   {
+    "areaPoiID": 8162,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2215,
+    "x": 0.8534989356994629,
+    "y": 0.5435968041419983
+   }
+  ],
+  "1299": [
+   {
+    "areaPoiID": 8386,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2395,
+    "x": 0.3545298874378204,
+    "y": 0.7882573008537292
+   }
+  ],
+  "1300": [
+   {
+    "areaPoiID": 8510,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2424,
+    "x": 0.6346237063407898,
+    "y": 0.1538743227720261
+   }
+  ],
+  "1302": [
+   {
+    "areaPoiID": 8363,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2371,
+    "x": 0.416634738445282,
+    "y": 0.2152570486068726
+   }
+  ],
+  "1303": [
+   {
+    "areaPoiID": 8321,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2371,
+    "x": 0.6524597406387329,
+    "y": 0.6841634511947632
+   },
+   {
+    "areaPoiID": 8321,
+    "continent": 2274,
+    "mapType": 3,
+    "uiMapID": 2472,
+    "x": 0.4386582970619202,
+    "y": 0.03935106471180916
+   }
+  ],
+  "1304": [
+   {
+    "areaPoiID": 8217,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2393,
+    "x": 0.5722204446792603,
+    "y": 0.610485315322876
+   }
+  ],
+  "1305": [
+   {
+    "areaPoiID": 8256,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2413,
+    "x": 0.7355959415435791,
+    "y": 0.6635911464691162
+   }
+  ],
+  "1307": [
+   {
+    "areaPoiID": 8270,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2405,
+    "x": 0.4524276852607727,
+    "y": 0.6483229398727417
+   }
+  ],
+  "1308": [
+   {
+    "areaPoiID": 8271,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2424,
+    "x": 0.526098370552063,
+    "y": 0.8529684543609619
+   }
+  ],
+  "1309": [
+   {
+    "areaPoiID": 8481,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2413,
+    "x": 0.2646704316139221,
+    "y": 0.780472993850708
+   }
+  ],
+  "1311": [
+   {
+    "areaPoiID": 8472,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 23,
+    "x": 0.9982317090034485,
+    "y": 0.1660241186618805
+   },
+   {
+    "areaPoiID": 8472,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2437,
+    "x": 0.2983188331127167,
+    "y": 0.8450312614440918
+   }
+  ],
+  "1313": [
+   {
+    "areaPoiID": 8647,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2405,
+    "x": 0.5166492462158203,
+    "y": 0.1874566078186035
+   },
+   {
+    "areaPoiID": 8647,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2444,
+    "x": 0.5365370512008667,
+    "y": 0.3339091837406158
+   }
+  ],
+  "1314": [
+   {
+    "areaPoiID": 8482,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2413,
+    "x": 0.6138330698013306,
+    "y": 0.6289299130439758
+   }
+  ],
+  "1315": [
+   {
+    "areaPoiID": 8480,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2437,
+    "x": 0.4383769333362579,
+    "y": 0.395054817199707
+   }
+  ],
+  "1316": [
+   {
+    "areaPoiID": 8644,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2405,
+    "x": 0.6497592329978943,
+    "y": 0.617821216583252
+   }
+  ],
+  "1320": [
+   {
+    "areaPoiID": 8930,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2509,
+    "x": 0.4723437428474426,
+    "y": 0.2286461591720581
+   }
+  ],
+  "1322": [
+   {
+    "areaPoiID": 8931,
+    "continent": 2537,
+    "mapType": 3,
+    "uiMapID": 2509,
+    "x": 0.4724136590957642,
+    "y": 0.6812924146652222
+   }
+  ],
+  "1324": [
+   {
+    "areaPoiID": 9031,
+    "continent": 2537,
+    "mapType": 5,
+    "uiMapID": 2613,
+    "x": 0.7426869869232178,
+    "y": 0.05914324522018433
+   }
+  ],
+  "184": [
+   {
+    "areaPoiID": 6667,
+    "continent": 12,
+    "mapType": 5,
+    "uiMapID": 75,
+    "x": 0.5704441070556641,
+    "y": 0.2578063607215881
+   }
+  ],
+  "185": [
+   {
+    "areaPoiID": 6665,
+    "continent": 12,
+    "mapType": 5,
+    "uiMapID": 75,
+    "x": 0.2213585823774338,
+    "y": 0.638188898563385
+   }
+  ],
+  "186": [
+   {
+    "areaPoiID": 6668,
+    "continent": 12,
+    "mapType": 5,
+    "uiMapID": 75,
+    "x": 0.6838666796684265,
+    "y": 0.2951576709747315
+   }
+  ],
+  "187": [
+   {
+    "areaPoiID": 6512,
+    "continent": 12,
+    "mapType": 5,
+    "uiMapID": 75,
+    "x": 0.6087607145309448,
+    "y": 0.2115684747695923
+   }
+  ],
+  "226": [
+   {
+    "areaPoiID": 6846,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 1,
+    "x": 0.4620391130447388,
+    "y": 0.0001350287348031998
+   },
+   {
+    "areaPoiID": 6846,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 10,
+    "x": 0.8019052743911743,
+    "y": 0.0006696491036564112
+   },
+   {
+    "areaPoiID": 6846,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 76,
+    "x": 0.1872512251138687,
+    "y": 0.9718024730682373
+   },
+   {
+    "areaPoiID": 6846,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 85,
+    "x": 0.5169553160667419,
+    "y": 0.585393488407135
+   },
+   {
+    "areaPoiID": 6846,
+    "continent": 12,
+    "mapType": 6,
+    "uiMapID": 86,
+    "x": 0.66713547706604,
+    "y": 0.5154144167900085
+   },
+   {
+    "areaPoiID": 6846,
+    "continent": 12,
+    "mapType": 6,
+    "uiMapID": 1534,
+    "x": 0.5175687074661255,
+    "y": 0.5833286046981812
+   }
+  ],
+  "227": [
+   {
+    "areaPoiID": 6498,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 62,
+    "x": 0.3300457298755646,
+    "y": 0.9467339515686035
+   },
+   {
+    "areaPoiID": 6498,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 63,
+    "x": 0.1416657865047455,
+    "y": 0.1380993276834488
+   },
+   {
+    "areaPoiID": 6498,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 77,
+    "x": 0.1509045958518982,
+    "y": 0.7658716440200806
+   }
+  ],
+  "228": [
+   {
+    "areaPoiID": 6499,
+    "continent": 13,
+    "mapType": 5,
+    "uiMapID": 35,
+    "x": 0.392814040184021,
+    "y": 0.1819712072610855
+   }
+  ],
+  "229": [
+   {
+    "areaPoiID": 6661,
+    "continent": 13,
+    "mapType": 5,
+    "uiMapID": 33,
+    "x": 0.8045907020568848,
+    "y": 0.4193606376647949
+   }
+  ],
+  "230": [
+   {
+    "areaPoiID": 6501,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 69,
+    "x": 0.5951884388923645,
+    "y": 0.4032370746135712
+   },
+   {
+    "areaPoiID": 6501,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 199,
+    "x": 0.006899159867316485,
+    "y": 0.8983138203620911
+   }
+  ],
+  "231": [
+   {
+    "areaPoiID": 6502,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 27,
+    "x": 0.313986212015152,
+    "y": 0.3804655373096466
+   },
+   {
+    "areaPoiID": 6502,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 469,
+    "x": 0.3279077708721161,
+    "y": 0.3702539503574371
+   }
+  ],
+  "232": [
+   {
+    "areaPoiID": 6503,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 66,
+    "x": 0.2922506630420685,
+    "y": 0.6253125667572021
+   }
+  ],
+  "233": [
+   {
+    "areaPoiID": 6728,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 64,
+    "x": 0.467481255531311,
+    "y": 0.2333393096923828
+   },
+   {
+    "areaPoiID": 6728,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 70,
+    "x": 0.2886189222335815,
+    "y": 0.7479429841041565
+   },
+   {
+    "areaPoiID": 6728,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 199,
+    "x": 0.5189206600189209,
+    "y": 0.9825223088264465
+   }
+  ],
+  "234": [
+   {
+    "areaPoiID": 6727,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 64,
+    "x": 0.2802567481994629,
+    "y": 0.1695754677057266
+   },
+   {
+    "areaPoiID": 6727,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 70,
+    "x": 0.1317070126533508,
+    "y": 0.6945028901100159
+   },
+   {
+    "areaPoiID": 6727,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 199,
+    "x": 0.4077857732772827,
+    "y": 0.9446726441383362
+   }
+  ],
+  "236": [
+   {
+    "areaPoiID": 6724,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 23,
+    "x": 0.2707794606685638,
+    "y": 0.115162618458271
+   }
+  ],
+  "237": [
+   {
+    "areaPoiID": 6722,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 51,
+    "x": 0.6967295408248901,
+    "y": 0.535352349281311
+   }
+  ],
+  "238": [
+   {
+    "areaPoiID": 6723,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 37,
+    "x": 0.2022498846054077,
+    "y": 0.3635671436786652
+   },
+   {
+    "areaPoiID": 6723,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 84,
+    "x": 0.5119275450706482,
+    "y": 0.6779278516769409
+   }
+  ],
+  "239": [
+   {
+    "areaPoiID": 6721,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 15,
+    "x": 0.4203214049339294,
+    "y": 0.1147611439228058
+   },
+   {
+    "areaPoiID": 6721,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 48,
+    "x": 0.4347088634967804,
+    "y": 0.870552659034729
+   }
+  ],
+  "240": [
+   {
+    "areaPoiID": 6720,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 1,
+    "x": 0.03064798377454281,
+    "y": 0.7458879351615906
+   },
+   {
+    "areaPoiID": 6720,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 7,
+    "x": 0.7942606806755066,
+    "y": 0.179497554898262
+   },
+   {
+    "areaPoiID": 6720,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 10,
+    "x": 0.4049252569675446,
+    "y": 0.686811089515686
+   },
+   {
+    "areaPoiID": 6720,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 199,
+    "x": 0.4695852398872376,
+    "y": 0.2074384838342667
+   }
+  ],
+  "241": [
+   {
+    "areaPoiID": 6719,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 64,
+    "x": 0.5630220174789429,
+    "y": 0.9765526056289673
+   },
+   {
+    "areaPoiID": 6719,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 71,
+    "x": 0.3948879837989807,
+    "y": 0.2205300629138947
+   },
+   {
+    "areaPoiID": 6719,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 78,
+    "x": 0.9307999610900879,
+    "y": 0.3504941761493683
+   }
+  ],
+  "246": [
+   {
+    "areaPoiID": 6726,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 22,
+    "x": 0.6979111433029175,
+    "y": 0.7356728315353394
+   },
+   {
+    "areaPoiID": 6726,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 23,
+    "x": 0.0736365020275116,
+    "y": 0.9102999567985535
+   },
+   {
+    "areaPoiID": 6726,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 25,
+    "x": 0.9119482636451721,
+    "y": 0.06894951313734055
+   },
+   {
+    "areaPoiID": 6726,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 26,
+    "x": 0.262168288230896,
+    "y": 0.08140203356742859
+   }
+  ],
+  "247": [
+   {
+    "areaPoiID": 6715,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 107,
+    "x": 0.9203940629959106,
+    "y": 0.923960268497467
+   },
+   {
+    "areaPoiID": 6715,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 108,
+    "x": 0.3467924892902374,
+    "y": 0.6559972167015076
+   }
+  ],
+  "248": [
+   {
+    "areaPoiID": 6709,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 100,
+    "x": 0.4792024791240692,
+    "y": 0.5342845320701599
+   }
+  ],
+  "250": [
+   {
+    "areaPoiID": 6716,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 107,
+    "x": 0.9689192175865173,
+    "y": 0.8503612875938416
+   },
+   {
+    "areaPoiID": 6716,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 108,
+    "x": 0.3964406251907349,
+    "y": 0.5806944966316223
+   }
+  ],
+  "251": [
+   {
+    "areaPoiID": 6666,
+    "continent": 12,
+    "mapType": 5,
+    "uiMapID": 75,
+    "x": 0.2633145153522492,
+    "y": 0.3279245495796204
+   }
+  ],
+  "252": [
+   {
+    "areaPoiID": 6717,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 108,
+    "x": 0.4459944665431976,
+    "y": 0.6560972332954407
+   }
+  ],
+  "253": [
+   {
+    "areaPoiID": 6714,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 107,
+    "x": 0.9687600135803223,
+    "y": 0.9980885982513428
+   },
+   {
+    "areaPoiID": 6714,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 108,
+    "x": 0.3962777256965637,
+    "y": 0.7318415641784668
+   }
+  ],
+  "254": [
+   {
+    "areaPoiID": 6713,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 109,
+    "x": 0.7436956167221069,
+    "y": 0.5774846076965332
+   }
+  ],
+  "255": [
+   {
+    "areaPoiID": 6664,
+    "continent": 12,
+    "mapType": 5,
+    "uiMapID": 75,
+    "x": 0.3443105518817902,
+    "y": 0.8489721417427063
+   }
+  ],
+  "256": [
+   {
+    "areaPoiID": 6708,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 100,
+    "x": 0.4601845443248749,
+    "y": 0.5179404616355896
+   }
+  ],
+  "257": [
+   {
+    "areaPoiID": 6711,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 109,
+    "x": 0.7169638276100159,
+    "y": 0.5506004095077515
+   }
+  ],
+  "258": [
+   {
+    "areaPoiID": 6712,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 109,
+    "x": 0.7053602337837219,
+    "y": 0.6964083313941956
+   }
+  ],
+  "259": [
+   {
+    "areaPoiID": 6710,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 100,
+    "x": 0.4806663990020752,
+    "y": 0.5191794633865356
+   }
+  ],
+  "260": [
+   {
+    "areaPoiID": 6705,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 102,
+    "x": 0.4895983338356018,
+    "y": 0.3592978417873383
+   }
+  ],
+  "261": [
+   {
+    "areaPoiID": 6706,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 102,
+    "x": 0.5047541856765747,
+    "y": 0.3333728015422821
+   },
+   {
+    "areaPoiID": 6706,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 105,
+    "x": 0.3517546951770783,
+    "y": 0.9927397966384888
+   }
+  ],
+  "262": [
+   {
+    "areaPoiID": 6707,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 102,
+    "x": 0.5417836904525757,
+    "y": 0.344352513551712
+   }
+  ],
+  "271": [
+   {
+    "areaPoiID": 6704,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 115,
+    "x": 0.2838508486747742,
+    "y": 0.5167503356933594
+   }
+  ],
+  "272": [
+   {
+    "areaPoiID": 6703,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 115,
+    "x": 0.259956032037735,
+    "y": 0.5079607963562012
+   }
+  ],
+  "273": [
+   {
+    "areaPoiID": 6702,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 116,
+    "x": 0.1755581498146057,
+    "y": 0.2120170891284943
+   },
+   {
+    "areaPoiID": 6702,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 121,
+    "x": 0.2867784202098846,
+    "y": 0.86932772397995
+   }
+  ],
+  "274": [
+   {
+    "areaPoiID": 6701,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 120,
+    "x": 0.8799732327461243,
+    "y": 0.6837071776390076
+   },
+   {
+    "areaPoiID": 6701,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 121,
+    "x": 0.7643834352493286,
+    "y": 0.2140923291444778
+   }
+  ],
+  "275": [
+   {
+    "areaPoiID": 6699,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 120,
+    "x": 0.4532597362995148,
+    "y": 0.2148197740316391
+   }
+  ],
+  "276": [
+   {
+    "areaPoiID": 6698,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 118,
+    "x": 0.553109884262085,
+    "y": 0.9084556102752686
+   },
+   {
+    "areaPoiID": 6698,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 123,
+    "x": 0.7912198901176453,
+    "y": 0.0444045327603817
+   }
+  ],
+  "277": [
+   {
+    "areaPoiID": 6700,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 120,
+    "x": 0.3958808183670044,
+    "y": 0.268978089094162
+   }
+  ],
+  "278": [
+   {
+    "areaPoiID": 6697,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 118,
+    "x": 0.5472988486289978,
+    "y": 0.9168335795402527
+   },
+   {
+    "areaPoiID": 6697,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 123,
+    "x": 0.7789711356163025,
+    "y": 0.06206692010164261
+   }
+  ],
+  "279": [
+   {
+    "areaPoiID": 6663,
+    "continent": 12,
+    "mapType": 5,
+    "uiMapID": 75,
+    "x": 0.6011393666267395,
+    "y": 0.8272160291671753
+   }
+  ],
+  "280": [
+   {
+    "areaPoiID": 6696,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 118,
+    "x": 0.5484758615493774,
+    "y": 0.898594856262207
+   },
+   {
+    "areaPoiID": 6696,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 123,
+    "x": 0.7814521193504333,
+    "y": 0.02361628413200378
+   }
+  ],
+  "281": [
+   {
+    "areaPoiID": 6695,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 114,
+    "x": 0.2859270572662354,
+    "y": 0.2772421836853027
+   }
+  ],
+  "282": [
+   {
+    "areaPoiID": 6694,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 114,
+    "x": 0.2660072445869446,
+    "y": 0.2746069133281708
+   }
+  ],
+  "283": [
+   {
+    "areaPoiID": 6845,
+    "continent": 113,
+    "mapType": 4,
+    "uiMapID": 125,
+    "x": 0.6616487503051758,
+    "y": 0.6745491027832031
+   }
+  ],
+  "284": [
+   {
+    "areaPoiID": 6692,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 118,
+    "x": 0.741755485534668,
+    "y": 0.2044987082481384
+   },
+   {
+    "areaPoiID": 6692,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 120,
+    "x": 0.1475352644920349,
+    "y": 0.3428933620452881
+   },
+   {
+    "areaPoiID": 6692,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 170,
+    "x": 0.5454301238059998,
+    "y": 0.9009636044502258
+   }
+  ],
+  "285": [
+   {
+    "areaPoiID": 6691,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 117,
+    "x": 0.5788071751594543,
+    "y": 0.4951065480709076
+   }
+  ],
+  "286": [
+   {
+    "areaPoiID": 6690,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 117,
+    "x": 0.5722126364707947,
+    "y": 0.464937150478363
+   }
+  ],
+  "302": [
+   {
+    "areaPoiID": 6677,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 371,
+    "x": 0.02698419615626335,
+    "y": 0.9377142786979675
+   },
+   {
+    "areaPoiID": 6677,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 376,
+    "x": 0.3606445789337158,
+    "y": 0.6909657120704651
+   },
+   {
+    "areaPoiID": 6677,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 418,
+    "x": 0.3593129813671112,
+    "y": 0.1925682276487351
+   },
+   {
+    "areaPoiID": 6677,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 422,
+    "x": 0.911036491394043,
+    "y": 0.5965288877487183
+   }
+  ],
+  "303": [
+   {
+    "areaPoiID": 6681,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 376,
+    "x": 0.1526039838790894,
+    "y": 0.1542718559503555
+   },
+   {
+    "areaPoiID": 6681,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 390,
+    "x": 0.1583092957735062,
+    "y": 0.7441561818122864
+   },
+   {
+    "areaPoiID": 6681,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 422,
+    "x": 0.7584678530693054,
+    "y": 0.2030169814825058
+   }
+  ],
+  "311": [
+   {
+    "areaPoiID": 6496,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 18,
+    "x": 0.8532388210296631,
+    "y": 0.322755366563797
+   },
+   {
+    "areaPoiID": 6496,
+    "continent": 13,
+    "mapType": 5,
+    "uiMapID": 19,
+    "x": 0.7914432883262634,
+    "y": 0.6119601130485535
+   },
+   {
+    "areaPoiID": 6496,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 22,
+    "x": 0.2881190180778503,
+    "y": 0.1749311536550522
+   }
+  ],
+  "312": [
+   {
+    "areaPoiID": 6679,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 379,
+    "x": 0.3671042621135712,
+    "y": 0.4746221303939819
+   },
+   {
+    "areaPoiID": 6679,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 388,
+    "x": 0.7899106740951538,
+    "y": 0.2402979880571365
+   }
+  ],
+  "313": [
+   {
+    "areaPoiID": 6676,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 371,
+    "x": 0.561717689037323,
+    "y": 0.578675389289856
+   }
+  ],
+  "316": [
+   {
+    "areaPoiID": 6497,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 18,
+    "x": 0.8482211828231812,
+    "y": 0.304345577955246
+   },
+   {
+    "areaPoiID": 6497,
+    "continent": 13,
+    "mapType": 5,
+    "uiMapID": 19,
+    "x": 0.6808358430862427,
+    "y": 0.2061397582292557
+   },
+   {
+    "areaPoiID": 6497,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 22,
+    "x": 0.2828460931777954,
+    "y": 0.1555848270654678
+   }
+  ],
+  "317": [
+   {
+    "areaPoiID": 6511,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 379,
+    "x": 0.59608393907547,
+    "y": 0.3917136192321777
+   }
+  ],
+  "320": [
+   {
+    "areaPoiID": 6509,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 371,
+    "x": 0.215964674949646,
+    "y": 0.5793851017951965
+   },
+   {
+    "areaPoiID": 6509,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 376,
+    "x": 0.6968772411346436,
+    "y": 0.05361854285001755
+   },
+   {
+    "areaPoiID": 6509,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 433,
+    "x": 0.4842218160629273,
+    "y": 0.6138435006141663
+   }
+  ],
+  "321": [
+   {
+    "areaPoiID": 6680,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 371,
+    "x": 0.1450336575508118,
+    "y": 0.4859480261802673
+   },
+   {
+    "areaPoiID": 6680,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 390,
+    "x": 0.8060479164123535,
+    "y": 0.3303813338279724
+   },
+   {
+    "areaPoiID": 6680,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 433,
+    "x": 0.2080770581960678,
+    "y": 0.2501880526542664
+   }
+  ],
+  "324": [
+   {
+    "areaPoiID": 6678,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 388,
+    "x": 0.3468970060348511,
+    "y": 0.8151991367340088
+   }
+  ],
+  "330": [
+   {
+    "areaPoiID": 6510,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 422,
+    "x": 0.3892280757427216,
+    "y": 0.3499815464019775
+   }
+  ],
+  "362": [
+   {
+    "areaPoiID": 6508,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 504,
+    "x": 0.6383166313171387,
+    "y": 0.3203892707824707
+   }
+  ],
+  "369": [
+   {
+    "areaPoiID": 6507,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 371,
+    "x": 0.1200326979160309,
+    "y": 0.5202184319496155
+   },
+   {
+    "areaPoiID": 6507,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 390,
+    "x": 0.7371308207511902,
+    "y": 0.4248996376991272
+   },
+   {
+    "areaPoiID": 6507,
+    "continent": 424,
+    "mapType": 3,
+    "uiMapID": 433,
+    "x": 0.1107446625828743,
+    "y": 0.3835678994655609
+   }
+  ],
+  "385": [
+   {
+    "areaPoiID": 6672,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 525,
+    "x": 0.4992754459381104,
+    "y": 0.2480425536632538
+   },
+   {
+    "areaPoiID": 6672,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 543,
+    "x": 0.07499975711107254,
+    "y": 0.4267650246620178
+   }
+  ],
+  "457": [
+   {
+    "areaPoiID": 6505,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 543,
+    "x": 0.5156561136245728,
+    "y": 0.2719962596893311
+   }
+  ],
+  "476": [
+   {
+    "areaPoiID": 6674,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 542,
+    "x": 0.3558484017848969,
+    "y": 0.3361255526542664
+   }
+  ],
+  "477": [
+   {
+    "areaPoiID": 6506,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 550,
+    "x": 0.3296887278556824,
+    "y": 0.3837372660636902
+   }
+  ],
+  "536": [
+   {
+    "areaPoiID": 6670,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 543,
+    "x": 0.5515932440757751,
+    "y": 0.3173155188560486
+   }
+  ],
+  "537": [
+   {
+    "areaPoiID": 6675,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 535,
+    "x": 0.9558442831039429,
+    "y": 0.9231212735176086
+   },
+   {
+    "areaPoiID": 6675,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 539,
+    "x": 0.3186028003692627,
+    "y": 0.4255208075046539
+   },
+   {
+    "areaPoiID": 6675,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 542,
+    "x": 0.750300943851471,
+    "y": 0.1543652713298798
+   }
+  ],
+  "547": [
+   {
+    "areaPoiID": 6673,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 535,
+    "x": 0.4629254043102264,
+    "y": 0.7394633293151855
+   }
+  ],
+  "556": [
+   {
+    "areaPoiID": 6669,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 543,
+    "x": 0.5957828164100647,
+    "y": 0.4566237032413483
+   }
+  ],
+  "558": [
+   {
+    "areaPoiID": 6671,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 543,
+    "x": 0.4541420042514801,
+    "y": 0.1353485137224197
+   }
+  ],
+  "559": [
+   {
+    "areaPoiID": 6660,
+    "continent": 13,
+    "mapType": 5,
+    "uiMapID": 33,
+    "x": 0.7903094291687012,
+    "y": 0.3379790186882019
+   }
+  ],
+  "63": [
+   {
+    "areaPoiID": 6500,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 50,
+    "x": 0.05284621566534042,
+    "y": 0.01986587047576904
+   },
+   {
+    "areaPoiID": 6500,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 52,
+    "x": 0.4255968034267426,
+    "y": 0.7161531448364258
+   },
+   {
+    "areaPoiID": 6500,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 224,
+    "x": 0.2213037312030792,
+    "y": 0.02435506135225296
+   }
+  ],
+  "64": [
+   {
+    "areaPoiID": 6725,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 21,
+    "x": 0.4492383003234863,
+    "y": 0.6788931488990784
+   },
+   {
+    "areaPoiID": 6725,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 25,
+    "x": 0.05898237600922585,
+    "y": 0.5291966199874878
+   }
+  ],
+  "65": [
+   {
+    "areaPoiID": 6684,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 203,
+    "x": 0.4817356765270233,
+    "y": 0.4041244983673096
+   },
+   {
+    "areaPoiID": 6684,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 204,
+    "x": 0.6933059692382812,
+    "y": 0.2525822222232819
+   },
+   {
+    "areaPoiID": 6684,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 205,
+    "x": 0.2625027894973755,
+    "y": 0.2586129307746887
+   }
+  ],
+  "66": [
+   {
+    "areaPoiID": 6662,
+    "continent": 13,
+    "mapType": 5,
+    "uiMapID": 34,
+    "x": 0.7124114036560059,
+    "y": 0.5337115526199341
+   }
+  ],
+  "669": [
+   {
+    "areaPoiID": 6504,
+    "continent": 572,
+    "mapType": 3,
+    "uiMapID": 534,
+    "x": 0.4696506857872009,
+    "y": 0.526409387588501
+   }
+  ],
+  "67": [
+   {
+    "areaPoiID": 6687,
+    "continent": 948,
+    "mapType": 3,
+    "uiMapID": 207,
+    "x": 0.4738357067108154,
+    "y": 0.5205475091934204
+   }
+  ],
+  "68": [
+   {
+    "areaPoiID": 6685,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 249,
+    "x": 0.7670150399208069,
+    "y": 0.8435750007629395
+   },
+   {
+    "areaPoiID": 6685,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 1527,
+    "x": 0.7670150399208069,
+    "y": 0.8435750007629395
+   }
+  ],
+  "69": [
+   {
+    "areaPoiID": 6686,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 249,
+    "x": 0.605222761631012,
+    "y": 0.6415955424308777
+   },
+   {
+    "areaPoiID": 6686,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 1527,
+    "x": 0.605222761631012,
+    "y": 0.6415955424308777
+   }
+  ],
+  "70": [
+   {
+    "areaPoiID": 6688,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 71,
+    "x": 0.2461368143558502,
+    "y": 0.923362672328949
+   },
+   {
+    "areaPoiID": 6688,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 249,
+    "x": 0.6909272074699402,
+    "y": 0.5283268094062805
+   },
+   {
+    "areaPoiID": 6688,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 1527,
+    "x": 0.6909272074699402,
+    "y": 0.5283268094062805
+   }
+  ],
+  "71": [
+   {
+    "areaPoiID": 6689,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 56,
+    "x": 0.7400195002555847,
+    "y": 0.6930975914001465
+   },
+   {
+    "areaPoiID": 6689,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 241,
+    "x": 0.1920705139636993,
+    "y": 0.5411800146102905
+   }
+  ],
+  "716": [
+   {
+    "areaPoiID": 5091,
+    "continent": 619,
+    "mapType": 3,
+    "uiMapID": 630,
+    "x": 0.6116455793380737,
+    "y": 0.4111564457416534
+   }
+  ],
+  "726": [
+   {
+    "areaPoiID": 5099,
+    "continent": 619,
+    "mapType": 3,
+    "uiMapID": 680,
+    "x": 0.4116709232330322,
+    "y": 0.615059494972229
+   }
+  ],
+  "73": [
+   {
+    "areaPoiID": 6517,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 32,
+    "x": 0.3902711272239685,
+    "y": 0.9679264426231384
+   },
+   {
+    "areaPoiID": 6517,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 36,
+    "x": 0.2313160449266434,
+    "y": 0.2639859318733215
+   }
+  ],
+  "740": [
+   {
+    "areaPoiID": 5093,
+    "continent": 619,
+    "mapType": 3,
+    "uiMapID": 641,
+    "x": 0.3721569776535034,
+    "y": 0.5031870007514954
+   }
+  ],
+  "741": [
+   {
+    "areaPoiID": 6535,
+    "continent": 13,
+    "mapType": 5,
+    "uiMapID": 35,
+    "x": 0.5377001166343689,
+    "y": 0.8131274580955505
+   }
+  ],
+  "742": [
+   {
+    "areaPoiID": 6536,
+    "continent": 13,
+    "mapType": 5,
+    "uiMapID": 33,
+    "x": 0.6401437520980835,
+    "y": 0.7153289318084717
+   }
+  ],
+  "743": [
+   {
+    "areaPoiID": 6538,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 81,
+    "x": 0.3644229173660278,
+    "y": 0.9403195381164551
+   },
+   {
+    "areaPoiID": 6538,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 249,
+    "x": 0.151327908039093,
+    "y": 0.09408524632453918
+   },
+   {
+    "areaPoiID": 6538,
+    "continent": 12,
+    "mapType": 6,
+    "uiMapID": 327,
+    "x": 0.5894527435302734,
+    "y": 0.1423433274030685
+   },
+   {
+    "areaPoiID": 6538,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 1527,
+    "x": 0.151327908039093,
+    "y": 0.09408524632453918
+   }
+  ],
+  "744": [
+   {
+    "areaPoiID": 6537,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 81,
+    "x": 0.2432011812925339,
+    "y": 0.8729052543640137
+   },
+   {
+    "areaPoiID": 6537,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 249,
+    "x": 0.07189982384443283,
+    "y": 0.04990160092711449
+   },
+   {
+    "areaPoiID": 6537,
+    "continent": 12,
+    "mapType": 6,
+    "uiMapID": 327,
+    "x": 0.46798175573349,
+    "y": 0.07477296888828278
+   },
+   {
+    "areaPoiID": 6537,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 1527,
+    "x": 0.07189982384443283,
+    "y": 0.04990160092711449
+   }
+  ],
+  "745": [
+   {
+    "areaPoiID": 6528,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 17,
+    "x": 0.2223207205533981,
+    "y": 0.2177990078926086
+   },
+   {
+    "areaPoiID": 6528,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 42,
+    "x": 0.4698658585548401,
+    "y": 0.7490599751472473
+   },
+   {
+    "areaPoiID": 6528,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 50,
+    "x": 0.9150608777999878,
+    "y": 0.03600012883543968
+   },
+   {
+    "areaPoiID": 6528,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 224,
+    "x": 0.7608392238616943,
+    "y": 0.03444954380393028
+   }
+  ],
+  "746": [
+   {
+    "areaPoiID": 6529,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 105,
+    "x": 0.6906967163085938,
+    "y": 0.2414241433143616
+   },
+   {
+    "areaPoiID": 6529,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 109,
+    "x": 0.0689740777015686,
+    "y": 0.5168792605400085
+   }
+  ],
+  "747": [
+   {
+    "areaPoiID": 6531,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 100,
+    "x": 0.4657725691795349,
+    "y": 0.5283609628677368
+   }
+  ],
+  "748": [
+   {
+    "areaPoiID": 6530,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 102,
+    "x": 0.5190587639808655,
+    "y": 0.3348917961120606
+   },
+   {
+    "areaPoiID": 6530,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 105,
+    "x": 0.3650100529193878,
+    "y": 0.9941476583480835
+   }
+  ],
+  "749": [
+   {
+    "areaPoiID": 6534,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 109,
+    "x": 0.7359933257102966,
+    "y": 0.6372154951095581
+   }
+  ],
+  "75": [
+   {
+    "areaPoiID": 6518,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 244,
+    "x": 0.4605655372142792,
+    "y": 0.479333370923996
+   }
+  ],
+  "750": [
+   {
+    "areaPoiID": 6513,
+    "continent": 12,
+    "mapType": 5,
+    "uiMapID": 75,
+    "x": 0.39601069688797,
+    "y": 0.1704939603805542
+   }
+  ],
+  "751": [
+   {
+    "areaPoiID": 6532,
+    "continent": 101,
+    "mapType": 3,
+    "uiMapID": 104,
+    "x": 0.7105785012245178,
+    "y": 0.4628381133079529
+   }
+  ],
+  "753": [
+   {
+    "areaPoiID": 6526,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 115,
+    "x": 0.1402876824140549,
+    "y": 0.02409091219305992
+   },
+   {
+    "areaPoiID": 6526,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 118,
+    "x": 0.4151681661605835,
+    "y": 0.9428209662437439
+   },
+   {
+    "areaPoiID": 6526,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 119,
+    "x": 0.9386215209960938,
+    "y": 0.6206902265548706
+   },
+   {
+    "areaPoiID": 6526,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 123,
+    "x": 0.5004605054855347,
+    "y": 0.1168531179428101
+   }
+  ],
+  "754": [
+   {
+    "areaPoiID": 6524,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 115,
+    "x": 0.87345951795578,
+    "y": 0.5100224614143372
+   },
+   {
+    "areaPoiID": 6524,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 116,
+    "x": 0.03069525398313999,
+    "y": 0.5282685160636902
+   }
+  ],
+  "755": [
+   {
+    "areaPoiID": 6520,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 115,
+    "x": 0.6001855731010437,
+    "y": 0.5701841711997986
+   }
+  ],
+  "756": [
+   {
+    "areaPoiID": 6525,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 114,
+    "x": 0.2752324640750885,
+    "y": 0.2673586308956146
+   }
+  ],
+  "757": [
+   {
+    "areaPoiID": 6522,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 118,
+    "x": 0.7516672611236572,
+    "y": 0.218052014708519
+   },
+   {
+    "areaPoiID": 6522,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 120,
+    "x": 0.1562741100788117,
+    "y": 0.3548448383808136
+   },
+   {
+    "areaPoiID": 6522,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 170,
+    "x": 0.5623334646224976,
+    "y": 0.9240740537643433
+   }
+  ],
+  "758": [
+   {
+    "areaPoiID": 6521,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 118,
+    "x": 0.5380496382713318,
+    "y": 0.870911717414856
+   }
+  ],
+  "759": [
+   {
+    "areaPoiID": 6523,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 120,
+    "x": 0.4157048165798187,
+    "y": 0.1779823005199432
+   }
+  ],
+  "76": [
+   {
+    "areaPoiID": 6682,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 17,
+    "x": 0.005119741894304752,
+    "y": 0.546095073223114
+   },
+   {
+    "areaPoiID": 6682,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 50,
+    "x": 0.7210367918014526,
+    "y": 0.3292721211910248
+   },
+   {
+    "areaPoiID": 6682,
+    "continent": 13,
+    "mapType": 3,
+    "uiMapID": 224,
+    "x": 0.6394276022911072,
+    "y": 0.2179366797208786
+   }
+  ],
+  "760": [
+   {
+    "areaPoiID": 6527,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 64,
+    "x": 0.7461293339729309,
+    "y": 0.2469755411148071
+   },
+   {
+    "areaPoiID": 6527,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 70,
+    "x": 0.5221524834632874,
+    "y": 0.7593713998794556
+   },
+   {
+    "areaPoiID": 6527,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 199,
+    "x": 0.6843238472938538,
+    "y": 0.9906166791915894
+   }
+  ],
+  "761": [
+   {
+    "areaPoiID": 6519,
+    "continent": 113,
+    "mapType": 3,
+    "uiMapID": 115,
+    "x": 0.6134830713272095,
+    "y": 0.5259039998054504
+   }
+  ],
+  "767": [
+   {
+    "areaPoiID": 5103,
+    "continent": 619,
+    "mapType": 3,
+    "uiMapID": 650,
+    "x": 0.495697557926178,
+    "y": 0.6854421496391296
+   }
+  ],
+  "777": [
+   {
+    "areaPoiID": 5098,
+    "continent": 619,
+    "mapType": 4,
+    "uiMapID": 627,
+    "x": 0.6557790040969849,
+    "y": 0.6738144755363464
+   }
+  ],
+  "78": [
+   {
+    "areaPoiID": 6514,
+    "continent": 12,
+    "mapType": 3,
+    "uiMapID": 198,
+    "x": 0.4679722487926483,
+    "y": 0.783856987953186
+   }
+  ],
+  "786": [
+   {
+    "areaPoiID": 5101,
+    "continent": 619,
+    "mapType": 3,
+    "uiMapID": 680,
+    "x": 0.4372674226760864,
+    "y": 0.5729442834854126
+   }
+  ],
+  "800": [
+   {
+    "areaPoiID": 5100,
+    "continent": 619,
+    "mapType": 3,
+    "uiMapID": 680,
+    "x": 0.5076637268066406,
+    "y": 0.6553155183792114
+   }
+  ],
+  "875": [
+   {
+    "areaPoiID": 5250,
+    "continent": 619,
+    "mapType": 3,
+    "uiMapID": 646,
+    "x": 0.6400927901268005,
+    "y": 0.2136678546667099
+   }
+  ],
+  "900": [
+   {
+    "areaPoiID": 5251,
+    "continent": 619,
+    "mapType": 3,
+    "uiMapID": 646,
+    "x": 0.6481842994689941,
+    "y": 0.1675436943769455
+   }
+  ],
+  "946": [
+   {
+    "areaPoiID": 5440,
+    "continent": 905,
+    "mapType": 3,
+    "uiMapID": 885,
+    "x": 0.5482028722763062,
+    "y": 0.6253138780593872
+   }
+  ],
+  "968": [
+   {
+    "areaPoiID": 5838,
+    "continent": 875,
+    "mapType": 3,
+    "uiMapID": 862,
+    "x": 0.4353704750537872,
+    "y": 0.3948581218719482
+   }
+  ]
+ },
+ "instances": {
+  "1001": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2095,
+       "itemID": 159842,
+       "mountID": 995
+      }
+     ],
+     "numLoot": 35,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1754,
+   "name": "Freehold",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1002": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1771,
+   "name": "Tol Dagor",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1012": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 32,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 32,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1594,
+   "name": "The MOTHERLODE!!",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1021": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 39,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 39,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 39,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1862,
+   "name": "Waycrest Manor",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1022": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 35,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 35,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2158,
+       "itemID": 160829,
+       "mountID": 1053
+      }
+     ],
+     "numLoot": 36,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1841,
+   "name": "The Underrot",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1023": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1822,
+   "name": "Siege of Boralus",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1028": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 2210,
+       "itemID": 174842,
+       "mountID": 1250
+      }
+     ],
+     "numLoot": 112,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [
+      {
+       "encounterID": 2210,
+       "itemID": 174842,
+       "mountID": 1250
+      }
+     ],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2210,
+       "itemID": 174842,
+       "mountID": 1250
+      }
+     ],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [
+      {
+       "encounterID": 2210,
+       "itemID": 174842,
+       "mountID": 1250
+      }
+     ],
+     "numLoot": 30,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1861,
+   "name": "Azeroth",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1030": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 35,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 35,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1877,
+   "name": "Temple of Sethraliss",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1031": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 86,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 86,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 86,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 86,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1861,
+   "name": "Uldir",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1036": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 31,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 31,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 32,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1864,
+   "name": "Shrine of the Storm",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1041": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 35,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2172,
+       "itemID": 159921,
+       "mountID": 1040
+      }
+     ],
+     "numLoot": 36,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1762,
+   "name": "Kings' Rest",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1176": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 2334,
+       "itemID": 166518,
+       "mountID": 1217
+      }
+     ],
+     "numLoot": 114,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [
+      {
+       "encounterID": 2334,
+       "itemID": 166518,
+       "mountID": 1217
+      }
+     ],
+     "numLoot": 114,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2343,
+       "itemID": 166705,
+       "mountID": 1219
+      },
+      {
+       "encounterID": 2334,
+       "itemID": 166518,
+       "mountID": 1217
+      }
+     ],
+     "numLoot": 116,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [
+      {
+       "encounterID": 2343,
+       "itemID": 166518,
+       "mountID": 1217
+      }
+     ],
+     "numLoot": 112,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2070,
+   "name": "Battle of Dazar'alor",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1177": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 19,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 19,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 19,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 19,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2096,
+   "name": "Crucible of Storms",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1178": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 83,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2355,
+       "itemID": 168826,
+       "mountID": 1252
+      }
+     ],
+     "numLoot": 90,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2097,
+   "name": "Operation: Mechagon",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1179": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 117,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 118,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 118,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 117,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2164,
+   "name": "The Eternal Palace",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1180": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 110,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 110,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2375,
+       "itemID": 174872,
+       "mountID": 1293
+      }
+     ],
+     "numLoot": 111,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 110,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2217,
+   "name": "Ny'alotha, the Waking City",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  },
+  "1182": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 64,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 64,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2396,
+       "itemID": 181819,
+       "mountID": 1406
+      }
+     ],
+     "numLoot": 65,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2286,
+   "name": "The Necrotic Wake",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1183": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 62,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 62,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 63,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2289,
+   "name": "Plaguefall",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1184": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 59,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 59,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 60,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2290,
+   "name": "Mists of Tirna Scithe",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1185": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 68,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 68,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 68,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2287,
+   "name": "Halls of Atonement",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1186": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 62,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 62,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 62,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2285,
+   "name": "Spires of Ascension",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1187": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 63,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 63,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 63,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2293,
+   "name": "Theater of Pain",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1188": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 59,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 59,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 59,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2291,
+   "name": "De Other Side",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1189": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 58,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 58,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 59,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2284,
+   "name": "Sanguine Depths",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1190": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 298,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 298,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 298,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 298,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2296,
+   "name": "Castle Nathria",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1192": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 104,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 104,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 104,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 104,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2559,
+   "name": "Shadowlands",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1193": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 2439,
+       "itemID": 186656,
+       "mountID": 1500
+      }
+     ],
+     "numLoot": 232,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [
+      {
+       "encounterID": 2439,
+       "itemID": 186656,
+       "mountID": 1500
+      }
+     ],
+     "numLoot": 232,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2439,
+       "itemID": 186656,
+       "mountID": 1500
+      },
+      {
+       "encounterID": 2441,
+       "itemID": 186642,
+       "mountID": 1471
+      }
+     ],
+     "numLoot": 234,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [
+      {
+       "encounterID": 2439,
+       "itemID": 186656,
+       "mountID": 1500
+      }
+     ],
+     "numLoot": 231,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2450,
+   "name": "Sanctum of Domination",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1194": {
+   "difficulties": {
+    "2": {
+     "mounts": [
+      {
+       "encounterID": 2455,
+       "itemID": 186638,
+       "mountID": 1481
+      }
+     ],
+     "numLoot": 116,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2455,
+       "itemID": 186638,
+       "mountID": 1481
+      }
+     ],
+     "numLoot": 116,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2441,
+   "name": "Tazavesh, the Veiled Market",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1195": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 273,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 273,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2464,
+       "itemID": 190768,
+       "mountID": 1587
+      }
+     ],
+     "numLoot": 274,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 273,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2481,
+   "name": "Sepulcher of the First Ones",
+   "tier": 9,
+   "tierName": "Shadowlands"
+  },
+  "1196": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2520,
+   "name": "Brackenhide Hollow",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1197": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2451,
+   "name": "Uldaman: Legacy of Tyr",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1198": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2516,
+   "name": "The Nokhud Offensive",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1199": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 23,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 23,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 23,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2519,
+   "name": "Neltharus",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1200": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 112,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 112,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 112,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 112,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2522,
+   "name": "Vault of the Incarnates",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1201": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2526,
+   "name": "Algeth'ar Academy",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1202": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2521,
+   "name": "Ruby Life Pools",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1203": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2515,
+   "name": "The Azure Vault",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1204": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2527,
+   "name": "Halls of Infusion",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1205": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 37,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 37,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 37,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 37,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2574,
+   "name": "Dragon Isles",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1207": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 137,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 137,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2519,
+       "itemID": 210061,
+       "mountID": 1818
+      }
+     ],
+     "numLoot": 138,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 137,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2549,
+   "name": "Amirdrassil, the Dream's Hope",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1208": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 139,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 139,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 139,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 139,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2569,
+   "name": "Aberrus, the Shadowed Crucible",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1209": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 52,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 53,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2579,
+   "name": "Dawn of the Infinite",
+   "tier": 10,
+   "tierName": "Dragonflight"
+  },
+  "1210": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 25,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 25,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2561,
+       "itemID": 225548,
+       "mountID": 2204
+      }
+     ],
+     "numLoot": 26,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2651,
+   "name": "Darkflame Cleft",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1267": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 23,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 23,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 23,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2649,
+   "name": "Priory of the Sacred Flame",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1268": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 23,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 23,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 23,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2648,
+   "name": "The Rookery",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1269": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2652,
+   "name": "The Stonevault",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1270": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2662,
+   "name": "The Dawnbreaker",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1271": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 19,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 19,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 19,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2660,
+   "name": "Ara-Kara, City of Echoes",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1272": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2661,
+   "name": "Cinderbrew Meadery",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1273": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 2602,
+       "itemID": 224147,
+       "mountID": 2219
+      }
+     ],
+     "numLoot": 113,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [
+      {
+       "encounterID": 2602,
+       "itemID": 224147,
+       "mountID": 2219
+      }
+     ],
+     "numLoot": 113,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2602,
+       "itemID": 224151,
+       "mountID": 2223
+      },
+      {
+       "encounterID": 2602,
+       "itemID": 224147,
+       "mountID": 2219
+      }
+     ],
+     "numLoot": 114,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [
+      {
+       "encounterID": 2602,
+       "itemID": 224147,
+       "mountID": 2219
+      }
+     ],
+     "numLoot": 113,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2657,
+   "name": "Nerub-ar Palace",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1274": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2669,
+   "name": "City of Threads",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1276": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 429,
+   "name": "Dire Maul - Warpwood Quarter",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "1277": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 429,
+   "name": "Dire Maul - Gordok Commons",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "1278": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2774,
+   "name": "Khaz Algar",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1292": {
+   "difficulties": {
+    "1": {
+     "mounts": [
+      {
+       "encounterID": 456,
+       "itemID": 13335,
+       "mountID": 69
+      }
+     ],
+     "numLoot": 49,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 329,
+   "name": "Stratholme - Service Entrance",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "1296": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 2646,
+       "itemID": 236960,
+       "mountID": 2507
+      }
+     ],
+     "numLoot": 117,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [
+      {
+       "encounterID": 2646,
+       "itemID": 236960,
+       "mountID": 2507
+      }
+     ],
+     "numLoot": 117,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2646,
+       "itemID": 235626,
+       "mountID": 2487
+      },
+      {
+       "encounterID": 2646,
+       "itemID": 236960,
+       "mountID": 2507
+      }
+     ],
+     "numLoot": 118,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [
+      {
+       "encounterID": 2646,
+       "itemID": 236960,
+       "mountID": 2507
+      }
+     ],
+     "numLoot": 117,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2769,
+   "name": "Liberation of Undermine",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1298": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2773,
+   "name": "Operation: Floodgate",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1299": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2658,
+       "itemID": 262914,
+       "mountID": 2805
+      }
+     ],
+     "numLoot": 30,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2805,
+   "name": "Windrunner Spire",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1300": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2662,
+       "itemID": 260231,
+       "mountID": 2817
+      }
+     ],
+     "numLoot": 31,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2811,
+   "name": "Magisters' Terrace",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1301": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 77,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 77,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 77,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2792,
+   "name": "Blackrock Depths",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "1302": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 118,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 118,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2691,
+       "itemID": 243061,
+       "mountID": 2569
+      }
+     ],
+     "numLoot": 119,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 118,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2810,
+   "name": "Manaforge Omega",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1303": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2830,
+   "name": "Eco-Dome Al'dani",
+   "tier": 11,
+   "tierName": "The War Within"
+  },
+  "1304": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 31,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 31,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2813,
+   "name": "Murder Row",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1305": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 15,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 15,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 15,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 15,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1592,
+   "name": "Sporefall",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1307": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 87,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 87,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 87,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 87,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2912,
+   "name": "The Voidspire",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1308": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2740,
+       "itemID": 246590,
+       "mountID": 2607
+      }
+     ],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2913,
+   "name": "March on Quel'Danas",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1309": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2859,
+   "name": "The Blinding Vale",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1311": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 25,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 25,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2825,
+   "name": "Den of Nalorakk",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1312": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 17,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2930,
+   "name": "Midnight",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1313": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2923,
+   "name": "Voidscar Arena",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1314": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 15,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 15,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 15,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 15,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2939,
+   "name": "The Dreamrift",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1315": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2874,
+   "name": "Maisara Caverns",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1316": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2915,
+   "name": "Nexus-Point Xenas",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1317": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 13,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 13,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 13,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 13,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 2987,
+   "name": "The Tidebound Grotto",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1319": {
+   "difficulties": {
+    "23": {
+     "mounts": [],
+     "numLoot": 0,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 3029,
+   "name": "Keystone Dungeons",
+   "tier": 13,
+   "tierName": "Current Season"
+  },
+  "1320": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 114,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 115,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 2895,
+       "itemID": 275658,
+       "mountID": 3030
+      }
+     ],
+     "numLoot": 118,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 114,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 3004,
+   "name": "The Venomous Abyss",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1322": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 2880,
+       "itemID": 276804,
+       "mountID": 3058
+      }
+     ],
+     "numLoot": 27,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 2993,
+   "name": "Altar of Fangs",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "1324": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 12,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 12,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 13,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 12,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 3095,
+   "name": "The Unbinding of Kith'ix",
+   "tier": 12,
+   "tierName": "Midnight"
+  },
+  "184": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 31,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 938,
+   "name": "End Time",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "185": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 939,
+   "name": "Well of Eternity",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "186": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 25,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 940,
+   "name": "Hour of Twilight",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "187": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 333,
+       "itemID": 77067,
+       "mountID": 442
+      },
+      {
+       "encounterID": 331,
+       "itemID": 78919,
+       "mountID": 445
+      }
+     ],
+     "numLoot": 104,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 331,
+       "itemID": 78919,
+       "mountID": 445
+      },
+      {
+       "encounterID": 333,
+       "itemID": 77067,
+       "mountID": 442
+      }
+     ],
+     "numLoot": 104,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [
+      {
+       "encounterID": 331,
+       "itemID": 78919,
+       "mountID": 445
+      },
+      {
+       "encounterID": 333,
+       "itemID": 77067,
+       "mountID": 442
+      },
+      {
+       "encounterID": 333,
+       "itemID": 77069,
+       "mountID": 444
+      }
+     ],
+     "numLoot": 105,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [
+      {
+       "encounterID": 331,
+       "itemID": 78919,
+       "mountID": 445
+      },
+      {
+       "encounterID": 333,
+       "itemID": 77069,
+       "mountID": 444
+      },
+      {
+       "encounterID": 333,
+       "itemID": 77067,
+       "mountID": 442
+      }
+     ],
+     "numLoot": 105,
+     "uncached": 0
+    },
+    "7": {
+     "mounts": [],
+     "numLoot": 101,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 967,
+   "name": "Dragon Soul",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "226": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 18,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 389,
+   "name": "Ragefire Chasm",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "227": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 48,
+   "name": "Blackfathom Deeps",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "228": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 113,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 230,
+   "name": "Blackrock Depths",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "229": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 45,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 229,
+   "name": "Lower Blackrock Spire",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "230": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 429,
+   "name": "Dire Maul - Capital Gardens",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "231": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 22,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 90,
+   "name": "Gnomeregan",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "232": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 349,
+   "name": "Maraudon",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "233": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 20,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 129,
+   "name": "Razorfen Downs",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "234": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 17,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 47,
+   "name": "Razorfen Kraul",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "236": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 43,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 329,
+   "name": "Stratholme - Main Gate",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "237": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 109,
+   "name": "The Temple of Atal'hakkar",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "238": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 15,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 34,
+   "name": "The Stockade",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "239": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 70,
+   "name": "Uldaman",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "240": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 32,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 43,
+   "name": "Wailing Caverns",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "241": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 209,
+   "name": "Zul'Farrak",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "246": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 29,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1007,
+   "name": "Scholomance",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "247": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 558,
+   "name": "Auchenai Crypts",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "248": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 52,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 52,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 543,
+   "name": "Hellfire Ramparts",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "249": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 48,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [
+      {
+       "encounterID": 533,
+       "itemID": 35513,
+       "mountID": 213
+      }
+     ],
+     "numLoot": 51,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 585,
+   "name": "Magisters' Terrace",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "250": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 44,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 54,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 557,
+   "name": "Mana-Tombs",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "251": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 43,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 43,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 560,
+   "name": "Old Hillsbrad Foothills",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "252": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 18,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [
+      {
+       "encounterID": 542,
+       "itemID": 32768,
+       "mountID": 185
+      }
+     ],
+     "numLoot": 25,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 556,
+   "name": "Sethekk Halls",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "253": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 32,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 32,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 555,
+   "name": "Shadow Labyrinth",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "254": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 552,
+   "name": "The Arcatraz",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "255": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 269,
+   "name": "The Black Morass",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "256": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 38,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 38,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 542,
+   "name": "The Blood Furnace",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "257": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 36,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 36,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 553,
+   "name": "The Botanica",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "258": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 25,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 25,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 554,
+   "name": "The Mechanar",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "259": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 31,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 31,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 540,
+   "name": "The Shattered Halls",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "260": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 547,
+   "name": "The Slave Pens",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "261": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 545,
+   "name": "The Steamvault",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "262": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 51,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 51,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 546,
+   "name": "The Underbog",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "271": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 37,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 37,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 619,
+   "name": "Ahn'kahet: The Old Kingdom",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "272": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 601,
+   "name": "Azjol-Nerub",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "273": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 600,
+   "name": "Drak'Tharon Keep",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "274": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 38,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 38,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 604,
+   "name": "Gundrak",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "275": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 602,
+   "name": "Halls of Lightning",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "276": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 48,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 48,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 668,
+   "name": "Halls of Reflection",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "277": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 599,
+   "name": "Halls of Stone",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "278": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 49,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 49,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 1,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 658,
+   "name": "Pit of Saron",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "279": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 595,
+   "name": "The Culling of Stratholme",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "280": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 37,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 37,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 632,
+   "name": "The Forge of Souls",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "281": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 38,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 576,
+   "name": "The Nexus",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "282": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 578,
+   "name": "The Oculus",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "283": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 51,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 51,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 608,
+   "name": "The Violet Hold",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "284": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 67,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 67,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 650,
+   "name": "Trial of the Champion",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "285": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 574,
+   "name": "Utgarde Keep",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "286": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [
+      {
+       "encounterID": 643,
+       "itemID": 44151,
+       "mountID": 264
+      }
+     ],
+     "numLoot": 42,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 575,
+   "name": "Utgarde Pinnacle",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "302": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 961,
+   "name": "Stormstout Brewery",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "303": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 962,
+   "name": "Gate of the Setting Sun",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "311": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1001,
+   "name": "Scarlet Halls",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "312": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 959,
+   "name": "Shado-Pan Monastery",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "313": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 960,
+   "name": "Temple of the Jade Serpent",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "316": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1004,
+   "name": "Scarlet Monastery",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "317": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 726,
+       "itemID": 87777,
+       "mountID": 478
+      }
+     ],
+     "numLoot": 89,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 726,
+       "itemID": 87777,
+       "mountID": 478
+      }
+     ],
+     "numLoot": 89,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [
+      {
+       "encounterID": 726,
+       "itemID": 87777,
+       "mountID": 478
+      }
+     ],
+     "numLoot": 89,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [
+      {
+       "encounterID": 726,
+       "itemID": 87777,
+       "mountID": 478
+      }
+     ],
+     "numLoot": 89,
+     "uncached": 0
+    },
+    "7": {
+     "mounts": [],
+     "numLoot": 87,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1008,
+   "name": "Mogu'shan Vaults",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "320": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 75,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [],
+     "numLoot": 75,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [],
+     "numLoot": 75,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [],
+     "numLoot": 75,
+     "uncached": 0
+    },
+    "7": {
+     "mounts": [],
+     "numLoot": 60,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 996,
+   "name": "Terrace of Endless Spring",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "321": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 21,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 994,
+   "name": "Mogu'shan Palace",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "322": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 814,
+       "itemID": 95057,
+       "mountID": 542
+      },
+      {
+       "encounterID": 826,
+       "itemID": 94228,
+       "mountID": 533
+      },
+      {
+       "encounterID": 725,
+       "itemID": 89783,
+       "mountID": 515
+      },
+      {
+       "encounterID": 691,
+       "itemID": 87771,
+       "mountID": 473
+      }
+     ],
+     "numLoot": 777,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 826,
+       "itemID": 94228,
+       "mountID": 533
+      },
+      {
+       "encounterID": 691,
+       "itemID": 87771,
+       "mountID": 473
+      },
+      {
+       "encounterID": 814,
+       "itemID": 95057,
+       "mountID": 542
+      },
+      {
+       "encounterID": 725,
+       "itemID": 89783,
+       "mountID": 515
+      }
+     ],
+     "numLoot": 777,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [
+      {
+       "encounterID": 826,
+       "itemID": 94228,
+       "mountID": 533
+      },
+      {
+       "encounterID": 691,
+       "itemID": 87771,
+       "mountID": 473
+      },
+      {
+       "encounterID": 814,
+       "itemID": 95057,
+       "mountID": 542
+      },
+      {
+       "encounterID": 725,
+       "itemID": 89783,
+       "mountID": 515
+      }
+     ],
+     "numLoot": 777,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [
+      {
+       "encounterID": 826,
+       "itemID": 94228,
+       "mountID": 533
+      },
+      {
+       "encounterID": 691,
+       "itemID": 87771,
+       "mountID": 473
+      },
+      {
+       "encounterID": 814,
+       "itemID": 95057,
+       "mountID": 542
+      },
+      {
+       "encounterID": 725,
+       "itemID": 89783,
+       "mountID": 515
+      }
+     ],
+     "numLoot": 777,
+     "uncached": 0
+    },
+    "7": {
+     "mounts": [
+      {
+       "encounterID": 826,
+       "itemID": 94228,
+       "mountID": 533
+      },
+      {
+       "encounterID": 691,
+       "itemID": 87771,
+       "mountID": 473
+      },
+      {
+       "encounterID": 814,
+       "itemID": 95057,
+       "mountID": 542
+      },
+      {
+       "encounterID": 725,
+       "itemID": 89783,
+       "mountID": 515
+      }
+     ],
+     "numLoot": 777,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 996,
+   "name": "Pandaria",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "324": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 26,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1011,
+   "name": "Siege of Niuzao Temple",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "330": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 77,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [],
+     "numLoot": 77,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [],
+     "numLoot": 77,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [],
+     "numLoot": 77,
+     "uncached": 0
+    },
+    "7": {
+     "mounts": [],
+     "numLoot": 77,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1009,
+   "name": "Heart of Fear",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "362": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 819,
+       "itemID": 93666,
+       "mountID": 531
+      },
+      {
+       "encounterID": 828,
+       "itemID": 95059,
+       "mountID": 543
+      }
+     ],
+     "numLoot": 219,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 828,
+       "itemID": 95059,
+       "mountID": 543
+      },
+      {
+       "encounterID": 819,
+       "itemID": 93666,
+       "mountID": 531
+      }
+     ],
+     "numLoot": 219,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [
+      {
+       "encounterID": 819,
+       "itemID": 93666,
+       "mountID": 531
+      },
+      {
+       "encounterID": 828,
+       "itemID": 95059,
+       "mountID": 543
+      }
+     ],
+     "numLoot": 265,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [
+      {
+       "encounterID": 828,
+       "itemID": 95059,
+       "mountID": 543
+      },
+      {
+       "encounterID": 819,
+       "itemID": 93666,
+       "mountID": 531
+      }
+     ],
+     "numLoot": 265,
+     "uncached": 0
+    },
+    "7": {
+     "mounts": [],
+     "numLoot": 217,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1098,
+   "name": "Throne of Thunder",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "369": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 271,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 271,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 869,
+       "itemID": 104253,
+       "mountID": 559
+      }
+     ],
+     "numLoot": 272,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 271,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1136,
+   "name": "Siege of Orgrimmar",
+   "tier": 5,
+   "tierName": "Mists of Pandaria"
+  },
+  "385": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 192,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 192,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 192,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1175,
+   "name": "Bloodmaul Slag Mines",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "457": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 207,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 207,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 959,
+       "itemID": 116660,
+       "mountID": 613
+      }
+     ],
+     "numLoot": 208,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 130,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1205,
+   "name": "Blackrock Foundry",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "476": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 194,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 203,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 203,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1209,
+   "name": "Skyreach",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "477": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 90,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 90,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 90,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 61,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1228,
+   "name": "Highmaul",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "536": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 151,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 151,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 151,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1208,
+   "name": "Grimrail Depot",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "537": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 193,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 193,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 193,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1176,
+   "name": "Shadowmoon Burial Grounds",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "547": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 195,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 195,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 195,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1182,
+   "name": "Auchindoun",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "556": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 236,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 236,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 236,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1279,
+   "name": "The Everbloom",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "557": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 1262,
+       "itemID": 116771,
+       "mountID": 634
+      }
+     ],
+     "numLoot": 31,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 16,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 0,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 0,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1228,
+   "name": "Draenor",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "558": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 195,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 195,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 195,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1195,
+   "name": "Iron Docks",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "559": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 239,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 239,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 239,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1358,
+   "name": "Upper Blackrock Spire",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "63": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 25,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 35,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 36,
+   "name": "Deadmines",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "64": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 31,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 33,
+   "name": "Shadowfang Keep",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "65": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 28,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 643,
+   "name": "Throne of the Tides",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "66": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 32,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 32,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 645,
+   "name": "Blackrock Caverns",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "669": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 271,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 271,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 1438,
+       "itemID": 123890,
+       "mountID": 751
+      }
+     ],
+     "numLoot": 272,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 168,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1448,
+   "name": "Hellfire Citadel",
+   "tier": 6,
+   "tierName": "Warlords of Draenor"
+  },
+  "67": {
+   "difficulties": {
+    "1": {
+     "mounts": [
+      {
+       "encounterID": 111,
+       "itemID": 63043,
+       "mountID": 397
+      }
+     ],
+     "numLoot": 30,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [
+      {
+       "encounterID": 111,
+       "itemID": 63043,
+       "mountID": 397
+      }
+     ],
+     "numLoot": 30,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 725,
+   "name": "The Stonecore",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "68": {
+   "difficulties": {
+    "1": {
+     "mounts": [
+      {
+       "encounterID": 115,
+       "itemID": 63040,
+       "mountID": 395
+      }
+     ],
+     "numLoot": 26,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [
+      {
+       "encounterID": 115,
+       "itemID": 63040,
+       "mountID": 395
+      }
+     ],
+     "numLoot": 26,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 657,
+   "name": "The Vortex Pinnacle",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "69": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 27,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 755,
+   "name": "Lost City of the Tol'vir",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "70": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 644,
+   "name": "Halls of Origination",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "707": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 56,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 56,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 56,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1493,
+   "name": "Vault of the Wardens",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "71": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 32,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 30,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 670,
+   "name": "Grim Batol",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "716": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 57,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 57,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 57,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1456,
+   "name": "Eye of Azshara",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "72": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 55,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [],
+     "numLoot": 55,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [],
+     "numLoot": 71,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [],
+     "numLoot": 71,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 671,
+   "name": "The Bastion of Twilight",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "721": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 63,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 63,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 63,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1477,
+   "name": "Halls of Valor",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "726": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 57,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 57,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1516,
+   "name": "The Arcway",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "727": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 41,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1492,
+   "name": "Maw of Souls",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "73": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 80,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [],
+     "numLoot": 80,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [],
+     "numLoot": 86,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [],
+     "numLoot": 86,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 669,
+   "name": "Blackwing Descent",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "74": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 155,
+       "itemID": 63041,
+       "mountID": 396
+      }
+     ],
+     "numLoot": 41,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 155,
+       "itemID": 63041,
+       "mountID": 396
+      }
+     ],
+     "numLoot": 41,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [
+      {
+       "encounterID": 155,
+       "itemID": 63041,
+       "mountID": 396
+      }
+     ],
+     "numLoot": 42,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [
+      {
+       "encounterID": 155,
+       "itemID": 63041,
+       "mountID": 396
+      }
+     ],
+     "numLoot": 42,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 754,
+   "name": "Throne of the Four Winds",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "740": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 52,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 52,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 52,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1501,
+   "name": "Black Rook Hold",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "741": {
+   "difficulties": {
+    "9": {
+     "mounts": [],
+     "numLoot": 129,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 409,
+   "name": "Molten Core",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "742": {
+   "difficulties": {
+    "9": {
+     "mounts": [],
+     "numLoot": 135,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 469,
+   "name": "Blackwing Lair",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "743": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 59,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 509,
+   "name": "Ruins of Ahn'Qiraj",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "744": {
+   "difficulties": {
+    "9": {
+     "mounts": [],
+     "numLoot": 117,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 531,
+   "name": "Temple of Ahn'Qiraj",
+   "tier": 1,
+   "tierName": "Classic"
+  },
+  "745": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 1553,
+       "itemID": 30480,
+       "mountID": 168
+      }
+     ],
+     "numLoot": 145,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 532,
+   "name": "Karazhan",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "746": {
+   "difficulties": {
+    "4": {
+     "mounts": [],
+     "numLoot": 24,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 565,
+   "name": "Gruul's Lair",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "747": {
+   "difficulties": {
+    "4": {
+     "mounts": [],
+     "numLoot": 16,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 544,
+   "name": "Magtheridon's Lair",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "748": {
+   "difficulties": {
+    "4": {
+     "mounts": [],
+     "numLoot": 76,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 548,
+   "name": "Serpentshrine Cavern",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "749": {
+   "difficulties": {
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 1576,
+       "itemID": 32458,
+       "mountID": 183
+      }
+     ],
+     "numLoot": 56,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 550,
+   "name": "The Eye",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "75": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 427,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [],
+     "numLoot": 427,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 757,
+   "name": "Baradin Hold",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "750": {
+   "difficulties": {
+    "4": {
+     "mounts": [],
+     "numLoot": 63,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 534,
+   "name": "The Battle for Mount Hyjal",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "751": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 116,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 564,
+   "name": "Black Temple",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "752": {
+   "difficulties": {
+    "4": {
+     "mounts": [],
+     "numLoot": 95,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 580,
+   "name": "Sunwell Plateau",
+   "tier": 2,
+   "tierName": "Burning Crusade"
+  },
+  "753": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 1597,
+       "itemID": 43959,
+       "mountID": 286
+      }
+     ],
+     "numLoot": 456,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 1597,
+       "itemID": 43959,
+       "mountID": 286
+      }
+     ],
+     "numLoot": 456,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 624,
+   "name": "Vault of Archavon",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "754": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 140,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [],
+     "numLoot": 221,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 533,
+   "name": "Naxxramas",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "755": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 1616,
+       "itemID": 43986,
+       "mountID": 253
+      }
+     ],
+     "numLoot": 20,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 1616,
+       "itemID": 43954,
+       "mountID": 250
+      }
+     ],
+     "numLoot": 25,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 615,
+   "name": "The Obsidian Sanctum",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "756": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 1617,
+       "itemID": 43953,
+       "mountID": 247
+      },
+      {
+       "encounterID": 1617,
+       "itemID": 43952,
+       "mountID": 246
+      }
+     ],
+     "numLoot": 12,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 1617,
+       "itemID": 43952,
+       "mountID": 246
+      },
+      {
+       "encounterID": 1617,
+       "itemID": 43953,
+       "mountID": 247
+      }
+     ],
+     "numLoot": 22,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 616,
+   "name": "The Eye of Eternity",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "757": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 69,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [],
+     "numLoot": 85,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [],
+     "numLoot": 70,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [],
+     "numLoot": 85,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 649,
+   "name": "Trial of the Crusader",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "758": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 146,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [],
+     "numLoot": 147,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [],
+     "numLoot": 150,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [
+      {
+       "encounterID": 1636,
+       "itemID": 50818,
+       "mountID": 363
+      }
+     ],
+     "numLoot": 151,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 631,
+   "name": "Icecrown Citadel",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "759": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 1649,
+       "itemID": 45693,
+       "mountID": 304
+      }
+     ],
+     "numLoot": 413,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 603,
+   "name": "Ulduar",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "76": {
+   "difficulties": {
+    "1": {
+     "mounts": [
+      {
+       "encounterID": 176,
+       "itemID": 68823,
+       "mountID": 410
+      },
+      {
+       "encounterID": 181,
+       "itemID": 68824,
+       "mountID": 411
+      }
+     ],
+     "numLoot": 44,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [
+      {
+       "encounterID": 176,
+       "itemID": 68823,
+       "mountID": 410
+      },
+      {
+       "encounterID": 181,
+       "itemID": 68824,
+       "mountID": 411
+      }
+     ],
+     "numLoot": 44,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 859,
+   "name": "Zul'Gurub",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "760": {
+   "difficulties": {
+    "3": {
+     "mounts": [
+      {
+       "encounterID": 1651,
+       "itemID": 49636,
+       "mountID": 349
+      }
+     ],
+     "numLoot": 36,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [
+      {
+       "encounterID": 1651,
+       "itemID": 49636,
+       "mountID": 349
+      }
+     ],
+     "numLoot": 36,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 249,
+   "name": "Onyxia's Lair",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "761": {
+   "difficulties": {
+    "3": {
+     "mounts": [],
+     "numLoot": 12,
+     "uncached": 0
+    },
+    "4": {
+     "mounts": [],
+     "numLoot": 16,
+     "uncached": 0
+    },
+    "5": {
+     "mounts": [],
+     "numLoot": 12,
+     "uncached": 0
+    },
+    "6": {
+     "mounts": [],
+     "numLoot": 16,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 724,
+   "name": "The Ruby Sanctum",
+   "tier": 3,
+   "tierName": "Wrath of the Lich King"
+  },
+  "762": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 54,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 54,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 54,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1466,
+   "name": "Darkheart Thicket",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "767": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 53,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 53,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 53,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1458,
+   "name": "Neltharion's Lair",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "768": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 107,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 108,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 108,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 107,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1520,
+   "name": "The Emerald Nightmare",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "77": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 36,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 36,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 568,
+   "name": "Zul'Aman",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "777": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 94,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 94,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 94,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1544,
+   "name": "Assault on Violet Hold",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "78": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 194,
+       "itemID": 71665,
+       "mountID": 425
+      },
+      {
+       "encounterID": 198,
+       "itemID": 69224,
+       "mountID": 415
+      }
+     ],
+     "numLoot": 112,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [
+      {
+       "encounterID": 194,
+       "itemID": 71665,
+       "mountID": 425
+      },
+      {
+       "encounterID": 198,
+       "itemID": 69224,
+       "mountID": 415
+      }
+     ],
+     "numLoot": 122,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 720,
+   "name": "Firelands",
+   "tier": 4,
+   "tierName": "Cataclysm"
+  },
+  "786": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 1737,
+       "itemID": 137574,
+       "mountID": 791
+      }
+     ],
+     "numLoot": 195,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [
+      {
+       "encounterID": 1737,
+       "itemID": 137574,
+       "mountID": 791
+      }
+     ],
+     "numLoot": 195,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 1737,
+       "itemID": 137575,
+       "mountID": 633
+      },
+      {
+       "encounterID": 1737,
+       "itemID": 137574,
+       "mountID": 791
+      }
+     ],
+     "numLoot": 196,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 194,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1530,
+   "name": "The Nighthold",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "800": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 44,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 44,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1571,
+   "name": "Court of Stars",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "822": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 113,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 113,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 113,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 113,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1520,
+   "name": "Broken Isles",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "860": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 93,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [
+      {
+       "encounterID": 1835,
+       "itemID": 142236,
+       "mountID": 875
+      }
+     ],
+     "numLoot": 94,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1651,
+   "name": "Return to Karazhan",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "861": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1648,
+   "name": "Trial of Valor",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "875": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 1861,
+       "itemID": 143643,
+       "mountID": 899
+      }
+     ],
+     "numLoot": 200,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [
+      {
+       "encounterID": 1861,
+       "itemID": 143643,
+       "mountID": 899
+      }
+     ],
+     "numLoot": 200,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 1861,
+       "itemID": 143643,
+       "mountID": 899
+      }
+     ],
+     "numLoot": 200,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [
+      {
+       "encounterID": 1861,
+       "itemID": 143643,
+       "mountID": 899
+      }
+     ],
+     "numLoot": 200,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1676,
+   "name": "Tomb of Sargeras",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "900": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 46,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 46,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1677,
+   "name": "Cathedral of Eternal Night",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "945": {
+   "difficulties": {
+    "2": {
+     "mounts": [],
+     "numLoot": 50,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 50,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1753,
+   "name": "Seat of the Triumvirate",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "946": {
+   "difficulties": {
+    "14": {
+     "mounts": [
+      {
+       "encounterID": 1987,
+       "itemID": 152816,
+       "mountID": 971
+      }
+     ],
+     "numLoot": 237,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [
+      {
+       "encounterID": 1987,
+       "itemID": 152816,
+       "mountID": 971
+      }
+     ],
+     "numLoot": 237,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [
+      {
+       "encounterID": 1987,
+       "itemID": 152816,
+       "mountID": 971
+      },
+      {
+       "encounterID": 2031,
+       "itemID": 152789,
+       "mountID": 954
+      }
+     ],
+     "numLoot": 238,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [
+      {
+       "encounterID": 1987,
+       "itemID": 152816,
+       "mountID": 971
+      }
+     ],
+     "numLoot": 231,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1712,
+   "name": "Antorus, the Burning Throne",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "959": {
+   "difficulties": {
+    "14": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    },
+    "15": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    },
+    "16": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    },
+    "17": {
+     "mounts": [],
+     "numLoot": 42,
+     "uncached": 0
+    }
+   },
+   "isRaid": true,
+   "mapID": 1520,
+   "name": "Invasion Points",
+   "tier": 7,
+   "tierName": "Legion"
+  },
+  "968": {
+   "difficulties": {
+    "1": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    },
+    "2": {
+     "mounts": [],
+     "numLoot": 33,
+     "uncached": 0
+    },
+    "23": {
+     "mounts": [],
+     "numLoot": 34,
+     "uncached": 0
+    }
+   },
+   "isRaid": false,
+   "mapID": 1763,
+   "name": "Atal'Dazar",
+   "tier": 8,
+   "tierName": "Battle for Azeroth"
+  }
+ },
+ "locale": "enUS",
+ "maps": {
+  "1": {
+   "mapType": 3,
+   "name": "Durotar",
+   "parentMapID": 12
+  },
+  "10": {
+   "mapType": 3,
+   "name": "Northern Barrens",
+   "parentMapID": 12
+  },
+  "100": {
+   "mapType": 3,
+   "name": "Hellfire Peninsula",
+   "parentMapID": 101
+  },
+  "102": {
+   "mapType": 3,
+   "name": "Zangarmarsh",
+   "parentMapID": 101
+  },
+  "104": {
+   "mapType": 3,
+   "name": "Shadowmoon Valley",
+   "parentMapID": 101
+  },
+  "105": {
+   "mapType": 3,
+   "name": "Blade's Edge Mountains",
+   "parentMapID": 101
+  },
+  "107": {
+   "mapType": 3,
+   "name": "Nagrand",
+   "parentMapID": 101
+  },
+  "108": {
+   "mapType": 3,
+   "name": "Terokkar Forest",
+   "parentMapID": 101
+  },
+  "109": {
+   "mapType": 3,
+   "name": "Netherstorm",
+   "parentMapID": 101
+  },
+  "114": {
+   "mapType": 3,
+   "name": "Borean Tundra",
+   "parentMapID": 113
+  },
+  "115": {
+   "mapType": 3,
+   "name": "Dragonblight",
+   "parentMapID": 113
+  },
+  "116": {
+   "mapType": 3,
+   "name": "Grizzly Hills",
+   "parentMapID": 113
+  },
+  "1161": {
+   "mapType": 3,
+   "name": "Boralus",
+   "parentMapID": 895
+  },
+  "1169": {
+   "mapType": 3,
+   "name": "Tol Dagor",
+   "parentMapID": 876
+  },
+  "117": {
+   "mapType": 3,
+   "name": "Howling Fjord",
+   "parentMapID": 113
+  },
+  "118": {
+   "mapType": 3,
+   "name": "Icecrown",
+   "parentMapID": 113
+  },
+  "119": {
+   "mapType": 3,
+   "name": "Sholazar Basin",
+   "parentMapID": 113
+  },
+  "120": {
+   "mapType": 3,
+   "name": "The Storm Peaks",
+   "parentMapID": 113
+  },
+  "121": {
+   "mapType": 3,
+   "name": "Zul'Drak",
+   "parentMapID": 113
+  },
+  "123": {
+   "mapType": 3,
+   "name": "Wintergrasp",
+   "parentMapID": 113
+  },
+  "125": {
+   "mapType": 4,
+   "name": "Dalaran",
+   "parentMapID": 127
+  },
+  "1462": {
+   "mapType": 3,
+   "name": "Mechagon Island",
+   "parentMapID": 876
+  },
+  "15": {
+   "mapType": 3,
+   "name": "Badlands",
+   "parentMapID": 13
+  },
+  "1525": {
+   "mapType": 3,
+   "name": "Revendreth",
+   "parentMapID": 1550
+  },
+  "1527": {
+   "mapType": 3,
+   "name": "Uldum",
+   "parentMapID": 12
+  },
+  "1533": {
+   "mapType": 3,
+   "name": "Bastion",
+   "parentMapID": 1550
+  },
+  "1534": {
+   "mapType": 6,
+   "name": "Orgrimmar",
+   "parentMapID": 12
+  },
+  "1536": {
+   "mapType": 3,
+   "name": "Maldraxxus",
+   "parentMapID": 1550
+  },
+  "1543": {
+   "mapType": 3,
+   "name": "The Maw",
+   "parentMapID": 1550
+  },
+  "1565": {
+   "mapType": 3,
+   "name": "Ardenweald",
+   "parentMapID": 1550
+  },
+  "17": {
+   "mapType": 3,
+   "name": "Blasted Lands",
+   "parentMapID": 13
+  },
+  "170": {
+   "mapType": 3,
+   "name": "Hrothgar's Landing",
+   "parentMapID": 113
+  },
+  "18": {
+   "mapType": 3,
+   "name": "Tirisfal Glades",
+   "parentMapID": 13
+  },
+  "19": {
+   "mapType": 5,
+   "name": "Scarlet Monastery Entrance",
+   "parentMapID": 18
+  },
+  "1970": {
+   "mapType": 3,
+   "name": "Zereth Mortis",
+   "parentMapID": 1550
+  },
+  "198": {
+   "mapType": 3,
+   "name": "Mount Hyjal",
+   "parentMapID": 12
+  },
+  "199": {
+   "mapType": 3,
+   "name": "Southern Barrens",
+   "parentMapID": 12
+  },
+  "2022": {
+   "mapType": 3,
+   "name": "The Waking Shores",
+   "parentMapID": 1978
+  },
+  "2023": {
+   "mapType": 3,
+   "name": "Ohn'ahran Plains",
+   "parentMapID": 1978
+  },
+  "2024": {
+   "mapType": 3,
+   "name": "The Azure Span",
+   "parentMapID": 1978
+  },
+  "2025": {
+   "mapType": 3,
+   "name": "Thaldraszus",
+   "parentMapID": 1978
+  },
+  "203": {
+   "mapType": 3,
+   "name": "Vashj'ir",
+   "parentMapID": 13
+  },
+  "204": {
+   "mapType": 3,
+   "name": "Abyssal Depths",
+   "parentMapID": 203
+  },
+  "205": {
+   "mapType": 3,
+   "name": "Shimmering Expanse",
+   "parentMapID": 203
+  },
+  "207": {
+   "mapType": 3,
+   "name": "Deepholm",
+   "parentMapID": 948
+  },
+  "21": {
+   "mapType": 3,
+   "name": "Silverpine Forest",
+   "parentMapID": 13
+  },
+  "2133": {
+   "mapType": 3,
+   "name": "Zaralek Cavern",
+   "parentMapID": 1978
+  },
+  "22": {
+   "mapType": 3,
+   "name": "Western Plaguelands",
+   "parentMapID": 13
+  },
+  "2200": {
+   "mapType": 3,
+   "name": "Emerald Dream",
+   "parentMapID": 1978
+  },
+  "2213": {
+   "mapType": 3,
+   "name": "City of Threads",
+   "parentMapID": 2255
+  },
+  "2214": {
+   "mapType": 3,
+   "name": "The Ringing Deeps",
+   "parentMapID": 2274
+  },
+  "2215": {
+   "mapType": 3,
+   "name": "Hallowfall",
+   "parentMapID": 2274
+  },
+  "2216": {
+   "mapType": 3,
+   "name": "City of Threads - Lower",
+   "parentMapID": 2255
+  },
+  "224": {
+   "mapType": 3,
+   "name": "Stranglethorn Vale",
+   "parentMapID": 13
+  },
+  "2248": {
+   "mapType": 3,
+   "name": "Isle of Dorn",
+   "parentMapID": 2274
+  },
+  "2255": {
+   "mapType": 3,
+   "name": "Azj-Kahet",
+   "parentMapID": 2274
+  },
+  "2256": {
+   "mapType": 3,
+   "name": "Azj-Kahet - Lower",
+   "parentMapID": 2274
+  },
+  "23": {
+   "mapType": 3,
+   "name": "Eastern Plaguelands",
+   "parentMapID": 13
+  },
+  "2339": {
+   "mapType": 3,
+   "name": "Dornogal",
+   "parentMapID": 2248
+  },
+  "2346": {
+   "mapType": 3,
+   "name": "Undermine",
+   "parentMapID": 2214
+  },
+  "2371": {
+   "mapType": 3,
+   "name": "K'aresh",
+   "parentMapID": 2274
+  },
+  "2393": {
+   "mapType": 3,
+   "name": "Silvermoon City",
+   "parentMapID": 2395
+  },
+  "2395": {
+   "mapType": 3,
+   "name": "Eversong Woods",
+   "parentMapID": 2537
+  },
+  "2405": {
+   "mapType": 3,
+   "name": "Voidstorm",
+   "parentMapID": 2537
+  },
+  "241": {
+   "mapType": 3,
+   "name": "Twilight Highlands",
+   "parentMapID": 13
+  },
+  "2413": {
+   "mapType": 3,
+   "name": "Harandar",
+   "parentMapID": 2537
+  },
+  "2424": {
+   "mapType": 3,
+   "name": "Isle of Quel'Danas",
+   "parentMapID": 2537
+  },
+  "2437": {
+   "mapType": 3,
+   "name": "Zul'Aman",
+   "parentMapID": 2537
+  },
+  "244": {
+   "mapType": 3,
+   "name": "Tol Barad",
+   "parentMapID": 13
+  },
+  "2444": {
+   "mapType": 3,
+   "name": "Slayer's Rise",
+   "parentMapID": 2405
+  },
+  "2472": {
+   "mapType": 3,
+   "name": "Tazavesh",
+   "parentMapID": 2371
+  },
+  "249": {
+   "mapType": 3,
+   "name": "Uldum",
+   "parentMapID": 12
+  },
+  "25": {
+   "mapType": 3,
+   "name": "Hillsbrad Foothills",
+   "parentMapID": 13
+  },
+  "2509": {
+   "mapType": 3,
+   "name": "Vaults of Atal'Utek",
+   "parentMapID": 2512
+  },
+  "26": {
+   "mapType": 3,
+   "name": "The Hinterlands",
+   "parentMapID": 13
+  },
+  "2613": {
+   "mapType": 5,
+   "name": "The Underbelly",
+   "parentMapID": 2509
+  },
+  "27": {
+   "mapType": 3,
+   "name": "Dun Morogh",
+   "parentMapID": 13
+  },
+  "32": {
+   "mapType": 3,
+   "name": "Searing Gorge",
+   "parentMapID": 13
+  },
+  "327": {
+   "mapType": 6,
+   "name": "Ahn'Qiraj: The Fallen Kingdom",
+   "parentMapID": 12
+  },
+  "33": {
+   "mapType": 5,
+   "name": "Blackrock Mountain",
+   "parentMapID": 36
+  },
+  "34": {
+   "mapType": 5,
+   "name": "Blackrock Mountain",
+   "parentMapID": 36
+  },
+  "35": {
+   "mapType": 5,
+   "name": "Blackrock Mountain",
+   "parentMapID": 32
+  },
+  "36": {
+   "mapType": 3,
+   "name": "Burning Steppes",
+   "parentMapID": 13
+  },
+  "37": {
+   "mapType": 3,
+   "name": "Elwynn Forest",
+   "parentMapID": 13
+  },
+  "371": {
+   "mapType": 3,
+   "name": "The Jade Forest",
+   "parentMapID": 424
+  },
+  "376": {
+   "mapType": 3,
+   "name": "Valley of the Four Winds",
+   "parentMapID": 424
+  },
+  "379": {
+   "mapType": 3,
+   "name": "Kun-Lai Summit",
+   "parentMapID": 424
+  },
+  "388": {
+   "mapType": 3,
+   "name": "Townlong Steppes",
+   "parentMapID": 424
+  },
+  "390": {
+   "mapType": 3,
+   "name": "Vale of Eternal Blossoms",
+   "parentMapID": 424
+  },
+  "418": {
+   "mapType": 3,
+   "name": "Krasarang Wilds",
+   "parentMapID": 424
+  },
+  "42": {
+   "mapType": 3,
+   "name": "Deadwind Pass",
+   "parentMapID": 13
+  },
+  "422": {
+   "mapType": 3,
+   "name": "Dread Wastes",
+   "parentMapID": 424
+  },
+  "433": {
+   "mapType": 3,
+   "name": "The Veiled Stair",
+   "parentMapID": 424
+  },
+  "469": {
+   "mapType": 3,
+   "name": "New Tinkertown",
+   "parentMapID": 27
+  },
+  "48": {
+   "mapType": 3,
+   "name": "Loch Modan",
+   "parentMapID": 13
+  },
+  "50": {
+   "mapType": 3,
+   "name": "Northern Stranglethorn",
+   "parentMapID": 224
+  },
+  "504": {
+   "mapType": 3,
+   "name": "Isle of Thunder",
+   "parentMapID": 424
+  },
+  "51": {
+   "mapType": 3,
+   "name": "Swamp of Sorrows",
+   "parentMapID": 13
+  },
+  "52": {
+   "mapType": 3,
+   "name": "Westfall",
+   "parentMapID": 13
+  },
+  "525": {
+   "mapType": 3,
+   "name": "Frostfire Ridge",
+   "parentMapID": 572
+  },
+  "534": {
+   "mapType": 3,
+   "name": "Tanaan Jungle",
+   "parentMapID": 572
+  },
+  "535": {
+   "mapType": 3,
+   "name": "Talador",
+   "parentMapID": 572
+  },
+  "539": {
+   "mapType": 3,
+   "name": "Shadowmoon Valley",
+   "parentMapID": 572
+  },
+  "542": {
+   "mapType": 3,
+   "name": "Spires of Arak",
+   "parentMapID": 572
+  },
+  "543": {
+   "mapType": 3,
+   "name": "Gorgrond",
+   "parentMapID": 572
+  },
+  "550": {
+   "mapType": 3,
+   "name": "Nagrand",
+   "parentMapID": 572
+  },
+  "56": {
+   "mapType": 3,
+   "name": "Wetlands",
+   "parentMapID": 13
+  },
+  "62": {
+   "mapType": 3,
+   "name": "Darkshore",
+   "parentMapID": 12
+  },
+  "627": {
+   "mapType": 4,
+   "name": "Dalaran",
+   "parentMapID": 619
+  },
+  "63": {
+   "mapType": 3,
+   "name": "Ashenvale",
+   "parentMapID": 12
+  },
+  "630": {
+   "mapType": 3,
+   "name": "Azsuna",
+   "parentMapID": 619
+  },
+  "64": {
+   "mapType": 3,
+   "name": "Thousand Needles",
+   "parentMapID": 12
+  },
+  "641": {
+   "mapType": 3,
+   "name": "Val'sharah",
+   "parentMapID": 619
+  },
+  "646": {
+   "mapType": 3,
+   "name": "Broken Shore",
+   "parentMapID": 619
+  },
+  "650": {
+   "mapType": 3,
+   "name": "Highmountain",
+   "parentMapID": 619
+  },
+  "66": {
+   "mapType": 3,
+   "name": "Desolace",
+   "parentMapID": 12
+  },
+  "680": {
+   "mapType": 3,
+   "name": "Suramar",
+   "parentMapID": 619
+  },
+  "69": {
+   "mapType": 3,
+   "name": "Feralas",
+   "parentMapID": 12
+  },
+  "7": {
+   "mapType": 3,
+   "name": "Mulgore",
+   "parentMapID": 12
+  },
+  "70": {
+   "mapType": 3,
+   "name": "Dustwallow Marsh",
+   "parentMapID": 12
+  },
+  "71": {
+   "mapType": 3,
+   "name": "Tanaris",
+   "parentMapID": 12
+  },
+  "75": {
+   "mapType": 5,
+   "name": "Caverns of Time",
+   "parentMapID": 71
+  },
+  "76": {
+   "mapType": 3,
+   "name": "Azshara",
+   "parentMapID": 12
+  },
+  "77": {
+   "mapType": 3,
+   "name": "Felwood",
+   "parentMapID": 12
+  },
+  "78": {
+   "mapType": 3,
+   "name": "Un'Goro Crater",
+   "parentMapID": 12
+  },
+  "81": {
+   "mapType": 3,
+   "name": "Silithus",
+   "parentMapID": 12
+  },
+  "84": {
+   "mapType": 3,
+   "name": "Stormwind City",
+   "parentMapID": 13
+  },
+  "85": {
+   "mapType": 3,
+   "name": "Orgrimmar",
+   "parentMapID": 12
+  },
+  "86": {
+   "mapType": 6,
+   "name": "Orgrimmar",
+   "parentMapID": 85
+  },
+  "862": {
+   "mapType": 3,
+   "name": "Zuldazar",
+   "parentMapID": 875
+  },
+  "863": {
+   "mapType": 3,
+   "name": "Nazmir",
+   "parentMapID": 875
+  },
+  "864": {
+   "mapType": 3,
+   "name": "Vol'dun",
+   "parentMapID": 875
+  },
+  "885": {
+   "mapType": 3,
+   "name": "Antoran Wastes",
+   "parentMapID": 905
+  },
+  "895": {
+   "mapType": 3,
+   "name": "Tiragarde Sound",
+   "parentMapID": 876
+  }
+ },
+ "scannedAt": "2026-11-05 13:38:04"
+}

@@ -1,0 +1,21 @@
+{
+  "_doc": "Hand-curated corrections applied on top of the in-game scan. Every entry needs a reason. See docs/04-arquitectura.md (pipeline).",
+  "currentExpansionTier": 12,
+  "worldBossPseudoInstances": {
+    "_reason": "Encounter Journal 'raids' whose map is a whole continent; they list world bosses, not instances.",
+    "ids": [322, 557, 822, 959, 1028, 1192, 1205, 1278, 1312]
+  },
+  "excludeInstances": {
+    "_reason": "Not real instances (Mythic+ keystone aggregate).",
+    "ids": [1319]
+  },
+  "entranceOverrides": {
+    "760": {
+      "uiMapID": 70,
+      "reason": "Onyxia's Lair is in Dustwallow Marsh; the entrance also appears near the edge of Thousand Needles (64) and the heuristic picked that one."
+    }
+  },
+  "lockoutModels": {
+    "_doc": "journalInstanceID -> instance | perBoss | daily | none. Missing = unknown (Verification Required) until validated in v0.3."
+  }
+}
