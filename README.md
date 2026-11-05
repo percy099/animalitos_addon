@@ -1,6 +1,6 @@
 # Mount Planner — código fuente
 
-Estado: **Foundation v0.1** (esqueleto). Basado en la baseline v1.1 de `F:\WowAddons\Mount_Planner_Deliverables`.
+Estado: **Foundation v0.1** (esqueleto). La documentación de producto y técnica (v1.2) está en [`docs/`](docs/README.md).
 
 ## Estructura
 ```
