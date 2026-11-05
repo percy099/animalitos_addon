@@ -82,13 +82,14 @@ function UI.NumberBadge(parent, size)
 end
 
 -- Placeholder for sections that arrive in later parts.
-local function createPlaceholder(parent)
+local function createPlaceholder(parent, text)
     local p = CreateFrame("Frame", nil, parent)
     p:SetAllPoints()
     local t = fs(p, "GameFontHighlight", COLORS.muted)
     t:SetPoint("CENTER")
+    t:SetWidth(UI.CONTENT_WIDTH - 80)
     t:SetJustifyH("CENTER")
-    t:SetText(L["COMING_SOON"])
+    t:SetText(text or L["COMING_SOON"])
     return p
 end
 
@@ -195,8 +196,8 @@ function UI:Create()
     f.panels = {
         farm = ns.FarmPanel:Create(content),
         home = ns.HomePanel:Create(content),
-        collection = createPlaceholder(content),
-        settings = createPlaceholder(content),
+        collection = createPlaceholder(content, L["COLLECTION_SOON"]),
+        settings = ns.SettingsPanel:Create(content),
     }
     f.farm, f.summary = f.panels.farm, f.panels.home
 
@@ -281,6 +282,7 @@ function UI:Refresh()
     f.nav.farm.badge:SetText(sum.ready > 0 and tostring(sum.ready) or "")
     if f.farm:IsShown() then ns.FarmPanel:Refresh(f.farm, entries, sum) end
     if f.summary:IsShown() then ns.HomePanel:Refresh(f.summary, entries, sum) end
+    if f.panels.settings:IsShown() then ns.SettingsPanel:Refresh(f.panels.settings) end
 end
 
 --- Shows the window on a given section (used by the minimap button).

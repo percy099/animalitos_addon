@@ -167,6 +167,15 @@ function FarmList:InstanceName(jid)
     return (EJ_GetInstanceInfo(jid)) or ("#" .. jid)
 end
 
+--- Encounter Journal tiers (1 = Classic ... newest expansion).
+function FarmList:NumTiers()
+    return (EJ_GetNumTiers and EJ_GetNumTiers()) or 12
+end
+
+function FarmList:TierName(tier)
+    return (EJ_GetTierInfo(tier)) or ("#" .. tier)
+end
+
 function FarmList:BossName(src)
     return (src and src.journalEncounterID and EJ_GetEncounterInfo(src.journalEncounterID)) or "?"
 end

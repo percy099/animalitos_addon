@@ -10,6 +10,10 @@ local function tomtomAvailable()
     return type(TomTom) == "table" and type(TomTom.AddWaypoint) == "function"
 end
 
+function Navigation:IsTomTomAvailable()
+    return tomtomAvailable()
+end
+
 function Navigation:Mode()
     local mode = ns.Storage.db.settings.navigation
     if mode == "tomtom" and not tomtomAvailable() then return "native" end

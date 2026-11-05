@@ -44,3 +44,17 @@ function MinimapButton:Init()
     self.available = true
     return true
 end
+
+function MinimapButton:IsShown()
+    local m = ns.Storage.db.ui.minimap
+    return not (m and m.hide)
+end
+
+function MinimapButton:SetShown(shown)
+    local ui = ns.Storage.db.ui
+    ui.minimap = ui.minimap or {}
+    ui.minimap.hide = not shown
+    if self.dbicon then
+        if shown then self.dbicon:Show(ADDON_NAME) else self.dbicon:Hide(ADDON_NAME) end
+    end
+end
