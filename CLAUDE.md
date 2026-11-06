@@ -16,10 +16,10 @@ La especificación vigente es `docs/` (v1.2, en español). El documento más út
 | v0.2 Dataset desde el scan en el juego + pipeline | ✅ 67 fuentes, 66 monturas, 50 instancias |
 | v0.3 Lockouts + elegibilidad + `/aplan now` / `go` / `why` | ✅ validada en el cliente (Dragon Soul, Firelands, ICC, Ulduar, Utgarde Pinnacle) |
 | v0.4 Pestaña "Farmeable ahora" (tarjetas, Ir, Ocultar hasta el reset) | 🟡 funciona; **pendiente**: la flecha del waypoint nativo no se vio (diagnosticar con `/aplan navdebug`, ver §9) y reordenar a mano |
-| Rediseño de la UI (rama `josemaria`, v0.4.7–0.6.5) | 🟡 validado en el cliente; pendiente revisar y fusionar con un PR (ver §10) |
-| v0.5 Colección virtualizada, Detalle de montura | 🟡 Colección hecha en la rama `josemaria` (lista, filtros, vista por expansión); falta el Detalle de montura |
-| Planner (rama `josemaria`, v0.6.0–0.6.5) | ✅ validado en el cliente, también con mago |
-| v0.6 Cobertura legacy completa y curación | 🟡 rama `josemaria` v0.7–0.8: world bosses (6 monturas, lockout validado con Galleon) y logros con montura (lista + enlace a instancias). Faltan rares y Kraulok |
+| Rediseño de la UI (rama `josemaria`, v0.4.7–0.10.2) | 🟡 validado en el cliente; pendiente revisar y fusionar con un PR (ver §10) |
+| v0.5 Colección virtualizada, Detalle de montura | ✅ rama `josemaria`: Colección (List, Boss drops, Achievements, Other drops) y Detalle de montura (estado, dónde conseguirla por dificultad, logros, texto del diario) |
+| Planner (rama `josemaria`, v0.6.0–0.10.2) | ✅ validado en el cliente, también con mago |
+| v0.6 Cobertura legacy completa y curación | 🟡 rama `josemaria` v0.7–0.8: world bosses (6 monturas, lockout validado con Galleon) y logros con montura (lista + enlace a instancias). Rares y otros drops: solo quién y zona desde el diario (vista *Other drops*, botón Map). Falta Kraulok |
 | v1.0 Release (CurseForge/Wago) | ⏳ |
 
 ## 3. Entorno
@@ -52,7 +52,7 @@ El orden de carga está en el `.toc` y **importa**:
 | `UI/Style.lua` | Sistema visual compartido (`ns.UI`): paleta, fuentes, paneles redondeados, botones, interruptor (`UI.Switch`), slider, scroll fino, buscador, círculos, recorte del arte del EJ. Se carga antes que los paneles |
 | `UI/FarmPanel.lua` | *Farmable now*: buscador, grupos por continente, tarjetas con arte, secciones "Locked out" / "Needs verification" (pools) |
 | `UI/HomePanel.lua` | *Home*: saludo con banner, anillo de colección, casillas de estado, "Start here", reinicios |
-| `UI/MountPreview.lua` | Panel lateral con el modelo 3D (ModelScene, como el diario) y "Open in Mount Journal" |
+| `UI/MountPreview.lua` | Detalle de montura: modelo 3D (ModelScene), estado, dónde conseguirla (fuentes del dataset con estado por dificultad y Go, u "Other drops" con Map), logros, texto del diario |
 | `UI/SettingsPanel.lua` | *Settings*: navegación, expansión máxima, minimapa, tamaño y posición de la ventana |
 | `UI/CollectionPanel.lua` | *Collection*: lista virtualizada de todo el diario, buscador, filtros, vista por expansión (solo drops del dataset) |
 | `UI/PlannerPanel.lua` | *Planner*: tabla de pasos (pools), reinicios, Reset all/dungeons/raids, Hide completed, Next step |
@@ -122,17 +122,16 @@ Personajes de prueba: **Pennyus** (druida 90, con lockouts en FL H, ICC 25H, Uld
 1. **Flecha del waypoint nativo:** no se vio en Eastern Kingdoms. Pedir `/aplan navdebug` y revisar la opción `showInGameNavigation`, si `IsSuperTrackingUserWaypoint` está activo y la distancia de `C_Navigation`. Alternativa: `/aplan nav tomtom`.
 2. Terminar la v0.4: reordenar la lista a mano (AC-09) y probar Ocultar y "Mostrar ocultas" entre reinicios del juego.
 3. Curar los huecos del reporte (entradas) y validar la lista en esES/esMX.
-4. v0.5: falta el Detalle de montura (fuentes y explicación por dificultad, como `/aplan why`); la Colección ya está en la rama `josemaria`.
-5. Datos: rares con montura (fuente y zona desde el texto del diario de monturas), misión oculta de Kraulok (capturar misiones completadas antes/después del kill).
-6. Planner: más portales escritos a mano (Horda, Kul Tiras/Zandalar, Shadowlands, druidas, Dalaran Hearthstone, juguetes de teletransporte). Los casos no cubiertos dicen "Travel to …".
-7. Preguntas abiertas: reparto de roles en el equipo, nombre público, publicar en CurseForge, en Wago o en ambos.
+4. Datos: misión oculta de Kraulok (capturar misiones completadas antes/después del kill). Rares: **no** replicar RareScanner (decisión del jugador): el addon dice qué rares faltan y en qué zona; RareScanner hace el resto.
+5. Planner: rutas de la Horda sin validar (nadie del equipo con Horda las ha probado); Horda → Isle of Thunder sin coordenadas. Los casos no cubiertos dicen "Travel to …".
+6. Preguntas abiertas: reparto de roles en el equipo, nombre público, publicar en CurseForge, en Wago o en ambos.
 
 ## 10. Rediseño de la UI (rama `josemaria`)
 Hecho por Josemaria Vives con Claude, guiado por el vision board del producto (`01_Mount_Planner_Product_Vision_Board.png`, fuera del repo) y con **ideas** de EllesmereUI. EllesmereUI es "all rights reserved": no se copió código ni arte, solo técnicas (bordes de 1 px, jerarquía de texto por transparencia, línea de brillo, botones planos, títulos en mayúsculas).
 
 **Decisiones:**
 - Ventana 720×500; siempre abre en *Farmable now*; orden de la barra lateral Home → Farmable now → Planner → Collection → Settings.
-- **Planner:** el orden de la ruta es fijo a propósito (pedido del jugador: si vas a Stormwind por los portales, la lista no puede reordenarse). Se calcula una vez por facción con todo el dataset: continentes en orden fijo (`ORDER`), y dentro de cada uno, vecino más cercano desde un hub fijo (`HUBS`). Lo hecho se marca o se oculta, sin mover el resto. Los textos de viaje vienen de tablas escritas a mano (`ZONE_PORTALS`, `CONTINENT_PORTALS`, `MAGE`); lo que no está cubierto cae en "Travel to …". Reglas de mago validadas: un teletransporte que deja en la zona de la instancia gana siempre (Theramore para Onyxia); un teletransporte lejano no gana a un portal de capital (Stormwind → Caverns of Time, no Theramore + vuelo); el mago usa el viaje gratis a la capital para tomar portales de zona (Uldum). Un portal que deja en el mapa padre (Tanaris) cuenta como llegada a la subzona (Caverns of Time).
+- **Planner:** el orden de la ruta es fijo a propósito (pedido del jugador: si vas a Stormwind por los portales, la lista no puede reordenarse). Se calcula una vez por facción con todo el dataset: continentes en orden fijo (`ORDER`), y dentro de cada uno, vecino más cercano desde un hub fijo (`HUBS`). Lo hecho se marca o se oculta, sin mover el resto. Los textos de viaje vienen de tablas escritas a mano (`ZONE_PORTALS`, `CONTINENT_PORTALS`, `MAGE`); lo que no está cubierto cae en "Travel to …". Reglas de mago validadas: un teletransporte que deja en la zona de la instancia gana siempre (Theramore para Onyxia); un teletransporte lejano no gana a un portal de capital (Stormwind → Caverns of Time, no Theramore + vuelo); el mago usa el viaje gratis a la capital para tomar portales de zona (Uldum). Un portal que deja en el mapa padre (Tanaris) cuenta como llegada a la subzona (Caverns of Time). Orden de prioridad en `TravelTexts`: teletransporte de Mythic+ conocido ("Path of…", leído de los flyouts del libro de hechizos por su descripción) → zonas solo por portal (`ZONE_ACCESS`: Isle of Thunder vía Townlong Steppes 49.7, 68.7 para Alianza) → rutas por cadena (`CONTINENT_ROUTES`: Alianza → Zandalar por Durotar y barco de las Islas del Eco) → teletransporte de mago a la zona → portales de zona/continente de la capital, teletransporte de mago al continente o `TRAVEL_ITEMS` (Dalaran y Garrison Hearthstone) → "Fly to".
 - **World bosses:** el EJ los agrupa en pseudoinstancias por continente; el pipeline crea una entrada por jefe con clave `-journalEncounterID` (`ejInstance`, `encounter`, dificultad única `0` = semanal). La posición se toma en el juego del pin del EJ (`C_EncounterJournal.GetEncountersOnMap`); el kill semanal, de `GetSavedWorldBossInfo` (comparando el nombre del encuentro y de sus criaturas: Galleon se guarda como "Galleon", validado). Solo `worldBossLockouts = savedWorldBoss` puede ser Ready; BfA (Kraulok) queda en verificación. En el Planner son opcionales ("Include world bosses", apagado por defecto).
 - **Logros:** se leen del cliente al vuelo, no van al dataset. Se construyen en una corrutina con `C_Timer.After(0)` (~6 ms por frame) porque recorrer todos los logros en un frame congelaba la pantalla. El enlace logro → instancia compara cada criterio pendiente (y el nombre/descripción del sublogro) con los nombres de jefes del EJ; es solo una pista.
 - **Datos de terceros revisados:** Mount Route Planner (Data) y RareScanner son "All Rights Reserved": no se usan ni se abren sus datos.
