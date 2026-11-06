@@ -347,6 +347,18 @@ function Collection:BuyInfo(mountID)
     return out
 end
 
+--- Missing mounts (visible for this character) whose price can be paid now.
+function Collection:BuyableCount()
+    local n = 0
+    for _, m in ipairs(self:GetList() or {}) do
+        if not m.isCollected then
+            local info = self:BuyInfo(m.mountID)
+            if info and info.canBuy == true then n = n + 1 end
+        end
+    end
+    return n
+end
+
 --- /aplan costs: uncollected mounts with a price, raw and parsed.
 function Collection:DebugCosts()
     -- Priced mounts with what was read; then how many could not be read.

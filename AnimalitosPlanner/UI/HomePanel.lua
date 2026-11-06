@@ -181,6 +181,9 @@ local STATS = {
       icon = "Interface\\LFGFrame\\UI-LFG-ICON-LOCK" },
     { key = "verify",  label = "STAT_VERIFY",  color = "muted",   opensFarm = true,
       icon = "Interface\\RaidFrame\\ReadyCheck-Waiting" },
+    -- Missing mounts whose price this character can pay (opens Collection).
+    { key = "buyable", label = "STAT_BUYABLE", color = "accent",  opensBuyable = true,
+      icon = "Interface\\MoneyFrame\\UI-GoldIcon" },
 }
 
 local function createStatTiles(p, top)
@@ -214,6 +217,14 @@ local function createStatTiles(p, top)
         if stat.opensFarm then
             t:EnableMouse(true)
             t:SetScript("OnMouseUp", function() ns.UI:SelectTab("farm") end)
+        elseif stat.opensBuyable then
+            -- Collection list, missing mounts, "Can pay now" in the source menu.
+            t:EnableMouse(true)
+            t:SetScript("OnMouseUp", function()
+                local ui = ns.Storage.db.ui
+                ui.collectionView, ui.collectionFilter, ui.collectionSource = "list", "missing", "buyable"
+                ns.UI:SelectTab("collection")
+            end)
         end
         p.stats[stat.key] = t
     end
@@ -388,6 +399,7 @@ function HomePanel:Refresh(p, entries, sum)
     p.stats.ready.value:SetText(fmt(sum.ready))
     p.stats.locked.value:SetText(ns.Lockouts.loaded and fmt(sum.locked) or "…")
     p.stats.verify.value:SetText(fmt(sum.verify))
+    p.stats.buyable.value:SetText(fmt(ns.Collection:BuyableCount()))
 
     -- First instances of the farm list (already ordered by proximity).
     local shown = 0

@@ -90,7 +90,16 @@ function W:ParseCost(text)
         end
     end
     if copper > 0 then table.insert(parts, 1, { kind = "gold", need = copper }) end
-    return #parts > 0 and parts or nil
+    -- Two vendors with the same price list it twice: keep one.
+    local seen, unique = {}, {}
+    for _, p in ipairs(parts) do
+        local key = ("%s:%s:%d"):format(p.kind, tostring(p.id or p.icon), p.need)
+        if not seen[key] then
+            seen[key] = true
+            unique[#unique + 1] = p
+        end
+    end
+    return #unique > 0 and unique or nil
 end
 
 --- How much of a price part this character has (nil = cannot tell).
