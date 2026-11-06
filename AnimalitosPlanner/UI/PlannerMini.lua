@@ -61,9 +61,13 @@ local function create()
     f:SetMovable(true)
     f:EnableMouse(true)
     f:RegisterForDrag("LeftButton")
-    f:SetScript("OnDragStart", f.StartMoving)
+    f:SetScript("OnDragStart", function(self)
+        if not InCombatLockdown() then hideSecure() end -- they do not follow the drag
+        self:StartMoving()
+    end)
     f:SetScript("OnDragStop", function(self)
         self:StopMovingOrSizing()
+        Mini:Refresh() -- puts the travel buttons back over their lines
         local point, _, relPoint, x, y = self:GetPoint()
         db().miniPoint = { point, relPoint, x, y }
     end)
@@ -82,7 +86,7 @@ local function create()
     open:SetPoint("TOPRIGHT", close, "TOPLEFT", -4, 0)
     open:SetHeight(26)
     open:RegisterForDrag("LeftButton")
-    open:SetScript("OnDragStart", function() f:StartMoving() end)
+    open:SetScript("OnDragStart", function() f:GetScript("OnDragStart")(f) end)
     open:SetScript("OnDragStop", function() f:GetScript("OnDragStop")(f) end)
     open:SetScript("OnClick", function() ns.UI:Open("planner") end)
     open:SetScript("OnEnter", function(self)
@@ -205,6 +209,34 @@ local function secureButton(i)
     return b
 end
 
+-- A secure button over a travel line. Placed by screen position on
+-- UIParent (not anchored to the line: a protected button anchored to the
+-- window would make the window protected too); moved again after a drag.
+local function placeSecure(f, t, action)
+    local left, top, right, bottom = t:GetLeft(), t:GetTop(), t:GetRight(), t:GetBottom()
+    if not (left and top and right and bottom) then
+        -- Not laid out yet (first open): try once more a moment later.
+        if not f.secureRetry then
+            f.secureRetry = true
+            C_Timer.After(0.1, function() Mini:Refresh() end)
+        end
+        return
+    end
+    local k = t:GetEffectiveScale() / UIParent:GetEffectiveScale()
+    f.secureUsed = f.secureUsed + 1
+    local b = secureButton(f.secureUsed)
+    b:SetAttribute("type", action.type)
+    b:SetAttribute("spell", action.spell)
+    b:SetAttribute("toy", action.toy)
+    b:SetAttribute("item", action.item)
+    b.actionName = action.name
+    b:SetFrameStrata(f:GetFrameStrata())
+    b:SetFrameLevel(f:GetFrameLevel() + 20)
+    b:ClearAllPoints()
+    b:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left * k - 4, top * k + 2)
+    b:SetSize((right - left) * k + 8, (top - bottom) * k + 4)
+    b:Show()
+end
 -- clickable: true for the current step (its first hop is where you are).
 local function travelLines(f, travel, color, clickable)
     for i, text in ipairs(travel) do
@@ -216,19 +248,12 @@ local function travelLines(f, travel, color, clickable)
         local t = line(f, "small", action and ns.UI.COLORS.text or color)
         place(f, t, ("|T%s:14:14:0:0:64:64:5:59:5:59|t  %s"):format(ns.Planner:TravelIcon(text), text), 2)
         if action then
-            f.secureUsed = f.secureUsed + 1
-            local b = secureButton(f.secureUsed)
-            b:SetAttribute("type", action.type)
-            b:SetAttribute("spell", action.spell)
-            b:SetAttribute("toy", action.toy)
-            b:SetAttribute("item", action.item)
-            b.actionName = action.name
-            b:SetFrameStrata(f:GetFrameStrata())
-            b:SetFrameLevel(f:GetFrameLevel() + 20)
-            b:ClearAllPoints()
-            b:SetPoint("TOPLEFT", t, "TOPLEFT", -4, 2)
-            b:SetPoint("BOTTOMRIGHT", t, "BOTTOMRIGHT", 4, -2)
-            b:Show()
+            -- Never let a failure here stop the window from drawing; say why.
+            local ok, err = pcall(placeSecure, f, t, action)
+            if not ok and not f.secureError then
+                f.secureError = true
+                ns:Print("travel button: " .. tostring(err))
+            end
         end
     end
 end
