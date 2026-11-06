@@ -98,6 +98,7 @@ Sin el juego:  python3 pipeline/build_dataset.py --from-raw data/raw/scan-12.1.5
 - **Huecos actuales:**
   - 5 instancias sin entrada: Throne of the Four Winds, Magisters' Terrace viejo (249, posiblemente reemplazado por la versión de Midnight 1300), Return to Karazhan, Ny'alotha y Stratholme Service Entrance.
   - 2 entradas dudosas: Vortex Pinnacle (Uldum, probablemente bien) y Nerub-ar Palace.
+- **Drops curados** (`extraSources` en `overrides.json`): monturas de jefes que el EJ no lista (Bronze Drake, Smoldering Ember Wyrm, Aerial Unit R-21/X, los otros 3 jefes de Vault of Archavon). Verificados a mano en Wowhead y warcraft.wiki.gg; en el juego `FarmList:ResolveCurated` comprueba el mountID desde el objeto y busca el journalEncounterID por dungeonEncounterID. Jefes ocultos (`hiddenBoss`) quedan siempre en To verify. Un segundo `/aplan scan` (2026-11-06, otra cuenta) dio **los mismos drops** y menos entradas (170 contra 181), así que se mantuvo el scan anterior.
 - Datos de terceros: **no importar** Rarity, SimpleArmory ni HandyNotes sin revisar su licencia (somos MIT). Wowhead solo para verificar a mano; nunca scraping.
 - `pipeline/savedvars.py` parsea SavedVariables. Ojo: el cliente escribe `nil,` como relleno en los arrays.
 
