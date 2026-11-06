@@ -117,6 +117,12 @@ local function create()
     f.undo:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
+    -- Instance helper: sets the difficulty the mounts drop on.
+    f.diff = ns.UI.Button(f, "primary")
+    f.diff:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    ns:On("PLAYER_DIFFICULTY_CHANGED", function()
+        if f:IsShown() then ns:Debounce("mini-diff", 0.3, function() Mini:Refresh() end) end
+    end)
     f.sep = f:CreateTexture(nil, "ARTWORK")
     f.sep:SetHeight(1)
     f.sep:SetColorTexture(1, 1, 1, 0.08)
@@ -172,6 +178,44 @@ local function runTitle(s)
     return ns.PlannerPanel.StepTitle(s)
 end
 
+-- Difficulty line (and its button) for a step at its entrance or inside.
+local DIFF_BLOCKED = { combat = "JOURNAL_COMBAT", leader = "MINI_DIFF_LEADER" }
+local function helper(f, e)
+    local C = ns.UI.COLORS
+    local D = ns.Difficulty
+    local want = D:Pick(e)
+    if not want then return end
+    local inside = D:Inside(e)
+    if inside then
+        if D:Drops(e, inside) then
+            place(f, line(f, "small", C.success), "|A:common-icon-checkmark:12:12|a  " .. L["MINI_DIFF_OK"]:format(D:Name(inside)), 6)
+        else
+            place(f, line(f, "small", C.warning), L["MINI_DIFF_WRONG"]:format(D:Name(inside), D:Name(want)), 6)
+        end
+        return
+    end
+    if D:IsSet(want) then
+        place(f, line(f, "small", C.success), "|A:common-icon-checkmark:12:12|a  " .. L["MINI_DIFF_SET"]:format(D:Name(want)), 6)
+        return
+    end
+    place(f, line(f, "small", C.text), L["MINI_DIFF_NEED"]:format(D:Name(want)), 6)
+    if not D:Settable(want) then return end
+    local blocked = D:Blocked()
+    ns.UI.SetButtonText(f.diff, L["MINI_DIFF_BTN"]:format(ns.FarmList:DifficultyName(want)), 90)
+    f.diff:ClearAllPoints()
+    f.diff:SetPoint("TOPLEFT", PAD, -(f.y + 4))
+    f.diff:SetEnabled(blocked == nil)
+    f.diff:SetScript("OnClick", function()
+        if not D:Set(want) then ns:Print(L[DIFF_BLOCKED[D:Blocked()] or "MINI_DIFF_LEADER"]) end
+    end)
+    f.diff:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(blocked and L[DIFF_BLOCKED[blocked] or "MINI_DIFF_LEADER"] or L["MINI_DIFF_TIP"], 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    f.diff:Show()
+    f.y = f.y + 4 + 22
+end
 function Mini:Refresh()
     local f = self.frame
     if not f or not f:IsShown() then return end
@@ -213,6 +257,11 @@ function Mini:Refresh()
     place(f, line(f, "title", C.text), runTitle(s), #cur.travel > 0 and 6 or 0)
     local rows, detail, note = ns.PlannerPanel.Describe(s)
     place(f, line(f, "tiny", C.muted), detail, 2)
+    -- At the entrance or inside: the difficulty the mounts drop on, and the
+    -- boss in front of each mount.
+    local here = not s.event and s.e and (s.e.near == 2 or ns.Difficulty:Inside(s.e) ~= nil)
+    f.diff:Hide()
+    if here then helper(f, s.e) end
     -- One clickable line per mount: click shows its 3D model beside the window.
     local seen, n = {}, 0
     for _, r in ipairs(rows) do
@@ -221,7 +270,10 @@ function Mini:Refresh()
             n = n + 1
             local b = mountButton(f, n)
             b.mountID = r.id
-            b.text:SetText(("|T%s:14:14:0:0|t %s"):format(r.icon, r.mount))
+            local label = r.mount
+            local m = here and s.e.mounts[r.id]
+            if m then label = ("%s  |cff999999%s|r"):format(r.mount, ns.FarmList:BossName(m.source)) end
+            b.text:SetText(("|T%s:14:14:0:0|t %s"):format(r.icon, label))
             b:SetPoint("TOPLEFT", PAD, -(f.y + 3))
             f.y = f.y + 3 + 16
         end
