@@ -172,21 +172,29 @@ local function header(lay, key)
     lay.y = lay.y + 4
 end
 
-local function goButton(lay, anchor, jid)
+-- Small button at the right of a text line: "Go" (waypoint) or "Map".
+local function lineButton(lay, anchor, label, enabled, onClick)
     local f = lay.f
     lay.nGo = lay.nGo + 1
     local b = f.gos[lay.nGo]
     if not b then
         b = ns.UI.Button(f.scrollChild, "primary")
-        ns.UI.SetButtonText(b, L["BTN_GO"], GO_W)
         b:SetHeight(20)
         f.gos[lay.nGo] = b
     end
+    ns.UI.SetButtonText(b, label, GO_W)
+    b:SetHeight(20)
     b:ClearAllPoints()
     b:SetPoint("TOPRIGHT", f.scrollChild, "TOPRIGHT", 0, select(5, anchor:GetPoint(1)) + 2)
-    b:SetEnabled(ns.Data.instances[jid] and ns.Data.instances[jid].entrance ~= nil)
-    b:SetScript("OnClick", function() ns.Navigation:GoToInstance(jid) end)
+    b:SetEnabled(enabled)
+    b:SetScript("OnClick", onClick)
     b:Show()
+end
+
+local function goButton(lay, anchor, jid)
+    local inst = ns.Data.instances[jid]
+    lineButton(lay, anchor, L["BTN_GO"], inst and inst.entrance ~= nil,
+        function() ns.Navigation:GoToInstance(jid) end)
 end
 
 local function achRow(lay, a)
@@ -313,6 +321,25 @@ local function build(f, mountID, m, extra)
         end
     end
 
+    -- Not in the dataset: who drops it and where, from the journal text.
+    -- No coordinates (the game does not give them) and no kill status.
+    local drops = (#blocks == 0) and ns.Collection:DropInfo(mountID) or nil
+    if drops and #drops > 0 then
+        header(lay, "DETAIL_WHERE")
+        for i, d in ipairs(drops) do
+            local title = text(lay, d.who, "title", C.text, 0, i > 1 and 10 or 2, GO_W + 6)
+            local zoneID = d.zone and d.zone.uiMapID
+            lineButton(lay, title, L["BTN_MAP"], zoneID ~= nil, function()
+                if not ns.Navigation:OpenMap(zoneID) then ns:Print(L["JOURNAL_COMBAT"]) end
+            end)
+            if d.zone then text(lay, d.zone.name, "small", C.dim, 0, 1, GO_W + 6) end
+            for _, e in ipairs(d.extra) do text(lay, e, "tiny", C.muted, 0, 1) end
+        end
+        if not (m and m.isCollected) then
+            text(lay, L["DETAIL_DROP_NOTE"], "tiny", C.muted, 0, 6)
+        end
+    end
+
     -- Achievements that reward this mount (built in the background).
     local achs = ns.Collection:Achievements()
     local mine = {}
@@ -332,7 +359,7 @@ local function build(f, mountID, m, extra)
     if extra.description and extra.description ~= "" then
         text(lay, extra.description, "small", C.muted, 0, 8)
     end
-    if #blocks == 0 and #mine == 0 and not (m and m.isCollected) then
+    if #blocks == 0 and #mine == 0 and not (drops and #drops > 0) and not (m and m.isCollected) then
         text(lay, L["DETAIL_NO_DATA"], "tiny", C.muted, 0, 10)
     end
     return lay.y

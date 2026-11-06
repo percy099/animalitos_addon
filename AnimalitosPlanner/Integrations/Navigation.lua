@@ -123,6 +123,37 @@ function Navigation:FindEncounterOnMaps(encounterID, roots)
     return nil
 end
 
+-- Continents whose zones are indexed by name (Mount Journal "Zone:" texts).
+local ZONE_ROOTS = { 13, 12, 948, 101, 113, 424, 572, 619, 905, 875, 876, 1550, 1978, 2274, 2537 }
+local zoneIndex
+
+--- [lowercase zone name] = { uiMapID, continent } for every zone (and
+--- sub-zone) under the known continents. Built once (client map data).
+function Navigation:ZoneIndex()
+    if zoneIndex then return zoneIndex end
+    zoneIndex = {}
+    if not C_Map.GetMapChildrenInfo then return zoneIndex end
+    for _, root in ipairs(ZONE_ROOTS) do
+        local ok, children = pcall(C_Map.GetMapChildrenInfo, root, nil, true)
+        for _, child in ipairs(ok and children or {}) do
+            local key = child.name and child.name:lower()
+            local t = child.mapType
+            if key and (t == Enum.UIMapType.Zone or t == Enum.UIMapType.Micro or t == Enum.UIMapType.Dungeon)
+                and not zoneIndex[key] then
+                zoneIndex[key] = { uiMapID = child.mapID, continent = root }
+            end
+        end
+    end
+    return zoneIndex
+end
+
+--- Opens the world map on a zone (player action only; not in combat).
+function Navigation:OpenMap(uiMapID)
+    if InCombatLockdown() or not uiMapID then return false end
+    if OpenWorldMap then OpenWorldMap(uiMapID) return true end
+    return false
+end
+
 --- True if the player knows the spell (mage teleports for the planner).
 function Navigation:KnowsSpell(spellID)
     local fn = (C_SpellBook and C_SpellBook.IsSpellKnown) or IsSpellKnown or IsPlayerSpell

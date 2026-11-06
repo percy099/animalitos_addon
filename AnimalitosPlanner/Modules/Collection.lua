@@ -49,6 +49,7 @@ function Collection:Scan()
     table.sort(list, function(a, b) return a.name < b.name end)
     self.summary, self.list = s, list
     self:InvalidateAchievements() -- collected flags changed; rebuild on demand
+    self.otherDrops = nil
     return s
 end
 
@@ -203,6 +204,72 @@ end
 function Collection:InvalidateAchievements()
     self.achievements, self.achByInstance = nil, nil
     self.achGen = (self.achGen or 0) + 1
+end
+
+-- Other drops (Mount Journal text) ---------------------------------------------
+-- Drop mounts the dataset does not cover (rares, trash, world drops). The
+-- journal's source text says who drops it and where:
+--   "|cFFFFD200Drop:|r Time-Lost Proto-Drake|n|cFFFFD200Zone:|r The Storm Peaks"
+-- Labels are localized, so the first label of the text is taken as the
+-- "who" label and any value that is a known zone name as the zone.
+local DROP_SOURCE_TYPE = 1
+
+local function stripCodes(s)
+    s = s:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|T.-|t", ""):gsub("|A.-|a", "")
+    return s
+end
+
+--- { { who, zone = {uiMapID, continent, name} | nil, extra = {text...} } }
+local function parseDropText(text)
+    local zones = ns.Navigation:ZoneIndex()
+    local out, whoLabel, cur = {}, nil, nil
+    text = stripCodes(text):gsub("\r", "")
+    for line in (text .. "|n"):gmatch("(.-)|n") do
+        for part in (line .. "\n"):gmatch("(.-)\n") do
+            local label, value = part:match("^%s*([^:]+):%s*(.-)%s*$")
+            if label and value ~= "" then
+                local z = zones[value:lower()]
+                if not whoLabel then whoLabel = label end
+                if label == whoLabel then
+                    cur = { who = value, extra = {} }
+                    out[#out + 1] = cur
+                elseif cur and z and not cur.zone then
+                    cur.zone = { uiMapID = z.uiMapID, continent = z.continent, name = value }
+                elseif cur then
+                    cur.extra[#cur.extra + 1] = ("%s: %s"):format(label, value)
+                end
+            end
+        end
+    end
+    return out
+end
+
+--- Drop mounts this character can see that have no dataset source, each
+--- with drops = parseDropText(...). Sorted by name. Cached with the list.
+function Collection:OtherDrops()
+    if self.otherDrops then return self.otherDrops end
+    local list = self:GetList()
+    if not list then return nil end
+    local covered = {}
+    for _, src in ipairs(ns.Data.sources) do covered[src.mountID] = true end
+    local out = {}
+    for _, m in ipairs(list) do
+        if m.sourceType == DROP_SOURCE_TYPE and not covered[m.mountID] then
+            local extra = ns.MountJournal:GetMountExtra(m.mountID)
+            local drops = extra and extra.sourceText and parseDropText(extra.sourceText) or {}
+            out[#out + 1] = { mount = m, drops = drops }
+        end
+    end
+    self.otherDrops = out
+    return out
+end
+
+--- Parsed drop info for one mount (detail panel), or nil.
+function Collection:DropInfo(mountID)
+    for _, d in ipairs(self:OtherDrops() or {}) do
+        if d.mount.mountID == mountID then return d.drops end
+    end
+    return nil
 end
 
 --- [journalInstanceID] = { { ach = entry, missing = { criterion text... } } }

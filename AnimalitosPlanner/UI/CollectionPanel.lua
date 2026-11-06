@@ -178,18 +178,20 @@ local function fillAchRow(r, a, index)
     r.pfill:SetColorTexture(color[1], color[2], color[3], 0.9)
 end
 
-local function fillRow(r, m, index, farm)
+local function fillRow(r, m, index, farm, sourceText)
     local C = ns.UI.COLORS
     r.mount, r.farm, r.ach = m, farm, nil
     r.ptrack:Hide()
     r.pfill:Hide()
+    -- "Other drops" shows who and where instead of the source type.
+    r.source:SetWidth(sourceText and 210 or 110)
     r.zebra:SetShown(index % 2 == 1)
     r.icon:SetTexture(m.icon or 134400) -- 134400 = question-mark icon
     r.icon:SetDesaturated(not m.isCollected)
     r.icon:SetAlpha(m.isCollected and 1 or 0.7)
     r.name:SetText(m.name)
     r.name:SetTextColor(1, 1, 1, m.isCollected and 1 or 0.78)
-    r.source:SetText(ns.MountJournal:GetSourceTypeLabel(m.sourceType))
+    r.source:SetText(sourceText or ns.MountJournal:GetSourceTypeLabel(m.sourceType))
     -- Green = farmable now (same meaning as in Farmable now), purple = collected.
     local color, text
     if m.isCollected then
@@ -218,6 +220,8 @@ local function render(p)
             r:SetPoint("RIGHT", p.child, "RIGHT", -4, 0)
             if p.mode == "ach" then
                 fillAchRow(r, m, index)
+            elseif p.mode == "drops" then
+                fillRow(r, m.mount, index, nil, m.label)
             else
                 fillRow(r, m, index, p.farm and p.farm[m.mountID])
             end
@@ -242,6 +246,7 @@ function CollectionPanel:Create(parent)
         { key = "list", text = L["COL_VIEW_LIST"] },
         { key = "exp",  text = L["COL_VIEW_EXP"] },
         { key = "ach",  text = L["COL_VIEW_ACH"] },
+        { key = "drops", text = L["COL_VIEW_DROPS"] },
     }, function(key)
         if p.bar then p.bar:SetValue(0) end
         ns.Storage.db.ui.collectionView = key
@@ -272,7 +277,8 @@ function CollectionPanel:Create(parent)
 
     p.source = ns.UI.Dropdown(lv, 170, function(value)
         -- Same menu, two meanings: source type (list) or category (achievements).
-        local field = (p.mode == "ach") and "collectionAchCategory" or "collectionSource"
+        local field = (p.mode == "ach") and "collectionAchCategory"
+            or (p.mode == "drops") and "collectionDropsContinent" or "collectionSource"
         ns.Storage.db.ui[field] = (value ~= "all") and value or nil
         if p.bar then p.bar:SetValue(0) end
         CollectionPanel:Refresh(p)
@@ -525,6 +531,79 @@ local function refreshAchievements(p, key)
     render(p)
 end
 
+-- Other drops view ------------------------------------------------------------
+-- Drop mounts with no dataset source (rares, trash, world drops): who and
+-- where, as the Mount Journal says. Dropdown = continent of the zone.
+local function refreshDrops(p, key)
+    local all = ns.Collection:OtherDrops()
+    p.chip:Hide()
+
+    local cont = ns.Storage.db.ui.collectionDropsContinent
+    local missingBy, present = {}, {}
+    for _, e in ipairs(all or {}) do
+        local first = e.drops[1]
+        e.continent = first and first.zone and first.zone.continent or 0
+        present[e.continent] = true
+        if not e.mount.isCollected then missingBy[e.continent] = (missingBy[e.continent] or 0) + 1 end
+        if first then
+            e.label = first.zone and ("%s · %s"):format(first.who, first.zone.name) or first.who
+            if #e.drops > 1 then e.label = e.label .. " +" .. (#e.drops - 1) end
+        else
+            e.label = L["COL_DROPS_UNKNOWN"]
+        end
+    end
+    local function contName(c)
+        if c == 0 then return L["COL_DROPS_NO_ZONE"] end
+        local info = C_Map.GetMapInfo(c)
+        return info and info.name or ("#" .. c)
+    end
+    local order = {}
+    for c in pairs(present) do order[#order + 1] = c end
+    table.sort(order, function(a, b)
+        local ma, mb = missingBy[a] or 0, missingBy[b] or 0
+        if ma ~= mb then return ma > mb end
+        return a < b
+    end)
+    local menu = { { value = "all", text = L["COL_DROPS_ALL"] } }
+    for _, c in ipairs(order) do
+        menu[#menu + 1] = { value = c, text = L["COL_SOURCE_ITEM"]:format(contName(c), fmt(missingBy[c] or 0)) }
+    end
+    p.source:SetItems(menu)
+    if cont and not present[cont] then cont = nil end
+    p.source:SetText(L["COL_DROPS_LABEL"]:format(cont and contName(cont) or L["COL_SOURCE_ANY"]))
+
+    local items, q, collected = {}, p.query or "", 0
+    for _, e in ipairs(all or {}) do
+        local owned = e.mount.isCollected
+        if owned then collected = collected + 1 end
+        local keep = (key == "all") or (key == "missing" and not owned) or (key == "collected" and owned)
+        if keep and cont then keep = e.continent == cont end
+        if keep and q ~= "" then
+            keep = e.mount.name:lower():find(q, 1, true) ~= nil or e.label:lower():find(q, 1, true) ~= nil
+        end
+        if keep then items[#items + 1] = e end
+    end
+
+    local total = all and #all or 0
+    if total > 0 then
+        p.progressText:SetFormattedText(L["COL_DROPS_PROGRESS"], collected, total)
+        p.progressFill:SetWidth(math.max(1, (ns.UI.CONTENT_WIDTH - SCROLL_W) * collected / total))
+        p.progressFill:Show()
+    else
+        p.progressText:SetText(all and L["COL_NONE"] or L["JOURNAL_NOT_READY_SHORT"])
+        p.progressFill:Hide()
+    end
+
+    p.items = items
+    p.count:SetText(L["COL_COUNT"]:format(fmt(#items)))
+    p.count:Show()
+    p.empty:SetShown(#items == 0)
+    if #items == 0 then p.empty:SetText(all and L["COL_NONE"] or L["JOURNAL_NOT_READY_SHORT"]) end
+    p.child:SetHeight(math.max(#items * ROW_H, 1))
+    p.scroll:UpdateScrollChildRect()
+    render(p)
+end
+
 -- Refresh ---------------------------------------------------------------------
 --- entries (optional) = FarmList:Build() result, for the "Farmable" mark;
 --- internal refreshes (search, filters) reuse the last one.
@@ -535,7 +614,7 @@ function CollectionPanel:Refresh(p, entries)
     local view = ns.Storage.db.ui.collectionView or "list"
     p.mode = view
     p.view:SetSelected(view)
-    p.listView:SetShown(view == "list" or view == "ach")
+    p.listView:SetShown(view == "list" or view == "ach" or view == "drops")
     p.expView:SetShown(view == "exp")
     p.expNote:SetShown(view == "exp")
 
@@ -544,6 +623,10 @@ function CollectionPanel:Refresh(p, entries)
 
     if view == "ach" then
         refreshAchievements(p, key)
+        return
+    end
+    if view == "drops" then
+        refreshDrops(p, key)
         return
     end
 
