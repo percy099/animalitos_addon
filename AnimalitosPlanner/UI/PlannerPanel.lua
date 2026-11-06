@@ -223,6 +223,17 @@ function PlannerPanel:Create(parent)
     hideLabel:SetPoint("RIGHT", p.hide, "LEFT", -8, 0)
     hideLabel:SetText(L["PLAN_HIDE_DONE"])
 
+    -- World bosses are many and optional: off by default, opt in here.
+    p.wb = ns.UI.Switch(p, function(_, checked)
+        ns.Storage.db.ui.plannerWorldBosses = checked or nil
+        if p.bar then p.bar:SetValue(0) end
+        PlannerPanel:Refresh(p)
+    end)
+    p.wb:SetPoint("RIGHT", p, "TOPRIGHT", -SCROLL_W - 2, -9)
+    local wbLabel = ns.UI.fs(p, "small", C.dim)
+    wbLabel:SetPoint("RIGHT", p.wb, "LEFT", -8, 0)
+    wbLabel:SetText(L["PLAN_WORLD_BOSSES"])
+
     p.next = ns.UI.Button(p, "primary")
     ns.UI.SetButtonText(p.next, L["PLAN_NEXT"], 96)
     p.next:SetPoint("TOPRIGHT", -SCROLL_W, -56)
@@ -308,8 +319,10 @@ function PlannerPanel:Refresh(p, entries)
 
     local hideDone = ns.Storage.db.ui.plannerHideDone and true or false
     p.hide:SetChecked(hideDone)
+    local withWB = ns.Storage.db.ui.plannerWorldBosses and true or false
+    p.wb:SetChecked(withWB)
 
-    local steps, sum = ns.Planner:Build(entries, hideDone)
+    local steps, sum = ns.Planner:Build(entries, hideDone, withWB)
     p.nextJid = sum.nextJid
     p.next:SetEnabled(sum.nextJid ~= nil)
     local text = L["PLAN_PROGRESS"]:format(sum.done, sum.total)

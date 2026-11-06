@@ -269,9 +269,12 @@ end
 ---   step = { kind = "start", text } | { kind = "travel", text }
 ---        | { kind = "run", jid, inst, e, number, done, auto }
 ---   summary = { total, done, nextJid }
-function Planner:Build(entries, hideCompleted)
+function Planner:Build(entries, hideCompleted, withWorldBosses)
     local byJid = {}
-    for _, e in ipairs(entries or {}) do byJid[e.jid] = e end
+    for _, e in ipairs(entries or {}) do
+        -- World bosses only when the player opts in (the route order stays the same).
+        if withWorldBosses or not e.inst.worldBoss then byJid[e.jid] = e end
+    end
 
     local runs = {}
     for _, jid in ipairs(self:Route()) do
