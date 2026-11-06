@@ -174,7 +174,7 @@ end
 -- Icons are client files shown as monochrome glyphs in the stat's color.
 local STATS = {
     { key = "missing", label = "STAT_MISSING", color = { 1, 1, 1 },
-      icon = "Interface\\AddOns\\AnimalitosPlanner\\Media\\nav-farm" }, -- our horseshoe glyph
+      ring = true }, -- hollow circle: "not obtained yet"
     { key = "ready",   label = "STAT_READY",   color = "success", opensFarm = true,
       icon = "Interface\\RaidFrame\\ReadyCheck-Ready" },
     { key = "locked",  label = "STAT_LOCKED",  color = "warning", opensFarm = true,
@@ -200,10 +200,17 @@ local function createStatTiles(p, top)
         t.label:SetWidth(w - 12)
         t.label:SetJustifyH("CENTER")
         t.label:SetText(L[stat.label])
-        local icon = t:CreateTexture(nil, "ARTWORK")
-        icon:SetSize(16, 16)
-        icon:SetPoint("TOPLEFT", 8, -8)
-        ns.UI.Glyph(icon, stat.icon, { color[1], color[2], color[3], 0.75 })
+        if stat.ring then
+            local outer = ns.UI.Circle(t, "ARTWORK", 13, { color[1], color[2], color[3], 0.75 })
+            outer:SetPoint("TOPLEFT", 9, -9)
+            local inner = ns.UI.Circle(t, "ARTWORK", 9, C.surface, 1)
+            inner:SetPoint("CENTER", outer)
+        else
+            local icon = t:CreateTexture(nil, "ARTWORK")
+            icon:SetSize(16, 16)
+            icon:SetPoint("TOPLEFT", 8, -8)
+            ns.UI.Glyph(icon, stat.icon, { color[1], color[2], color[3], 0.75 })
+        end
         if stat.opensFarm then
             t:EnableMouse(true)
             t:SetScript("OnMouseUp", function() ns.UI:SelectTab("farm") end)
