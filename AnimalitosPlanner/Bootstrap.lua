@@ -54,7 +54,15 @@ end)
 -- UPDATE_INSTANCE_INFO delivers the answer.
 ns:On("PLAYER_ENTERING_WORLD", function()
     ns:Debounce("raidinfo", 1, function() ns.Lockouts:Request() end)
+    ns:Debounce("lfginfo", 3, function() ns.Holidays:Request() end)
 end)
+
+-- Dungeon Finder data (world event bosses: is the event on, done today?).
+local function lfgChanged()
+    ns:Debounce("lfgui", 1, function() ns.UI:Refresh() end)
+end
+ns:On("LFG_UPDATE_RANDOM_INFO", lfgChanged)
+ns:On("LFG_LOCK_INFO_RECEIVED", lfgChanged)
 
 ns:On("UPDATE_INSTANCE_INFO", function()
     ns.Lockouts:Refresh()
@@ -189,6 +197,14 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
     elseif cmd == "curated" then
         ns:Print("curated sources:")
         ns.FarmList:DebugCurated()
+    elseif cmd == "events" then
+        ns:Print("world event bosses:")
+        ns.Holidays:Debug()
+    elseif cmd == "events test" then
+        -- Shows every event as on (to see the UI outside the events); /reload ends it.
+        ns.Holidays.test = not ns.Holidays.test or nil
+        ns:Print("events test mode: " .. (ns.Holidays.test and "on" or "off"))
+        ns.UI:Refresh()
     elseif cmd == "unknown" then
         ns:Print("mounts without a source type:")
         ns.MountJournal:DebugUnknownSources()

@@ -51,6 +51,14 @@ local function showMountTooltip(row)
     local m = info.m
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
     GameTooltip:AddLine(mountName(info.id), 1, 1, 1)
+    if info.event then -- world event boss (Dungeon Finder queue)
+        GameTooltip:AddLine(("%s · %s"):format(info.event.name, info.event.event or ""),
+            C.tipMuted[1], C.tipMuted[2], C.tipMuted[3])
+        GameTooltip:AddLine(L["EVENT_DAILY"], C.tipMuted[1], C.tipMuted[2], C.tipMuted[3], true)
+        GameTooltip:AddLine(L["TIP_CLICK_PREVIEW"], C.accent[1], C.accent[2], C.accent[3])
+        GameTooltip:Show()
+        return
+    end
     GameTooltip:AddLine(("%s · %s"):format(ns.FarmList:BossName(m.source), ns.FarmList:InstanceName(info.jid)),
         C.tipMuted[1], C.tipMuted[2], C.tipMuted[3])
     if #m.ready > 0 then
@@ -308,13 +316,27 @@ function FarmPanel:Refresh(p, entries, sum)
         r:SetPoint("TOPLEFT", anchor, "TOPLEFT", x, -rowY)
         r:SetPoint("RIGHT", anchor, "RIGHT", -rightInset, 0)
         r:SetFrameLevel(anchor:GetFrameLevel() + 3)
-        r.info = { id = id, m = m, jid = jid }
+        r.info = { id = id, m = m, jid = jid, event = mode == "event" and m or nil }
 
         local mj = ns.MountJournal:GetMount(id)
         r.icon:SetTexture(mj and mj.icon or 134400) -- 134400 = question-mark icon
         local name = (ns.Collection:IsFavorite(id) and (ns.UI.STAR .. " ") or "") .. (mj and mj.name or ("#" .. id))
         local color
-        if mode == "ready" then
+        if mode == "event" then
+            -- m = FarmList:Holidays() item
+            local S = ns.Eligibility.STATES
+            r.text:SetText(name)
+            if m.state == S.READY then
+                r.status:SetText(L["STATUS_READY"])
+                color = C.success
+            elseif m.state == S.LOCKED_OUT then
+                r.status:SetText(L["RESET_IN"]:format(timeLeft(m.resetAt)))
+                color = C.warning
+            else
+                r.status:SetText(L["STATUS_VERIFY"])
+                color = C.muted
+            end
+        elseif mode == "ready" then
             r.text:SetText(("%s  %s(%s)|r"):format(name, MUTED_HEX, diffList(m.ready)))
             r.status:SetText(L["STATUS_READY"])
             color = C.success
@@ -343,6 +365,57 @@ function FarmPanel:Refresh(p, entries, sum)
         p.unhide:SetPoint("TOPLEFT", 0, -y)
         p.unhide:Show()
         y = y + 30
+    end
+
+    -- World event bosses while their event is on: on top, one card each,
+    -- "Queue" opens the Dungeon Finder (no travel).
+    local events = {}
+    for _, ev in ipairs(ns.FarmList:Holidays()) do
+        local keep = not searching or hit(ev.name) or hit(ev.event)
+        if not keep then
+            for _, id in ipairs(ev.mounts) do keep = keep or hit(mountName(id)) end
+        end
+        if keep then events[#events + 1] = ev end
+    end
+    if #events > 0 then
+        local h = take(p, "headers")
+        h:ClearAllPoints()
+        h:SetPoint("TOPLEFT", 0, -y)
+        h:SetWidth(width)
+        h.text:SetText(ns.UI.Upper(L["EVENT_HEADER"]))
+        h.count:SetText("")
+        h:Show()
+        y = y + h:GetHeight() + 6
+        for _, ev in ipairs(events) do
+            local c = take(p, "cards")
+            c:ClearAllPoints()
+            c:SetPoint("TOPLEFT", 0, -y)
+            c:SetWidth(width)
+            c.title:SetText(ev.name)
+            c.detail:SetText(("%s · %s"):format(ev.event or "", L["EVENT_DAILY_SHORT"]))
+            ns.UI.SetButtonText(c.go, L["BTN_QUEUE"], 62)
+            c.go:SetEnabled(true)
+            local lfgID = ev.h.lfgDungeonID
+            c.go:SetScript("OnClick", function()
+                if not ns.Holidays:OpenQueue(lfgID) then ns:Print(L["JOURNAL_COMBAT"]) end
+            end)
+            c.hide:Hide()
+            local rowY = CARD_HEAD_H
+            for k, id in ipairs(ev.mounts) do
+                mountRow(c, ROW_INDENT, rowY, 8, id, ev, nil, "event", k % 2 == 1)
+                rowY = rowY + ROW_H
+            end
+            local ch = math.max(rowY + 6, CARD_MIN_H)
+            c:SetHeight(ch)
+            -- Artwork: the first mount's icon, trimmed (events have no journal tile).
+            local mj = ns.MountJournal:GetMount(ev.mounts[1])
+            c.thumb:SetTexture(mj and mj.icon or nil)
+            c.thumb:SetShown(mj ~= nil)
+            ns.UI.SetArtCrop(c.thumb, THUMB_W, ch - THUMB_INSET * 2)
+            c:Show()
+            y = y + ch + CARD_GAP
+        end
+        y = y + GROUP_GAP - CARD_GAP
     end
 
     -- Ready instances, grouped by continent
@@ -397,6 +470,8 @@ function FarmPanel:Refresh(p, entries, sum)
             c.detail:SetText(table.concat(parts, " · "))
 
             local jid, isRaid = e.jid, e.inst.isRaid
+            ns.UI.SetButtonText(c.go, L["BTN_GO"], 50) -- pooled cards may have been event cards
+            c.hide:Show()
             c.go:SetEnabled(e.inst.entrance ~= nil)
             c.go:SetScript("OnClick", function() ns.Navigation:GoToInstance(jid) end)
             c.hide:SetScript("OnClick", function()

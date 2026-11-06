@@ -134,4 +134,9 @@ ns.Data = {
         { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1128, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Koralon) - Vault of Archavon (curated)
         { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1129, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Toravon) - Vault of Archavon (curated)
     },
+    holidays = {
+        { lfgDungeonID = 285, event = "EVENT_HALLOWS_END", mounts = { { mountID = 219, itemID = 37012 } } }, -- The Headless Horseman
+        { lfgDungeonID = 287, event = "EVENT_BREWFEST", mounts = { { mountID = 202, itemID = 33977 }, { mountID = 226, itemID = 37828 } } }, -- Coren Direbrew
+        { lfgDungeonID = 288, event = "EVENT_LOVE", mounts = { { mountID = 352, itemID = 50250 } } }, -- The Crown Chemical Co.
+    },
 }

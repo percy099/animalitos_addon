@@ -29,6 +29,21 @@
         "reason": "Same as Emalon" }
     ]
   },
+  "holidayBosses": {
+    "_reason": "World event bosses with a mount, queued from the Dungeon Finder once a day while their event is on. lfgDungeonID = LFGDungeons ID (warcraft.wiki.gg LfgDungeonID: 285 The Headless Horseman, 287 Coren Direbrew, 288 The Crown Chemical Co.). The event is on when the client lists that queue; done today = GetLFGDungeonRewards. Items checked on Wowhead; mountID re-checked in game from the item.",
+    "list": [
+      { "name": "The Headless Horseman", "lfgDungeonID": 285, "event": "EVENT_HALLOWS_END",
+        "mounts": [ { "name": "The Horseman's Reins", "mountID": 219, "itemID": 37012 } ],
+        "reason": "Hallow's End, Scarlet Monastery (wowhead item=37012)" },
+      { "name": "Coren Direbrew", "lfgDungeonID": 287, "event": "EVENT_BREWFEST",
+        "mounts": [ { "name": "Swift Brewfest Ram", "mountID": 202, "itemID": 33977 },
+                    { "name": "Great Brewfest Kodo", "mountID": 226, "itemID": 37828 } ],
+        "reason": "Brewfest, Blackrock Depths; both mounts drop for both factions (wowhead item=33977, item=37828)" },
+      { "name": "The Crown Chemical Co.", "lfgDungeonID": 288, "event": "EVENT_LOVE",
+        "mounts": [ { "name": "X-45 Heartbreaker (was Big Love Rocket)", "mountID": 352, "itemID": 50250 } ],
+        "reason": "Love is in the Air, Shadowfang Keep, from the boss's Heart-Shaped Box (wowhead item=50250)" }
+    ]
+  },
   "excludeInstances": {
     "_reason": "Not real instances (Mythic+ keystone aggregate).",
     "ids": [1319]

@@ -128,6 +128,40 @@ function FarmList:ResolveCurated()
     self.curatedDone = not pending
 end
 
+--- World event bosses whose event is on (or unknown) and that still drop a
+--- mount this account lacks: { h, name, event, mounts = {mountID...},
+--- state (READY / LOCKED_OUT / VERIFY), resetAt }.
+function FarmList:Holidays()
+    local S = ns.Eligibility.STATES
+    local out = {}
+    for _, h in ipairs((ns.Data and ns.Data.holidays) or {}) do
+        local status = ns.Holidays:Status(h.lfgDungeonID)
+        if status ~= "inactive" then
+            local mounts = {}
+            for _, mt in ipairs(h.mounts) do
+                local id = ns.MountJournal:GetMountFromItem(mt.itemID) or mt.mountID
+                local m = ns.MountJournal:GetMount(id)
+                if m and not m.isCollected and not m.shouldHideOnChar then mounts[#mounts + 1] = id end
+            end
+            if #mounts > 0 then
+                local state, resetAt
+                if status == nil then
+                    state = S.VERIFY
+                elseif ns.Holidays:DoneToday(h.lfgDungeonID) then
+                    state = S.LOCKED_OUT
+                    local daily = ns.Lockouts:GetResetTimes()
+                    resetAt = daily and (time() + daily) or nil
+                else
+                    state = S.READY
+                end
+                out[#out + 1] = { h = h, name = ns.Holidays:Name(h.lfgDungeonID) or "?",
+                    event = ns.L[h.event], mounts = mounts, state = state, resetAt = resetAt }
+            end
+        end
+    end
+    return out
+end
+
 --- /aplan curated: how the hand-curated sources resolved (diagnostics).
 function FarmList:DebugCurated()
     self.curatedDone = false
