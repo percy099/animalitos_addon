@@ -168,33 +168,72 @@ function CollectionPanel:Create(parent)
     p:SetAllPoints()
     p.query = ""
 
-    p.search = ns.UI.SearchBox(p, L["COL_SEARCH_HINT"], function(text)
+    -- View switch (List / By expansion), top right. Everything that belongs
+    -- to the list lives in p.listView so a view change is one Show/Hide.
+    p.view = ns.UI.Segmented(p, {
+        { key = "list", text = L["COL_VIEW_LIST"] },
+        { key = "exp",  text = L["COL_VIEW_EXP"] },
+    }, function(key)
+        ns.Storage.db.ui.collectionView = key
+        CollectionPanel:Refresh(p)
+    end)
+    p.view:SetPoint("TOPRIGHT", -SCROLL_W, 0)
+
+    local lv = CreateFrame("Frame", nil, p)
+    lv:SetAllPoints()
+    p.listView = lv
+
+    p.search = ns.UI.SearchBox(lv, L["COL_SEARCH_HINT"], function(text)
         p.query = strtrim(text):lower()
         if p.bar then p.bar:SetValue(0) end
         CollectionPanel:Refresh(p)
     end)
     p.search:SetPoint("TOPLEFT", 0, 0)
-    p.search:SetPoint("TOPRIGHT", -SCROLL_W, 0)
+    p.search:SetPoint("RIGHT", p.view, "LEFT", -8, 0)
 
     local items = {}
     for _, f in ipairs(FILTERS) do items[#items + 1] = { key = f.key, text = L[f.text] } end
-    p.filter = ns.UI.Segmented(p, items, function(key)
+    p.filter = ns.UI.Segmented(lv, items, function(key)
         ns.Storage.db.ui.collectionFilter = key
         if p.bar then p.bar:SetValue(0) end
         CollectionPanel:Refresh(p)
     end)
     p.filter:SetPoint("TOPLEFT", 0, -(SEARCH_H + 8))
 
-    p.source = ns.UI.Dropdown(p, 170, function(value)
+    p.source = ns.UI.Dropdown(lv, 170, function(value)
         ns.Storage.db.ui.collectionSource = (value ~= "all") and value or nil
         if p.bar then p.bar:SetValue(0) end
         CollectionPanel:Refresh(p)
     end)
     p.source:SetPoint("LEFT", p.filter, "RIGHT", 8, 0)
 
-    p.count = ns.UI.fs(p, "small", C.muted)
+    p.count = ns.UI.fs(lv, "small", C.muted)
     p.count:SetPoint("RIGHT", p, "TOPRIGHT", -SCROLL_W - 2, -(SEARCH_H + 8 + TOOLBAR_H / 2))
     p.count:SetJustifyH("RIGHT")
+
+    -- Expansion chip (set by clicking a tile in "By expansion"); X clears it.
+    p.chip = ns.UI.Button(lv, "primary")
+    p.chip:SetHeight(22)
+    p.chip:SetPoint("RIGHT", p, "TOPRIGHT", -SCROLL_W, -(SEARCH_H + 8 + TOOLBAR_H / 2))
+    p.chip:GetFontString():ClearAllPoints()
+    p.chip:GetFontString():SetPoint("LEFT", 10, 0)
+    local chipX = ns.UI.CloseButton(p.chip)
+    chipX:SetSize(18, 18)
+    chipX:SetPoint("RIGHT", -2, 0)
+    local function clearTier()
+        p.tierFilter = nil
+        CollectionPanel:Refresh(p)
+    end
+    chipX:SetScript("OnClick", clearTier)
+    p.chip:SetScript("OnClick", clearTier)
+    p.chip:Hide()
+
+    -- Note shown instead of the toolbar in the expansion view.
+    p.expNote = ns.UI.fs(p, "GameFontHighlightSmall", C.muted)
+    p.expNote:SetPoint("TOPLEFT", 2, -(SEARCH_H + 8 + 5))
+    p.expNote:SetPoint("RIGHT", -SCROLL_W, 0)
+    p.expNote:SetWordWrap(true)
+    p.expNote:SetText(L["COL_EXP_NOTE"])
 
     -- Progress: "86 / 1,183 collected · 7.3 %" and a thin bar
     local top = -(SEARCH_H + 8 + TOOLBAR_H + 8)
@@ -211,7 +250,7 @@ function CollectionPanel:Create(parent)
     p.progressFill:SetColorTexture(C.accent[1], C.accent[2], C.accent[3], 0.9)
     p.progressTrack = track
 
-    local scroll = CreateFrame("ScrollFrame", nil, p)
+    local scroll = CreateFrame("ScrollFrame", nil, lv)
     scroll:SetPoint("TOPLEFT", 0, -LIST_TOP)
     scroll:SetPoint("BOTTOMRIGHT", -SCROLL_W, 0)
     local child = CreateFrame("Frame", nil, scroll)
@@ -230,7 +269,123 @@ function CollectionPanel:Create(parent)
     p.empty:SetPoint("TOPLEFT", 4, -6)
     p.empty:SetPoint("RIGHT", -4, 0)
     p.empty:SetWordWrap(true)
+
+    -- Expansion view: a grid of tiles under the progress line.
+    p.expView = CreateFrame("Frame", nil, p)
+    p.expView:SetPoint("TOPLEFT", 0, -LIST_TOP)
+    p.expView:SetPoint("BOTTOMRIGHT", -SCROLL_W, 0)
+    p.tiles = {}
     return p
+end
+
+-- Expansion tiles ---------------------------------------------------------------
+local TILE_COLS, TILE_GAP = 4, 8
+
+local function showTileTooltip(tile)
+    local t = tile.info
+    if not t then return end
+    local C = ns.UI.COLORS
+    local farm = tile.panel.farm or {}
+    GameTooltip:SetOwner(tile, "ANCHOR_RIGHT")
+    GameTooltip:AddLine(ns.FarmList:TierName(t.tier), 1, 1, 1)
+    for _, id in ipairs(t.mounts) do
+        local m = ns.MountJournal:GetMount(id)
+        local name = m and m.name or ("#" .. id)
+        local c = (m and m.isCollected) and C.accent or (farm[id] and C.success) or C.tipMuted
+        GameTooltip:AddLine(name, c[1], c[2], c[3])
+    end
+    GameTooltip:AddLine(L["COL_TIP_TILE_CLICK"], C.accent[1], C.accent[2], C.accent[3])
+    GameTooltip:Show()
+end
+
+local function newTile(p)
+    local C = ns.UI.COLORS
+    local t = CreateFrame("Button", nil, p.expView, "BackdropTemplate")
+    ns.UI.StylePanel(t, nil, { noSheen = true })
+    t.panel = p
+    t.art = ns.UI.ArtTexture(t, "BACKGROUND", 1)
+    t.art:SetPoint("TOPLEFT", 1, -1)
+    t.art:SetPoint("BOTTOMRIGHT", -1, 1)
+    t.art:SetAlpha(0.45)
+    local shade = t:CreateTexture(nil, "BACKGROUND", nil, 2)
+    shade:SetAllPoints(t.art)
+    shade:SetColorTexture(1, 1, 1, 1)
+    local s = C.surface
+    shade:SetGradient("VERTICAL", CreateColor(s[1], s[2], s[3], 0.95), CreateColor(s[1], s[2], s[3], 0.2))
+    local hl = t:CreateTexture(nil, "HIGHLIGHT")
+    hl:SetAllPoints(t.art)
+    hl:SetColorTexture(1, 1, 1, 0.06)
+
+    t.name = ns.UI.fs(t, "title")
+    t.name:SetPoint("TOPLEFT", 9, -8)
+    t.name:SetPoint("RIGHT", -8, 0)
+    t.name:SetWordWrap(false)
+    ns.UI.Shadow(t.name)
+
+    t.value = ns.UI.fs(t, "large")
+    t.value:SetPoint("BOTTOMLEFT", 9, 22)
+    ns.UI.Shadow(t.value)
+    t.farm = ns.UI.fs(t, "tiny", C.success)
+    t.farm:SetPoint("BOTTOMRIGHT", -9, 24)
+    t.farm:SetJustifyH("RIGHT")
+    ns.UI.Shadow(t.farm)
+
+    local track = t:CreateTexture(nil, "ARTWORK")
+    track:SetPoint("BOTTOMLEFT", 9, 12)
+    track:SetPoint("BOTTOMRIGHT", -9, 12)
+    track:SetHeight(4)
+    track:SetColorTexture(1, 1, 1, 0.12)
+    t.fill = t:CreateTexture(nil, "ARTWORK", nil, 1)
+    t.fill:SetPoint("TOPLEFT", track)
+    t.fill:SetPoint("BOTTOMLEFT", track)
+    t.fill:SetColorTexture(C.accent[1], C.accent[2], C.accent[3], 0.95)
+
+    t:SetScript("OnEnter", showTileTooltip)
+    t:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    t:SetScript("OnClick", function(self)
+        -- Show this expansion's mounts in the list view.
+        p.tierFilter = self.info and self.info.tier
+        ns.Storage.db.ui.collectionView = "list"
+        if p.bar then p.bar:SetValue(0) end
+        CollectionPanel:Refresh(p)
+    end)
+    return t
+end
+
+local function renderTiles(p)
+    local data = ns.Collection:ByExpansion()
+    p.expData = data
+    local n = #data
+    local rows = math.max(1, math.ceil(n / TILE_COLS))
+    local areaW = ns.UI.CONTENT_WIDTH - SCROLL_W
+    local areaH = ns.UI.HEIGHT - 40 - 20 - LIST_TOP -- window minus header and paddings
+    local w = (areaW - (TILE_COLS - 1) * TILE_GAP) / TILE_COLS
+    local h = math.min(110, (areaH - (rows - 1) * TILE_GAP) / rows)
+    local farm = p.farm or {}
+    for i, info in ipairs(data) do
+        local t = p.tiles[i] or newTile(p)
+        p.tiles[i] = t
+        t.info = info
+        local col, row = (i - 1) % TILE_COLS, math.floor((i - 1) / TILE_COLS)
+        t:ClearAllPoints()
+        t:SetPoint("TOPLEFT", col * (w + TILE_GAP), -row * (h + TILE_GAP))
+        t:SetSize(w, h)
+        t.name:SetText(ns.FarmList:TierName(info.tier))
+        t.value:SetFormattedText("%d / %d", info.collected, #info.mounts)
+        local pct = #info.mounts > 0 and info.collected / #info.mounts or 0
+        t.fill:SetWidth(math.max(1, (w - 18) * pct))
+        local nFarm = 0
+        for _, id in ipairs(info.mounts) do
+            if farm[id] then nFarm = nFarm + 1 end
+        end
+        t.farm:SetText(nFarm > 0 and L["COL_TILE_FARMABLE"]:format(nFarm) or "")
+        local art = info.artJid and ns.FarmList:InstanceArt(info.artJid)
+        t.art:SetTexture(art)
+        t.art:SetShown(art ~= nil)
+        ns.UI.SetArtCrop(t.art, w - 2, h - 2)
+        t:Show()
+    end
+    for i = n + 1, #p.tiles do p.tiles[i]:Hide() end
 end
 
 -- Refresh ---------------------------------------------------------------------
@@ -239,6 +394,13 @@ end
 function CollectionPanel:Refresh(p, entries)
     if entries then p.farm = farmableMap(entries) end
     local list = ns.Collection:GetList()
+
+    local view = ns.Storage.db.ui.collectionView or "list"
+    p.view:SetSelected(view)
+    p.listView:SetShown(view == "list")
+    p.expView:SetShown(view == "exp")
+    p.expNote:SetShown(view == "exp")
+
     local key = filterKey()
     p.filter:SetSelected(key)
 
@@ -279,17 +441,38 @@ function CollectionPanel:Refresh(p, entries)
         p.progressFill:Hide()
     end
 
+    if view == "exp" then
+        renderTiles(p)
+        return
+    end
+
+    -- Expansion filter from a tile click
+    local tierSet
+    if p.tierFilter then
+        for _, t in ipairs(p.expData or ns.Collection:ByExpansion()) do
+            if t.tier == p.tierFilter then tierSet = t.set end
+        end
+        if not tierSet then p.tierFilter = nil end
+    end
+
     local items = {}
     local q = p.query or ""
     for _, m in ipairs(list or {}) do
         local keep = (key == "all") or (key == "missing" and not m.isCollected)
             or (key == "collected" and m.isCollected)
         if keep and src then keep = (m.sourceType or 0) == src end
+        if keep and tierSet then keep = tierSet[m.mountID] == true end
         if keep and q ~= "" then keep = m.name:lower():find(q, 1, true) ~= nil end
         if keep then items[#items + 1] = m end
     end
     p.items = items
     p.count:SetText(L["COL_COUNT"]:format(fmt(#items)))
+    p.count:SetShown(tierSet == nil)
+    p.chip:SetShown(tierSet ~= nil)
+    if tierSet then
+        p.chip:SetText(L["COL_CHIP"]:format(ns.FarmList:TierName(p.tierFilter), #items))
+        p.chip:SetWidth(p.chip:GetFontString():GetStringWidth() + 36)
+    end
 
     p.empty:SetShown(#items == 0)
     if #items == 0 then

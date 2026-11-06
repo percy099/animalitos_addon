@@ -51,6 +51,44 @@ function Collection:Scan()
     return s
 end
 
+--- Raid/dungeon mounts of our dataset grouped by expansion (Encounter
+--- Journal tier). The journal has no expansion field, so this covers only
+--- dataset sources, not the whole collection. Returns an array sorted by
+--- tier: { tier, mounts = {mountID...} (sorted by name), set = {[mountID]=true},
+---         collected, artJid } (artJid = an instance for the tile artwork).
+function Collection:ByExpansion()
+    local byTier, out = {}, {}
+    for _, src in ipairs((ns.Data and ns.Data.sources) or {}) do
+        local inst = ns.Data.instances[src.journalInstanceID]
+        local tier = inst and inst.tier
+        if tier then
+            local t = byTier[tier]
+            if not t then
+                t = { tier = tier, mounts = {}, set = {}, collected = 0 }
+                byTier[tier] = t
+                out[#out + 1] = t
+            end
+            -- Prefer a raid for the artwork; it is the expansion's best-known picture.
+            if not t.artJid or (inst.isRaid and not t.artIsRaid) then
+                t.artJid, t.artIsRaid = src.journalInstanceID, inst.isRaid
+            end
+            if not t.set[src.mountID] then
+                t.set[src.mountID] = true
+                t.mounts[#t.mounts + 1] = src.mountID
+                local m = ns.MountJournal:GetMount(src.mountID)
+                if m and m.isCollected then t.collected = t.collected + 1 end
+            end
+        end
+    end
+    local function name(id)
+        local m = ns.MountJournal:GetMount(id)
+        return m and m.name or ""
+    end
+    for _, t in ipairs(out) do table.sort(t.mounts, function(a, b) return name(a) < name(b) end) end
+    table.sort(out, function(a, b) return a.tier < b.tier end)
+    return out
+end
+
 --- Mounts the journal shows for this character (same set as its counter),
 --- sorted by name. Each item is a MountJournal:GetMount record. nil if the
 --- journal is not ready yet.
