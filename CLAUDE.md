@@ -19,7 +19,7 @@ La especificación vigente es `docs/` (v1.2, en español). El documento más út
 | Rediseño de la UI (rama `josemaria`, v0.4.7–0.6.5) | 🟡 validado en el cliente; pendiente revisar y fusionar con un PR (ver §10) |
 | v0.5 Colección virtualizada, Detalle de montura | 🟡 Colección hecha en la rama `josemaria` (lista, filtros, vista por expansión); falta el Detalle de montura |
 | Planner (rama `josemaria`, v0.6.0–0.6.5) | ✅ validado en el cliente, también con mago |
-| v0.6 Cobertura legacy completa y curación | ⏳ |
+| v0.6 Cobertura legacy completa y curación | 🟡 rama `josemaria` v0.7–0.8: world bosses (6 monturas, lockout validado con Galleon) y logros con montura (lista + enlace a instancias). Faltan rares y Kraulok |
 | v1.0 Release (CurseForge/Wago) | ⏳ |
 
 ## 3. Entorno
@@ -44,6 +44,7 @@ El orden de carga está en el `.toc` y **importa**:
 | `Modules/Eligibility.lua` | Estado por (fuente, dificultad): `ready`, `lockedOut`, `verificationRequired`, `unavailable`, `collected`, `outOfScope` |
 | `Modules/FarmList.lua` | Agrupa por instancia, ordena (zona actual → continente → número de monturas → expansión) y oculta hasta el reset |
 | `Modules/Planner.lua` | Ruta **estática** del planner (orden fijo por facción, nunca por posición), pasos de viaje (portales de capital, portales de zona de Cata, teletransportes de mago, mago en el grupo), marcas manuales por personaje hasta el reset |
+| `Integrations/Achievements.lua` | Logros con montura de recompensa (todas las categorías), progreso por criterio, criterios pendientes, abrir en la ventana de logros |
 | `Integrations/Navigation.lua` | Waypoint nativo (`C_Map.SetUserWaypoint` + `C_SuperTrack`) o TomTom; aviso si el destino está en otro continente; `Debug()` |
 | `Integrations/MinimapButton.lua` | Botón del minimapa vía LibDBIcon + LibDataBroker **si otro addon ya los carga** (dependencia blanda, no se incluyen; ver §10) |
 | `Modules/Probe.lua` | `/aplan probe`: firmas de API, EJ, mapa, lockouts y TomTom → `AnimalitosPlannerDB.diagnostics` |
@@ -122,8 +123,9 @@ Personajes de prueba: **Pennyus** (druida 90, con lockouts en FL H, ICC 25H, Uld
 2. Terminar la v0.4: reordenar la lista a mano (AC-09) y probar Ocultar y "Mostrar ocultas" entre reinicios del juego.
 3. Curar los huecos del reporte (entradas) y validar la lista en esES/esMX.
 4. v0.5: falta el Detalle de montura (fuentes y explicación por dificultad, como `/aplan why`); la Colección ya está en la rama `josemaria`.
-5. Planner: más portales escritos a mano (Horda, Kul Tiras/Zandalar, Shadowlands, druidas, Dalaran Hearthstone, juguetes de teletransporte). Los casos no cubiertos dicen "Travel to …".
-6. Preguntas abiertas: reparto de roles en el equipo, nombre público, publicar en CurseForge, en Wago o en ambos.
+5. Datos: rares con montura (fuente y zona desde el texto del diario de monturas), misión oculta de Kraulok (capturar misiones completadas antes/después del kill).
+6. Planner: más portales escritos a mano (Horda, Kul Tiras/Zandalar, Shadowlands, druidas, Dalaran Hearthstone, juguetes de teletransporte). Los casos no cubiertos dicen "Travel to …".
+7. Preguntas abiertas: reparto de roles en el equipo, nombre público, publicar en CurseForge, en Wago o en ambos.
 
 ## 10. Rediseño de la UI (rama `josemaria`)
 Hecho por Josemaria Vives con Claude, guiado por el vision board del producto (`01_Mount_Planner_Product_Vision_Board.png`, fuera del repo) y con **ideas** de EllesmereUI. EllesmereUI es "all rights reserved": no se copió código ni arte, solo técnicas (bordes de 1 px, jerarquía de texto por transparencia, línea de brillo, botones planos, títulos en mayúsculas).
@@ -131,6 +133,9 @@ Hecho por Josemaria Vives con Claude, guiado por el vision board del producto (`
 **Decisiones:**
 - Ventana 720×500; siempre abre en *Farmable now*; orden de la barra lateral Home → Farmable now → Planner → Collection → Settings.
 - **Planner:** el orden de la ruta es fijo a propósito (pedido del jugador: si vas a Stormwind por los portales, la lista no puede reordenarse). Se calcula una vez por facción con todo el dataset: continentes en orden fijo (`ORDER`), y dentro de cada uno, vecino más cercano desde un hub fijo (`HUBS`). Lo hecho se marca o se oculta, sin mover el resto. Los textos de viaje vienen de tablas escritas a mano (`ZONE_PORTALS`, `CONTINENT_PORTALS`, `MAGE`); lo que no está cubierto cae en "Travel to …". Reglas de mago validadas: un teletransporte que deja en la zona de la instancia gana siempre (Theramore para Onyxia); un teletransporte lejano no gana a un portal de capital (Stormwind → Caverns of Time, no Theramore + vuelo); el mago usa el viaje gratis a la capital para tomar portales de zona (Uldum). Un portal que deja en el mapa padre (Tanaris) cuenta como llegada a la subzona (Caverns of Time).
+- **World bosses:** el EJ los agrupa en pseudoinstancias por continente; el pipeline crea una entrada por jefe con clave `-journalEncounterID` (`ejInstance`, `encounter`, dificultad única `0` = semanal). La posición se toma en el juego del pin del EJ (`C_EncounterJournal.GetEncountersOnMap`); el kill semanal, de `GetSavedWorldBossInfo` (comparando el nombre del encuentro y de sus criaturas: Galleon se guarda como "Galleon", validado). Solo `worldBossLockouts = savedWorldBoss` puede ser Ready; BfA (Kraulok) queda en verificación. En el Planner son opcionales ("Include world bosses", apagado por defecto).
+- **Logros:** se leen del cliente al vuelo, no van al dataset. Se construyen en una corrutina con `C_Timer.After(0)` (~6 ms por frame) porque recorrer todos los logros en un frame congelaba la pantalla. El enlace logro → instancia compara cada criterio pendiente (y el nombre/descripción del sublogro) con los nombres de jefes del EJ; es solo una pista.
+- **Datos de terceros revisados:** Mount Route Planner (Data) y RareScanner son "All Rights Reserved": no se usan ni se abren sus datos.
 - Fuentes del cliente: Friz Quadrata para títulos y números, Arial Narrow para el texto.
 - Horas con el mismo reloj que el minimapa (`Lockouts:FormatClock`: hora del reino o local y 12/24 h según la opción del jugador). `date()` solo usa la zona horaria de Windows y salía desfasado.
 - Botón del minimapa: **LibDataBroker no tiene licencia**, así que no se incluye; LibDBIcon (BSD) tampoco, para no depender de LDB. El botón aparece solo si otro addon ya cargó ambas.
