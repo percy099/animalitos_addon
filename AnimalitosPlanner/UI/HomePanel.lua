@@ -17,7 +17,6 @@ local RESETS_W = 200
 local START_ROWS = 4
 local START_ROW_H = 38
 local RING_DURATION = 1000 -- the swipe is paused; only the ratio matters
-local WEEKDAYS = { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY" }
 
 local function fmt(n)
     return BreakUpLargeNumbers and BreakUpLargeNumbers(n) or tostring(n)
@@ -283,8 +282,8 @@ local function setReset(line, secs)
     end
     -- Round to the minute: the countdown lags a few seconds, so 16:00 showed as 15:59.
     local t = math.floor((time() + secs + 30) / 60) * 60
-    local day = _G["WEEKDAY_" .. WEEKDAYS[tonumber(date("%w", t)) + 1]] or date("%A", t)
-    line.when:SetText(("%s %s"):format(day, date("%H:%M", t)))
+    local day, clock = ns.Lockouts:FormatClock(t)
+    line.when:SetText(("%s %s"):format(day, clock))
     line.left:SetFormattedText(L["RESET_IN"], SecondsToTime(secs, true))
 end
 
@@ -307,7 +306,8 @@ function HomePanel:Refresh(p, entries, sum)
     SetPortraitTexture(p.portrait, "player")
     p.greeting:SetFormattedText(L["HOME_GREETING"], UnitName("player"))
     local at = ns.Lockouts.updatedAt
-    p.updated:SetText(at and L["LOCKOUTS_UPDATED"]:format(date("%H:%M", at)) or L["LOCKOUTS_UPDATING"])
+    p.updated:SetText(at and L["LOCKOUTS_UPDATED"]:format(select(2, ns.Lockouts:FormatClock(at)))
+        or L["LOCKOUTS_UPDATING"])
 
     local s = ns.Collection.summary or ns.Collection:Scan()
     if s and s.visibleTotal and s.visibleTotal > 0 then
@@ -350,7 +350,7 @@ function HomePanel:Refresh(p, entries, sum)
     if shown == 0 then
         p.startEmpty:SetText(ns.Lockouts.loaded and L["FARM_EMPTY"] or L["NOW_LOCKOUTS_LOADING"])
     end
-    p.startSummary:SetFormattedText(L["HOME_START_SUMMARY"], sum.ready, sum.instances)
+    p.startSummary:SetText(ns.UI.CountsText(sum.ready, sum.instances))
 
     local daily, weekly = ns.Lockouts:GetResetTimes()
     setReset(p.daily, daily)

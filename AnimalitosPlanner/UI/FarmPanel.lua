@@ -312,7 +312,7 @@ function FarmPanel:Refresh(p, entries, sum)
             title = ("%s  |cff8dd3a8%s|r"):format(title, L["GROUP_HERE"])
         end
         h.text:SetText(title)
-        h.count:SetFormattedText(L["HOME_START_SUMMARY"], g.mounts, #g.entries)
+        h.count:SetText(ns.UI.CountsText(g.mounts, #g.entries))
         h:Show()
         y = y + h:GetHeight() + 6
 

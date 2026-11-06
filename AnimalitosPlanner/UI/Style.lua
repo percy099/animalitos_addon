@@ -193,6 +193,14 @@ function UI.Upper(s)
     return (s:gsub("\195[\128-\191]", UPPER):upper())
 end
 
+--- "2 mounts · 1 instance" with singular/plural handled.
+function UI.CountsText(mounts, instances)
+    local L = ns.L
+    local m = mounts == 1 and L["MOUNT_ONE"] or L["MOUNTS_N"]:format(mounts)
+    local i = instances == 1 and L["INSTANCE_ONE"] or L["INSTANCES_N"]:format(instances)
+    return m .. " · " .. i
+end
+
 --- Small uppercase, dimmed section label ("START HERE", "NAVIGATION").
 function UI.SectionTitle(parent, text)
     local f = fs(parent, "caps", COLORS.dim)

@@ -60,6 +60,35 @@ function Lockouts:GetResetTimes()
     return daily, weekly
 end
 
+-- Clock display that matches the minimap clock: realm time unless the player
+-- chose local time, and 12h (AM/PM) unless they chose 24h ("military") time.
+-- os-style date() alone uses the Windows time zone, which can differ from both.
+local WEEKDAYS = { "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY" }
+
+local function realmOffset()
+    if GetCVar("timeMgrUseLocalTime") == "1" or not C_DateAndTime.GetCurrentCalendarTime then return 0 end
+    local c = C_DateAndTime.GetCurrentCalendarTime()
+    if not c then return 0 end
+    local realmNow = time({ year = c.year, month = c.month, day = c.monthDay, hour = c.hour, min = c.minute, sec = 0 })
+    -- Round to whole quarter hours: the calendar has no seconds.
+    return math.floor((realmNow - time()) / 900 + 0.5) * 900
+end
+
+--- Returns weekday name and "16:00" / "4:00 PM" for an epoch time, as the minimap clock shows it.
+function Lockouts:FormatClock(epoch)
+    local t = epoch + realmOffset()
+    local day = _G["WEEKDAY_" .. WEEKDAYS[tonumber(date("%w", t)) + 1]] or date("%A", t)
+    local clock
+    if GetCVar("timeMgrUseMilitaryTime") == "1" then
+        clock = date("%H:%M", t)
+    else
+        local h = tonumber(date("%H", t))
+        clock = ("%d:%s %s"):format((h % 12 == 0) and 12 or (h % 12), date("%M", t),
+            h < 12 and (TIMEMANAGER_AM or "AM") or (TIMEMANAGER_PM or "PM"))
+    end
+    return day, clock
+end
+
 --- All records for an instance map (any difficulty).
 function Lockouts:ForMap(instanceMapID)
     return self.byMap[instanceMapID] or {}

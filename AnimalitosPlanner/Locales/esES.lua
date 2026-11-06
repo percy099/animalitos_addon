@@ -91,6 +91,8 @@ L["TYPE_RAID"] = "Banda"
 L["TYPE_DUNGEON"] = "Mazmorra"
 L["MOUNT_ONE"] = "1 montura"
 L["MOUNTS_N"] = "%d monturas"
+L["INSTANCE_ONE"] = "1 instancia"
+L["INSTANCES_N"] = "%d instancias"
 
 -- Rediseño de la UI: Farmeable ahora + vista previa de montura
 L["GROUP_NO_LOCATION"] = "Sin ubicación de entrada todavía"

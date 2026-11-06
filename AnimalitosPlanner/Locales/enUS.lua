@@ -89,6 +89,8 @@ L["TYPE_RAID"] = "Raid"
 L["TYPE_DUNGEON"] = "Dungeon"
 L["MOUNT_ONE"] = "1 mount"
 L["MOUNTS_N"] = "%d mounts"
+L["INSTANCE_ONE"] = "1 instance"
+L["INSTANCES_N"] = "%d instances"
 
 -- UI redesign: Farmable now + mount preview
 L["GROUP_NO_LOCATION"] = "No entrance location yet"
