@@ -83,6 +83,12 @@ function MJ:ForEach(callback)
     return true
 end
 
+--- mountID taught by an item, or nil (also nil while the item is not cached).
+function MJ:GetMountFromItem(itemID)
+    if not (itemID and C_MountJournal.GetMountFromItem) then return nil end
+    return C_MountJournal.GetMountFromItem(itemID)
+end
+
 --- Localized label for a Mount Journal sourceType index.
 --- The journal source filter reuses the BATTLE_PET_SOURCE_n global strings.
 function MJ:GetSourceTypeLabel(sourceType)

@@ -108,17 +108,79 @@ local function newRow(p)
     r.name:SetPoint("RIGHT", r.source, "LEFT", -8, 0)
     r.name:SetWordWrap(false)
 
-    r:SetScript("OnEnter", showTooltip)
-    r:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    r:SetScript("OnClick", function(self)
-        if self.mount then ns.MountPreview:Toggle(self.mount.mountID) end
+    -- Achievement view only: thin progress bar under the name.
+    r.ptrack = r:CreateTexture(nil, "ARTWORK")
+    r.ptrack:SetPoint("BOTTOMLEFT", r.name, "BOTTOMLEFT", 0, -5)
+    r.ptrack:SetSize(120, 2)
+    r.ptrack:SetColorTexture(1, 1, 1, 0.1)
+    r.pfill = r:CreateTexture(nil, "ARTWORK", nil, 1)
+    r.pfill:SetPoint("TOPLEFT", r.ptrack)
+    r.pfill:SetHeight(2)
+
+    r:SetScript("OnEnter", function(self)
+        if self.ach then
+            -- Blizzard's achievement tooltip lists every criterion with progress.
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            local link = ns.Achievements:Link(self.ach.id)
+            if link then GameTooltip:SetHyperlink(link) else GameTooltip:AddLine(self.ach.name, 1, 1, 1) end
+            local C = ns.UI.COLORS
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine(L["COL_ACH_TIP"], C.accent[1], C.accent[2], C.accent[3])
+            GameTooltip:Show()
+        else
+            showTooltip(self)
+        end
     end)
+    r:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    r:SetScript("OnClick", function(self, button)
+        if self.ach then
+            if button == "RightButton" then
+                ns.MountPreview:Toggle(self.ach.mountID)
+            elseif not ns.Achievements:Open(self.ach.id) then
+                ns:Print(L["JOURNAL_COMBAT"])
+            end
+        elseif self.mount then
+            ns.MountPreview:Toggle(self.mount.mountID)
+        end
+    end)
+    r:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     return r
+end
+
+local function fillAchRow(r, a, index)
+    local C = ns.UI.COLORS
+    local m = a.mount
+    r.mount, r.farm, r.ach = nil, nil, a
+    r.zebra:SetShown(index % 2 == 1)
+    r.icon:SetTexture(m.icon or a.icon or 134400)
+    r.icon:SetDesaturated(not m.isCollected)
+    r.icon:SetAlpha(m.isCollected and 1 or 0.7)
+    r.name:SetText(a.name)
+    r.name:SetTextColor(1, 1, 1, m.isCollected and 1 or 0.85)
+    r.source:SetText(m.name)
+    local pct = a.total > 0 and a.done / a.total or 0
+    local color, text
+    if m.isCollected then
+        color, text = C.accent, L["STATUS_COLLECTED"]
+    elseif a.completed then
+        color, text = C.success, L["COL_ACH_DONE"]
+    else
+        color, text = C.warning or C.dim, ("%d / %d"):format(a.done, a.total)
+    end
+    r.status:SetText(text)
+    r.status:SetTextColor(color[1], color[2], color[3], color[4] or 1)
+    r.dot:SetVertexColor(color[1], color[2], color[3], color[4] or 1)
+    r.ptrack:Show()
+    r.pfill:SetShown(pct > 0)
+    r.pfill:SetWidth(math.max(1, 120 * pct))
+    r.pfill:SetColorTexture(color[1], color[2], color[3], 0.9)
 end
 
 local function fillRow(r, m, index, farm)
     local C = ns.UI.COLORS
-    r.mount, r.farm = m, farm
+    r.mount, r.farm, r.ach = m, farm, nil
+    r.ptrack:Hide()
+    r.pfill:Hide()
     r.zebra:SetShown(index % 2 == 1)
     r.icon:SetTexture(m.icon or 134400) -- 134400 = question-mark icon
     r.icon:SetDesaturated(not m.isCollected)
@@ -152,10 +214,14 @@ local function render(p)
             r:ClearAllPoints()
             r:SetPoint("TOPLEFT", 0, -(index - 1) * ROW_H)
             r:SetPoint("RIGHT", p.child, "RIGHT", -4, 0)
-            fillRow(r, m, index, p.farm and p.farm[m.mountID])
+            if p.mode == "ach" then
+                fillAchRow(r, m, index)
+            else
+                fillRow(r, m, index, p.farm and p.farm[m.mountID])
+            end
             r:Show()
         else
-            r.mount = nil
+            r.mount, r.ach = nil, nil
             r:Hide()
         end
     end
@@ -173,7 +239,9 @@ function CollectionPanel:Create(parent)
     p.view = ns.UI.Segmented(p, {
         { key = "list", text = L["COL_VIEW_LIST"] },
         { key = "exp",  text = L["COL_VIEW_EXP"] },
+        { key = "ach",  text = L["COL_VIEW_ACH"] },
     }, function(key)
+        if p.bar then p.bar:SetValue(0) end
         ns.Storage.db.ui.collectionView = key
         CollectionPanel:Refresh(p)
     end)
@@ -201,7 +269,9 @@ function CollectionPanel:Create(parent)
     p.filter:SetPoint("TOPLEFT", 0, -(SEARCH_H + 8))
 
     p.source = ns.UI.Dropdown(lv, 170, function(value)
-        ns.Storage.db.ui.collectionSource = (value ~= "all") and value or nil
+        -- Same menu, two meanings: source type (list) or category (achievements).
+        local field = (p.mode == "ach") and "collectionAchCategory" or "collectionSource"
+        ns.Storage.db.ui[field] = (value ~= "all") and value or nil
         if p.bar then p.bar:SetValue(0) end
         CollectionPanel:Refresh(p)
     end)
@@ -392,6 +462,67 @@ local function renderTiles(p)
     for i = n + 1, #p.tiles do p.tiles[i]:Hide() end
 end
 
+-- Achievements view -------------------------------------------------------------
+-- Same list, search and All / Missing / Collected filter (by the mount);
+-- the dropdown filters by achievement category instead of source.
+local function refreshAchievements(p, key)
+    local C = ns.UI.COLORS
+    local all = ns.Collection:Achievements()
+    p.chip:Hide()
+
+    local cat = ns.Storage.db.ui.collectionAchCategory
+    local menu = { { value = "all", text = L["COL_ACH_CAT_ALL"] } }
+    local missingBy, names, order = {}, {}, {}
+    for _, a in ipairs(all or {}) do
+        if not names[a.top] then names[a.top] = a.topName; order[#order + 1] = a.top end
+        if not a.mount.isCollected then missingBy[a.top] = (missingBy[a.top] or 0) + 1 end
+    end
+    table.sort(order, function(x, y)
+        local mx, my = missingBy[x] or 0, missingBy[y] or 0
+        if mx ~= my then return mx > my end
+        return names[x] < names[y]
+    end)
+    for _, top in ipairs(order) do
+        menu[#menu + 1] = { value = top, text = L["COL_SOURCE_ITEM"]:format(names[top], fmt(missingBy[top] or 0)) }
+    end
+    p.source:SetItems(menu)
+    if cat and not names[cat] then cat = nil end
+    p.source:SetText(L["COL_ACH_CAT_LABEL"]:format(cat and names[cat] or L["COL_SOURCE_ANY"]))
+
+    local items, q = {}, p.query or ""
+    local done, collected = 0, 0
+    for _, a in ipairs(all or {}) do
+        if a.completed then done = done + 1 end
+        if a.mount.isCollected then collected = collected + 1 end
+        local owned = a.mount.isCollected
+        local keep = (key == "all") or (key == "missing" and not owned) or (key == "collected" and owned)
+        if keep and cat then keep = a.top == cat end
+        if keep and q ~= "" then
+            keep = a.name:lower():find(q, 1, true) ~= nil or a.mount.name:lower():find(q, 1, true) ~= nil
+        end
+        if keep then items[#items + 1] = a end
+    end
+
+    local total = all and #all or 0
+    if total > 0 then
+        p.progressText:SetFormattedText(L["COL_ACH_PROGRESS"], collected, total, done)
+        p.progressFill:SetWidth(math.max(1, (ns.UI.CONTENT_WIDTH - SCROLL_W) * collected / total))
+        p.progressFill:Show()
+    else
+        p.progressText:SetText(all and L["COL_ACH_NONE"] or L["JOURNAL_NOT_READY_SHORT"])
+        p.progressFill:Hide()
+    end
+
+    p.items = items
+    p.count:SetText(L["COL_COUNT"]:format(fmt(#items)))
+    p.count:Show()
+    p.empty:SetShown(#items == 0)
+    if #items == 0 then p.empty:SetText(all and L["COL_NONE"] or L["JOURNAL_NOT_READY_SHORT"]) end
+    p.child:SetHeight(math.max(#items * ROW_H, 1))
+    p.scroll:UpdateScrollChildRect()
+    render(p)
+end
+
 -- Refresh ---------------------------------------------------------------------
 --- entries (optional) = FarmList:Build() result, for the "Farmable" mark;
 --- internal refreshes (search, filters) reuse the last one.
@@ -400,13 +531,19 @@ function CollectionPanel:Refresh(p, entries)
     local list = ns.Collection:GetList()
 
     local view = ns.Storage.db.ui.collectionView or "list"
+    p.mode = view
     p.view:SetSelected(view)
-    p.listView:SetShown(view == "list")
+    p.listView:SetShown(view == "list" or view == "ach")
     p.expView:SetShown(view == "exp")
     p.expNote:SetShown(view == "exp")
 
     local key = filterKey()
     p.filter:SetSelected(key)
+
+    if view == "ach" then
+        refreshAchievements(p, key)
+        return
+    end
 
     -- Source menu: "All sources" + every source with how many are missing.
     local src = sourceKey()

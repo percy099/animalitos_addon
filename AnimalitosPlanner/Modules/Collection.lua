@@ -48,7 +48,53 @@ function Collection:Scan()
     s.visibleTotal = s.collectedVisible + s.missingVisible
     table.sort(list, function(a, b) return a.name < b.name end)
     self.summary, self.list = s, list
+    self.achievements = nil -- collected flags changed; rebuild on demand
     return s
+end
+
+--- Mount-reward achievements for mounts this character can see, joined with
+--- the Mount Journal. Built on first use and cached until a mount or an
+--- achievement is earned. Each entry: Achievements:ScanMounts fields plus
+--- mount (journal record). Sorted: not collected first, then by progress.
+function Collection:Achievements()
+    if self.achievements then return self.achievements end
+    local list = self:GetList()
+    if not list then return nil end
+    local byName, byID = {}, {}
+    for _, m in ipairs(list) do
+        byName[m.name:lower()] = m.mountID
+        byID[m.mountID] = m
+    end
+    local found, uncached = ns.Achievements:ScanMounts(byName)
+    local out = {}
+    for _, a in ipairs(found) do
+        local m = byID[a.mountID]
+        if m then -- visible for this character
+            a.mount = m
+            out[#out + 1] = a
+        end
+    end
+    table.sort(out, function(a, b)
+        if a.mount.isCollected ~= b.mount.isCollected then return not a.mount.isCollected end
+        local pa, pb = a.done / a.total, b.done / b.total
+        if pa ~= pb then return pa > pb end
+        return a.name < b.name
+    end)
+    self.achievements = out
+    -- Reward items not cached yet: ask for them and rebuild once a bit later.
+    if #uncached > 0 and not self.achRetried then
+        self.achRetried = true
+        ns.Achievements:RequestItems(uncached)
+        C_Timer.After(2, function()
+            self.achievements = nil
+            if ns.UI and ns.UI.Refresh then ns.UI:Refresh() end
+        end)
+    end
+    return out
+end
+
+function Collection:InvalidateAchievements()
+    self.achievements = nil
 end
 
 --- Raid/dungeon mounts of our dataset grouped by expansion (Encounter

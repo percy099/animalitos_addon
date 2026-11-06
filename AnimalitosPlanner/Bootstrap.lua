@@ -26,6 +26,13 @@ ns:On("PLAYER_ENTERING_WORLD", function(_, isInitialLogin, isReloadingUi)
     end
 end)
 
+ns:On("ACHIEVEMENT_EARNED", function()
+    ns:Debounce("achievements", 1, function()
+        ns.Collection:InvalidateAchievements()
+        ns.UI:Refresh()
+    end)
+end)
+
 ns:On("NEW_MOUNT_ADDED", function()
     ns:Debounce("scan", 0.5, function()
         ns.Collection:Scan()
