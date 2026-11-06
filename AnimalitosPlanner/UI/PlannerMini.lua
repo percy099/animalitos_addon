@@ -262,6 +262,16 @@ local function runTitle(s)
     return ns.PlannerPanel.StepTitle(s)
 end
 
+-- True when every boss that drops this mount is dead in the current run:
+-- the lockout of the difficulty you are in says so (a heroic kill keeps
+-- the mount "Ready" overall when Normal has no lockout).
+local function killedThisRun(m, d)
+    local S = ns.Eligibility.STATES
+    for _, src in ipairs(m.sources or { m.source }) do
+        if ns.Eligibility:Evaluate(src, d) ~= S.LOCKED_OUT then return false end
+    end
+    return true
+end
 -- Difficulty line (and its button) for a step at its entrance or inside.
 local DIFF_BLOCKED = { combat = "JOURNAL_COMBAT", leader = "MINI_DIFF_LEADER" }
 local function helper(f, e)
@@ -349,6 +359,7 @@ function Mini:Refresh()
     -- At the entrance or inside: the difficulty the mounts drop on, and the
     -- boss in front of each mount.
     local here = not s.event and s.e and (s.e.near == 2 or ns.Difficulty:Inside(s.e) ~= nil)
+    local insideDiff = here and ns.Difficulty:Inside(s.e) or nil
     f.diff:Hide()
     if here then helper(f, s.e) end
     -- One clickable line per mount: click shows its 3D model beside the window.
@@ -362,6 +373,11 @@ function Mini:Refresh()
             local label = r.mount
             local m = here and s.e.mounts[r.id]
             if m then label = ("%s  |cff999999%s|r"):format(r.mount, ns.FarmList:BossName(m.source)) end
+            -- Inside: its boss already died in this run (this difficulty's
+            -- lockout): greyed out with a check.
+            if m and insideDiff and killedThisRun(m, insideDiff) then
+                label = ("|cff707070%s  %s|r  |A:common-icon-checkmark:12:12|a"):format(r.mount, ns.FarmList:BossName(m.source))
+            end
             b.text:SetText(("|T%s:14:14:0:0|t %s"):format(r.icon, label))
             b:SetPoint("TOPLEFT", PAD, -(f.y + 3))
             f.y = f.y + 3 + 16
