@@ -85,6 +85,11 @@ local function describe(r)
         notes[#notes + 1] = diffs[1] and L["PLAN_NOTE_HEROIC_NORMAL"] or L["PLAN_NOTE_HEROIC"]
     end
     if not next(ready) and not next(locked) and verifyReason then notes[#notes + 1] = verifyReason end
+    -- Raid skip to the mount's boss on the difficulty the mounts drop on.
+    if next(ready) then
+        local skip = ns.Difficulty:SkipNote(r.jid, ns.Difficulty:Pick(e))
+        if skip then notes[#notes + 1] = skip end
+    end
 
     local kind = ns.FarmList:TypeName(r.inst)
     local detail = #names > 0 and ("%s · %s"):format(kind, table.concat(names, ", ")) or kind

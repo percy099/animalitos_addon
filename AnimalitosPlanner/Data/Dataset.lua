@@ -139,6 +139,11 @@ ns.Data = {
         { lfgDungeonID = 287, event = "EVENT_BREWFEST", mounts = { { mountID = 202, itemID = 33977 }, { mountID = 226, itemID = 37828 } } }, -- Coren Direbrew
         { lfgDungeonID = 288, event = "EVENT_LOVE", mounts = { { mountID = 352, itemID = 50250 } } }, -- The Crown Chemical Co.
     },
+    skips = {
+        [786] = { { boss = "Grand Magistrix Elisande", encounter = 1743, quests = { { 14, 45381 }, { 15, 45382 }, { 16, 45383 } } } },
+        [946] = { { boss = "Imonar the Soulhunter", encounter = 2009, quests = { { 14, 49032 }, { 15, 49075 }, { 16, 49076 } } }, { boss = "Argus the Unmaker", encounter = 2031, quests = { { 14, 49133 }, { 15, 49134 }, { 16, 49135 } } } },
+        [1180] = { { boss = "Carapace of N'Zoth", encounter = 2366, quests = { { 14, 58373 }, { 15, 58374 }, { 16, 58375 } } } },
+    },
     vendorReqs = {
         [198809] = { reputation = { Alliance = 2524, Horde = 2523 }, standing = 8, exceptRace = "Dracthyr" },
         [198810] = { reputation = { Alliance = 2524, Horde = 2523 }, standing = 8, exceptRace = "Dracthyr" },

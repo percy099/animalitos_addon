@@ -29,7 +29,34 @@
         "reason": "Same as Emalon" }
     ]
   },
-  "vendorRequirements": {
+  "raidSkips": {
+    "_reason": "Raid skips: a quest per difficulty (Normal 14 / Heroic 15 / Mythic 16); a higher one unlocks the lower ones (warcraft.wiki.gg). IDs from each quest's warcraft.wiki.gg page (external links, in Normal, Heroic, Mythic order); /aplan skips shows their titles in game to confirm. boss = English fallback when the journal name is not available.",
+    "list": [
+      {
+        "name": "The Nighthold", "journalInstanceID": 786,
+        "skips": [
+          { "boss": "Grand Magistrix Elisande", "journalEncounterID": 1743, "quests": { "14": 45381, "15": 45382, "16": 45383 },
+            "reason": "The Nighthold: Talisman of the Shal'dorei (Elisande x4), warcraft.wiki.gg quest page" }
+        ]
+      },
+      {
+        "name": "Antorus, the Burning Throne", "journalInstanceID": 946,
+        "skips": [
+          { "boss": "Imonar the Soulhunter", "journalEncounterID": 2009, "quests": { "14": 49032, "15": 49075, "16": 49076 },
+            "reason": "Antorus, the Burning Throne: Dark Passage (Imonar x4), warcraft.wiki.gg quest page" },
+          { "boss": "Argus the Unmaker", "journalEncounterID": 2031, "quests": { "14": 49133, "15": 49134, "16": 49135 },
+            "reason": "Antorus, the Burning Throne: The Heart of Argus (Aggramar x4, after Dark Passage), warcraft.wiki.gg quest page" }
+        ]
+      },
+      {
+        "name": "Ny'alotha, the Waking City", "journalInstanceID": 1180,
+        "skips": [
+          { "boss": "Carapace of N'Zoth", "journalEncounterID": 2366, "quests": { "14": 58373, "15": 58374, "16": 58375 },
+            "reason": "Ny'alotha: MOTHER's Guidance (Carapace of N'Zoth x4), warcraft.wiki.gg quest page" }
+        ]
+      }
+    ]
+  },  "vendorRequirements": {
     "_reason": "Requirements a vendor asks for that the mount item's tooltip does not show (Requirements.lua cannot read them). Checked by hand on warcraft.wiki.gg / Wowhead. reputation = factionID per player faction (UnitFactionGroup), standing = reaction (8 = Exalted), exceptRace = race file name that skips the requirement.",
     "list": [
       {

@@ -93,3 +93,68 @@ end
 function D:Settable(d)
     return DUNGEON[d] or FLEX[d] or LEGACY[d] and true or false
 end
+
+-- Raid skips ------------------------------------------------------------------
+-- Curated (overrides.json raidSkips -> ns.Data.skips[jid]): the boss a skip
+-- jumps to and its quest per difficulty. A higher difficulty's quest also
+-- unlocks the lower ones. Skips are warband-wide once unlocked, so a quest
+-- done on any character counts when the client can tell.
+local RANK = { [14] = 1, [15] = 2, [16] = 3 }
+
+local function questDone(questID)
+    local Q = C_QuestLog
+    if Q.IsQuestFlaggedCompletedOnAccount and Q.IsQuestFlaggedCompletedOnAccount(questID) then return true end
+    return Q.IsQuestFlaggedCompleted(questID) and true or false
+end
+
+local function skipBoss(s)
+    return (EJ_GetEncounterInfo and EJ_GetEncounterInfo(s.encounter)) or s.boss
+end
+
+--- Skips of a raid for difficulty d: { { name, unlocked } }, or nil.
+function D:Skips(jid, d)
+    local list = ns.Data.skips and ns.Data.skips[jid]
+    if not list then return nil end
+    local need = RANK[d] or 1
+    local out = {}
+    for _, s in ipairs(list) do
+        local unlocked = false
+        for _, pair in ipairs(s.quests) do
+            if (RANK[pair[1]] or 0) >= need and questDone(pair[2]) then
+                unlocked = true
+                break
+            end
+        end
+        out[#out + 1] = { name = skipBoss(s), unlocked = unlocked }
+    end
+    return out
+end
+
+--- One line for the step: "Skip to Argus the Unmaker (check)", colored.
+function D:SkipNote(jid, d)
+    local skips = self:Skips(jid, d)
+    if not skips then return nil end
+    local parts = {}
+    for _, s in ipairs(skips) do
+        local icon = s.unlocked and "|A:common-icon-checkmark:11:11|a" or "|A:common-icon-redx:11:11|a"
+        parts[#parts + 1] = ("%s%s|r %s"):format(s.unlocked and "|cff8dd3a8" or "|cffe0a040",
+            ns.L["SKIP_TO"]:format(s.name), icon)
+    end
+    return table.concat(parts, "  ")
+end
+
+--- /aplan skips: each curated quest with its title in this client and
+--- whether it is done (to confirm the IDs).
+function D:DebugSkips()
+    for jid, list in pairs(ns.Data.skips or {}) do
+        print(("  %s:"):format(ns.FarmList:InstanceName(jid)))
+        for _, s in ipairs(list) do
+            for _, pair in ipairs(s.quests) do
+                local title = C_QuestLog.GetTitleForQuestID and C_QuestLog.GetTitleForQuestID(pair[2])
+                if not title and C_QuestLog.RequestLoadQuestByID then C_QuestLog.RequestLoadQuestByID(pair[2]) end
+                print(("    %s %s: %s (%s) done=%s"):format(skipBoss(s), ns.FarmList:DifficultyName(pair[1]),
+                    tostring(pair[2]), tostring(title or "not loaded, run again"), tostring(questDone(pair[2]))))
+            end
+        end
+    end
+end
