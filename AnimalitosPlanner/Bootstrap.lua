@@ -219,6 +219,8 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
         ns.Holidays.test = not ns.Holidays.test or nil
         ns:Print("events test mode: " .. (ns.Holidays.test and "on" or "off"))
         ns.UI:Refresh()
+    elseif cmd == "vendorprobe" then
+        ns.DevScan:ProbeVendors()
     elseif cmd == "unknown" then
         ns:Print("mounts without a source type:")
         ns.MountJournal:DebugUnknownSources()

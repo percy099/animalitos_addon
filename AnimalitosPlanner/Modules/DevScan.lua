@@ -269,3 +269,99 @@ function Scan:Run()
         end
     end)
 end
+
+-- Vendor probe (/aplan vendorprobe) ------------------------------------------------
+-- Diagnostic for "can I buy this mount now": the journal has no mount ->
+-- item link, so (1) every item ID is checked with GetItemInfoInstant (no
+-- cache needed) for the Mount subclass, (2) those items are loaded and
+-- GetMountFromItem gives the mount, (3) for missing Vendor mounts the item
+-- tooltip is read (C_TooltipInfo) and lines in red (requirements not met)
+-- are kept. Result: AnimalitosPlannerDB.vendorProbe, summary in chat.
+local MAX_ITEM_ID = 300000
+local ITEMS_PER_TICK = 6000
+local MOUNT_CLASS = (Enum.ItemClass and Enum.ItemClass.Miscellaneous) or 15
+local MOUNT_SUBCLASS = (Enum.ItemMiscellaneousSubclass and Enum.ItemMiscellaneousSubclass.Mount) or 5
+local VENDOR_SOURCE = 3
+local probing = false
+
+local function isRed(c)
+    return c and c.r and c.r > 0.9 and c.g < 0.25 and c.b < 0.25
+end
+
+local function tooltipLines(itemID)
+    local data = C_TooltipInfo and C_TooltipInfo.GetItemByID and C_TooltipInfo.GetItemByID(itemID)
+    local all, red = {}, {}
+    for _, line in ipairs(data and data.lines or {}) do
+        local text = line.leftText
+        if text and text ~= "" then
+            all[#all + 1] = text
+            if isRed(line.leftColor) then red[#red + 1] = text end
+        end
+    end
+    return all, red
+end
+
+function Scan:ProbeVendors()
+    if probing then msg("vendor probe already running.") return end
+    probing = true
+    local result = { startedAt = date("%Y-%m-%d %H:%M:%S"), mountItems = 0, mapped = 0, vendors = {} }
+    AnimalitosPlannerDB.vendorProbe = result
+    local items, cursor, phase, waitUntil = {}, 1, "sweep", 0
+    msg("vendor probe: looking for mount items...")
+    local ticker
+    ticker = C_Timer.NewTicker(TICK, function()
+        if phase == "sweep" then
+            local to = math.min(cursor + ITEMS_PER_TICK - 1, MAX_ITEM_ID)
+            for id = cursor, to do
+                local _, _, _, _, _, classID, subClassID = C_Item.GetItemInfoInstant(id)
+                if classID == MOUNT_CLASS and subClassID == MOUNT_SUBCLASS then
+                    items[#items + 1] = id
+                    C_Item.RequestLoadItemDataByID(id)
+                end
+            end
+            cursor = to + 1
+            if cursor > MAX_ITEM_ID then
+                result.mountItems = #items
+                msg(("%d mount items; loading them..."):format(#items))
+                phase, waitUntil = "wait", GetTime() + 8
+            end
+        elseif phase == "wait" then
+            if GetTime() >= waitUntil then phase = "read" end
+        elseif phase == "read" then
+            ticker:Cancel()
+            local itemOf = {}
+            for _, id in ipairs(items) do
+                local mountID = C_MountJournal.GetMountFromItem(id)
+                if mountID and not itemOf[mountID] then itemOf[mountID] = id end
+            end
+            for _ in pairs(itemOf) do result.mapped = result.mapped + 1 end
+            local missingVendor, withItem, withRed = 0, 0, 0
+            for _, m in ipairs(ns.Collection:GetList() or {}) do
+                if not m.isCollected and m.sourceType == VENDOR_SOURCE then
+                    missingVendor = missingVendor + 1
+                    local itemID = itemOf[m.mountID]
+                    local entry = { name = m.name, mountID = m.mountID, itemID = itemID }
+                    if itemID then
+                        withItem = withItem + 1
+                        entry.lines, entry.red = tooltipLines(itemID)
+                        if #entry.red > 0 then withRed = withRed + 1 end
+                    end
+                    result.vendors[#result.vendors + 1] = entry
+                end
+            end
+            result.missingVendor, result.withItem, result.withRed = missingVendor, withItem, withRed
+            msg(("%d mount items, %d mounts mapped to an item."):format(result.mountItems, result.mapped))
+            msg(("missing Vendor mounts: %d, with item: %d, with red requirement lines: %d"):format(
+                missingVendor, withItem, withRed))
+            local shown = 0
+            for _, e in ipairs(result.vendors) do
+                if e.red and #e.red > 0 and shown < 6 then
+                    shown = shown + 1
+                    print(("  %s: %s"):format(e.name, table.concat(e.red, " | ")))
+                end
+            end
+            msg("details saved: /reload, then send the SavedVariables file.")
+            probing = false
+        end
+    end)
+end
