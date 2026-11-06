@@ -398,12 +398,13 @@ function Planner:TravelTexts(fac, here, ent, mage)
         return out
     end
 
-    -- Another continent with a mage city (no zone portal is closer). Only
-    -- when it lands in the instance's zone, at the capital portal's own
-    -- destination, or there is no capital portal: Theramore + flying to
-    -- Tanaris is worse than Stormwind + the Caverns of Time portal.
+    -- Another continent with a mage city (no zone portal is closer). One
+    -- teleport beats hearth + portal, unless the capital portal lands right
+    -- in the instance's zone: Stormwind -> Caverns of Time beats Theramore +
+    -- flying to Tanaris, but Dalaran beats Azsuna for the Broken Shore.
     local dest = MAGE[fac][ent.continent]
-    local useful = dest and (sameArea(dest[1], ent.uiMapID) or not contPortal or dest[1] == contPortal)
+    local useful = dest and (sameArea(dest[1], ent.uiMapID) or not contPortal
+        or not sameArea(contPortal, ent.uiMapID))
     if ent.continent ~= here.continent and not zonePortal and useful then
         hop = mageHop(mage, dest)
         if hop then
