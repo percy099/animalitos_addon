@@ -167,6 +167,12 @@ function FarmList:InstanceName(jid)
     return (EJ_GetInstanceInfo(jid)) or ("#" .. jid)
 end
 
+--- Encounter Journal tile artwork for an instance (texture fileID), or nil.
+function FarmList:InstanceArt(jid)
+    local _, _, _, buttonImage = EJ_GetInstanceInfo(jid)
+    return buttonImage
+end
+
 --- Encounter Journal tiers (1 = Classic ... newest expansion).
 function FarmList:NumTiers()
     return (EJ_GetNumTiers and EJ_GetNumTiers()) or 12

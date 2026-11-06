@@ -16,6 +16,8 @@ local RING_THICKNESS = 10
 local RESETS_W = 200
 local START_ROWS = 4
 local START_ROW_H = 38
+local START_ART_W = 150 -- instance artwork behind each "Start here" row
+local BANNER_W = 320    -- instance artwork on the right of the greeting
 local RING_DURATION = 1000 -- the swipe is paused; only the ratio matters
 
 local function fmt(n)
@@ -45,6 +47,19 @@ local function createGreeting(p)
     head:SetPoint("TOPLEFT")
     head:SetPoint("TOPRIGHT")
     head:SetHeight(HEADER_H)
+
+    -- Banner: artwork of the first recommended instance on the right, fading
+    -- into the window background toward the greeting text.
+    p.banner = ns.UI.ArtTexture(head, "BACKGROUND", -2)
+    p.banner:SetPoint("TOPRIGHT")
+    p.banner:SetPoint("BOTTOMRIGHT")
+    p.banner:SetWidth(BANNER_W)
+    p.banner:SetAlpha(0.55)
+    local bg = C.background
+    local fade = head:CreateTexture(nil, "BACKGROUND", nil, -1)
+    fade:SetAllPoints(p.banner)
+    fade:SetColorTexture(1, 1, 1, 1)
+    fade:SetGradient("HORIZONTAL", CreateColor(bg[1], bg[2], bg[3], 1), CreateColor(bg[1], bg[2], bg[3], 0))
 
     local grad = head:CreateTexture(nil, "BACKGROUND")
     grad:SetAllPoints()
@@ -205,6 +220,19 @@ local function createStart(p, top)
         bg:SetAllPoints()
         bg:SetColorTexture(0, 0, 0, 0.18)
 
+        -- Instance artwork behind the number and name, fading out to the right.
+        r.art = r:CreateTexture(nil, "BACKGROUND", nil, 1)
+        r.art:SetPoint("TOPLEFT")
+        r.art:SetPoint("BOTTOMLEFT")
+        r.art:SetWidth(START_ART_W)
+        r.art:SetAlpha(0.5)
+        local s = C.surface
+        local fade = r:CreateTexture(nil, "BACKGROUND", nil, 2)
+        fade:SetAllPoints(r.art)
+        fade:SetColorTexture(1, 1, 1, 1)
+        fade:SetGradient("HORIZONTAL", CreateColor(0, 0, 0, 0.25),
+            CreateColor(s[1] * 0.82, s[2] * 0.82, s[3] * 0.82, 1))
+
         r.badge = ns.UI.NumberBadge(r, 20)
         r.badge:SetPoint("LEFT", 6, 0)
         r.badge.text:SetText(i)
@@ -340,12 +368,22 @@ function HomePanel:Refresh(p, entries, sum)
             r.detail:SetText(table.concat(parts, " · "))
             r.count:SetText(e.readyCount == 1 and L["MOUNT_ONE"] or L["MOUNTS_N"]:format(e.readyCount))
             local jid = e.jid
+            local art = ns.FarmList:InstanceArt(jid)
+            r.art:SetTexture(art)
+            r.art:SetShown(art ~= nil)
+            ns.UI.SetArtCrop(r.art, START_ART_W, START_ROW_H - 4)
+            if shown == 1 then
+                p.banner:SetTexture(art)
+                p.banner:SetShown(art ~= nil)
+                ns.UI.SetArtCrop(p.banner, BANNER_W, HEADER_H)
+            end
             r.go:SetEnabled(e.inst.entrance ~= nil)
             r.go:SetScript("OnClick", function() ns.Navigation:GoToInstance(jid) end)
             r:Show()
         end
     end
     for i = shown + 1, START_ROWS do p.startRows[i]:Hide() end
+    if shown == 0 then p.banner:Hide() end
     p.startEmpty:SetShown(shown == 0)
     if shown == 0 then
         p.startEmpty:SetText(ns.Lockouts.loaded and L["FARM_EMPTY"] or L["NOW_LOCKOUTS_LOADING"])

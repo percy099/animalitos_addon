@@ -11,8 +11,11 @@ ns.FarmPanel = FarmPanel
 local CARD_GAP = 6
 local GROUP_GAP = 12
 local CARD_HEAD_H = 40
+local CARD_MIN_H = 70
 local ROW_H = 22
-local ROW_INDENT = 34
+local THUMB_W = 92  -- instance artwork on the left of each card
+local THUMB_INSET = 6
+local ROW_INDENT = THUMB_INSET + THUMB_W + 10
 local SCROLL_W = 24
 local RIGHT_MARGIN = 8 -- keeps cards off the scroll bar
 local PLUS = "Interface\\Buttons\\UI-PlusButton-Up"
@@ -70,8 +73,24 @@ local function newCard(p)
     local s = ns.UI.COLORS.surface
     ns.UI.StylePanel(c, { s[1], s[2], s[3], 0.85 })
 
-    c.badge = ns.UI.NumberBadge(c, 20)
-    c.badge:SetPoint("TOPLEFT", 8, -9)
+    -- Instance artwork (Encounter Journal tile) with rounded corners; a
+    -- placeholder tint shows when the client has no art for it.
+    c.thumbBg = ns.UI.RoundedTexture(c, "ARTWORK", 0)
+    c.thumbBg:ClearAllPoints()
+    c.thumbBg:SetPoint("TOPLEFT", THUMB_INSET, -THUMB_INSET)
+    c.thumbBg:SetPoint("BOTTOMLEFT", THUMB_INSET, THUMB_INSET)
+    c.thumbBg:SetWidth(THUMB_W)
+    local a = ns.UI.COLORS.accent
+    c.thumbBg:SetVertexColor(a[1], a[2], a[3], 0.12)
+    c.thumb = ns.UI.ArtTexture(c, "ARTWORK", 1)
+    c.thumb:SetAllPoints(c.thumbBg)
+
+    -- Badge sits on the artwork's corner, above it.
+    local badgeHost = CreateFrame("Frame", nil, c)
+    badgeHost:SetAllPoints()
+    badgeHost:SetFrameLevel(c:GetFrameLevel() + 2)
+    c.badge = ns.UI.NumberBadge(badgeHost, 20)
+    c.badge:SetPoint("TOPLEFT", THUMB_INSET + 4, -(THUMB_INSET + 4))
 
     c.hide = ns.UI.Button(c, "secondary")
     ns.UI.SetButtonText(c.hide, L["BTN_HIDE"], 62)
@@ -81,7 +100,7 @@ local function newCard(p)
     c.go:SetPoint("RIGHT", c.hide, "LEFT", -6, 0)
 
     c.title = ns.UI.fs(c, "GameFontNormal")
-    c.title:SetPoint("TOPLEFT", c.badge, "TOPRIGHT", 8, 3)
+    c.title:SetPoint("TOPLEFT", ROW_INDENT, -9)
     c.title:SetPoint("RIGHT", c.go, "LEFT", -6, 0)
     c.title:SetWordWrap(false)
     c.detail = ns.UI.fs(c, "GameFontHighlightSmall", ns.UI.COLORS.muted)
@@ -350,9 +369,14 @@ function FarmPanel:Refresh(p, entries, sum)
                 mountRow(c, ROW_INDENT, rowY, 8, id, e.mounts[id], jid, "ready", k % 2 == 1)
                 rowY = rowY + ROW_H
             end
-            c:SetHeight(rowY + 6)
+            local h = math.max(rowY + 6, CARD_MIN_H)
+            c:SetHeight(h)
+            local art = ns.FarmList:InstanceArt(jid)
+            c.thumb:SetTexture(art)
+            c.thumb:SetShown(art ~= nil)
+            ns.UI.SetArtCrop(c.thumb, THUMB_W, h - THUMB_INSET * 2)
             c:Show()
-            y = y + c:GetHeight() + CARD_GAP
+            y = y + h + CARD_GAP
         end
     end
     if index == 0 then line(L["FARM_EMPTY"], C.muted) end

@@ -123,11 +123,12 @@ function UI:Create()
     tinsert(UISpecialFrames, f:GetName()) -- close with ESC
 
     -- Header: darker band, logo, title, character line, accent glow line
-    local band = f:CreateTexture(nil, "BACKGROUND", nil, 1)
+    local band = UI.RoundedTexture(f, "BACKGROUND", 1)
+    band:ClearAllPoints()
     band:SetPoint("TOPLEFT", UI.px(1), -UI.px(1))
     band:SetPoint("TOPRIGHT", -UI.px(1), -UI.px(1))
     band:SetHeight(HEADER_H - 1)
-    band:SetColorTexture(0, 0, 0, 0.28)
+    band:SetVertexColor(0, 0, 0, 0.28)
 
     local close = UI.CloseButton(f)
     close:SetPoint("TOPRIGHT", -8, -8)

@@ -82,16 +82,70 @@ function UI.px(n)
 end
 local px = UI.px
 
---- Panel look: flat fill, crisp 1px border and a faint top-lit sheen.
---- opts.border = color, opts.noSheen = true (when something must match the flat fill).
+-- Rounded corners: our own textures (pipeline/gen_ui_textures.py), 9-sliced
+-- so corners keep their shape at any size. Falls back to square 1px
+-- backdrops if the client lacks texture slicing.
+local MEDIA = "Interface\\AddOns\\AnimalitosPlanner\\Media\\"
+local ROUND_FILL, ROUND_EDGE, ROUND_MASK = MEDIA .. "round-fill", MEDIA .. "round-edge", MEDIA .. "round-mask"
+local ROUND_MARGIN = 8 -- texture pixels kept unstretched at each corner
+
+local roundedOK
+local function canRound()
+    if roundedOK == nil then
+        local probe = UIParent:CreateTexture()
+        roundedOK = probe.SetTextureSliceMargins ~= nil and Enum.UITextureSliceMode ~= nil
+        probe:Hide()
+    end
+    return roundedOK
+end
+
+local function sliced(frame, layer, sublevel, file)
+    local t = frame:CreateTexture(nil, layer, nil, sublevel)
+    t:SetTexture(file)
+    t:SetTextureSliceMargins(ROUND_MARGIN, ROUND_MARGIN, ROUND_MARGIN, ROUND_MARGIN)
+    t:SetTextureSliceMode(Enum.UITextureSliceMode.Stretched)
+    t:SetAllPoints()
+    return t
+end
+
+--- A white fill texture with rounded corners (square if unsupported); tint with SetVertexColor.
+function UI.RoundedTexture(frame, layer, sublevel)
+    if canRound() then return sliced(frame, layer, sublevel or 0, ROUND_FILL) end
+    local t = frame:CreateTexture(nil, layer, nil, sublevel or 0)
+    t:SetTexture(WHITE)
+    t:SetAllPoints()
+    return t
+end
+
+--- Recolors a panel styled with StylePanel (works for rounded and square).
+function UI.SetPanelColors(frame, fill, border)
+    if frame.apFill then
+        frame.apFill:SetVertexColor(fill[1], fill[2], fill[3], fill[4] or 1)
+        frame.apEdge:SetVertexColor(border[1], border[2], border[3], border[4] or 1)
+    else
+        frame:SetBackdropColor(fill[1], fill[2], fill[3], fill[4] or 1)
+        frame:SetBackdropBorderColor(border[1], border[2], border[3], border[4] or 1)
+    end
+end
+
+--- Panel look: rounded fill and 1px border, plus a faint top-lit sheen on square panels.
+--- opts.border = color, opts.noSheen = true (when something must match the flat fill),
+--- opts.square = true (keep square corners).
 function UI.StylePanel(frame, fill, opts)
     opts = opts or {}
+    local c = fill or COLORS.surface
+    local b = opts.border or COLORS.border
+    if not opts.square and canRound() then
+        if not frame.apFill then
+            frame.apFill = sliced(frame, "BACKGROUND", -8, ROUND_FILL)
+            frame.apEdge = sliced(frame, "BORDER", -8, ROUND_EDGE)
+        end
+        UI.SetPanelColors(frame, c, b)
+        return
+    end
     local e = px(1)
     frame:SetBackdrop({ bgFile = WHITE, edgeFile = WHITE, edgeSize = e })
-    local c = fill or COLORS.surface
-    frame:SetBackdropColor(c[1], c[2], c[3], c[4] or 1)
-    local b = opts.border or COLORS.border
-    frame:SetBackdropBorderColor(b[1], b[2], b[3], b[4] or 1)
+    UI.SetPanelColors(frame, c, b)
     if not opts.noSheen and not frame.sheen then
         local s = frame:CreateTexture(nil, "BACKGROUND", nil, 1)
         s:SetPoint("TOPLEFT", e, -e)
@@ -131,17 +185,15 @@ function UI.Button(parent, kind)
     label:SetPoint("CENTER")
     b:SetFontString(label)
     b:SetPushedTextOffset(0, -1)
-    b:SetBackdrop({ bgFile = WHITE, edgeFile = WHITE, edgeSize = px(1) })
+    UI.StylePanel(b, nil, { noSheen = true })
 
     local a = COLORS.accent
     local function paint(hover)
         if primary then
-            b:SetBackdropColor(a[1], a[2], a[3], hover and 0.42 or 0.26)
-            b:SetBackdropBorderColor(a[1], a[2], a[3], hover and 1 or 0.75)
+            UI.SetPanelColors(b, { a[1], a[2], a[3], hover and 0.42 or 0.26 }, { a[1], a[2], a[3], hover and 1 or 0.75 })
             label:SetTextColor(1, 1, 1, 1)
         else
-            b:SetBackdropColor(1, 1, 1, hover and 0.09 or 0.035)
-            b:SetBackdropBorderColor(1, 1, 1, hover and 0.32 or 0.14)
+            UI.SetPanelColors(b, { 1, 1, 1, hover and 0.09 or 0.035 }, { 1, 1, 1, hover and 0.32 or 0.14 })
             label:SetTextColor(1, 1, 1, hover and 1 or 0.82)
         end
     end
@@ -206,6 +258,35 @@ function UI.SectionTitle(parent, text)
     local f = fs(parent, "caps", COLORS.dim)
     f:SetText(UI.Upper(text or ""))
     return f
+end
+
+-- Instance artwork from the Encounter Journal (EJ_GetInstanceInfo buttonImage1).
+-- The picture fills the top-left 174x95 of a 256x128 texture.
+local ART_U, ART_V, ART_ASPECT = 174 / 256, 95 / 128, 174 / 95
+
+--- Crops instance artwork so it fills a w*h area without stretching (centered).
+function UI.SetArtCrop(tex, w, h)
+    if not (w and h) or w <= 0 or h <= 0 then return end
+    local a = w / h
+    if a >= ART_ASPECT then
+        local v = ART_V * ART_ASPECT / a
+        local top = (ART_V - v) / 2
+        tex:SetTexCoord(0, ART_U, top, top + v)
+    else
+        local u = ART_U * a / ART_ASPECT
+        local left = (ART_U - u) / 2
+        tex:SetTexCoord(left, left + u, 0, ART_V)
+    end
+end
+
+--- Texture for instance artwork with rounded corners (mask).
+function UI.ArtTexture(parent, layer, sublevel)
+    local t = parent:CreateTexture(nil, layer or "ARTWORK", nil, sublevel or 0)
+    local m = parent:CreateMaskTexture()
+    m:SetTexture(ROUND_MASK, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+    m:SetAllPoints(t)
+    t:AddMaskTexture(m)
+    return t
 end
 
 --- Filled circle tinted with `color` (rings, discs, status dots).
