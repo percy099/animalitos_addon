@@ -106,6 +106,19 @@ function MJ:PlainSourceText(text)
     return text
 end
 
+--- First line of the journal source text ("Zone: Siren Isle" -> "Siren
+--- Isle"; other labels kept: "Ritual Site: Daggerspine Point"), or nil.
+function MJ:SourceHint(mountID)
+    local extra = self:GetMountExtra(mountID)
+    local text = extra and extra.sourceText
+    if not text or text == "" then return nil end
+    local line = strtrim((self:PlainSourceText(text):match("^%s*([^\n]+)")) or "")
+    if line == "" then return nil end
+    local zoneLabel = ZONE and (ZONE .. ":")
+    if zoneLabel and line:sub(1, #zoneLabel) == zoneLabel then line = strtrim(line:sub(#zoneLabel + 1)) end
+    return line
+end
+
 --- /aplan unknown: mounts still without a source type, with their raw text
 --- (pipes doubled so chat shows the codes).
 function MJ:DebugUnknownSources()

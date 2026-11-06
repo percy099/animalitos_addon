@@ -197,6 +197,11 @@ local function fillRow(r, m, index, farm, sourceText)
     r.icon:SetAlpha(m.isCollected and 1 or 0.7)
     r.name:SetText(m.name)
     r.name:SetTextColor(1, 1, 1, m.isCollected and 1 or 0.78)
+    -- No source type at all (secrets, Siren Isle, rituals): the journal
+    -- text's first line says more than "Unknown source".
+    if not sourceText and not ns.MountJournal:HasSourceLabel(m.sourceType) then
+        sourceText = ns.MountJournal:SourceHint(m.mountID)
+    end
     r.source:SetText(sourceText or ns.MountJournal:GetSourceTypeLabel(m.sourceType))
     -- Green = farmable now (same meaning as in Farmable now), purple = collected.
     local color, text
