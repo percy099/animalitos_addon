@@ -16,9 +16,9 @@ La especificación vigente es `docs/` (v1.2, en español). El documento más út
 | v0.2 Dataset desde el scan en el juego + pipeline | ✅ 67 fuentes, 66 monturas, 50 instancias |
 | v0.3 Lockouts + elegibilidad + `/aplan now` / `go` / `why` | ✅ validada en el cliente (Dragon Soul, Firelands, ICC, Ulduar, Utgarde Pinnacle) |
 | v0.4 Pestaña "Farmeable ahora" (tarjetas, Ir, Ocultar hasta el reset) | 🟡 funciona; **pendiente**: la flecha del waypoint nativo no se vio (diagnosticar con `/aplan navdebug`, ver §9) y reordenar a mano |
-| Rediseño de la UI (rama `josemaria`, v0.4.7–0.11.0) | 🟡 validado en el cliente; pendiente revisar y fusionar con un PR (ver §10) |
+| Rediseño de la UI (rama `josemaria`, v0.4.7–0.12.2) | 🟡 validado en el cliente; pendiente revisar y fusionar con un PR (ver §10) |
 | v0.5 Colección virtualizada, Detalle de montura | ✅ rama `josemaria`: Colección (List, Boss drops, Achievements, Other drops) y Detalle de montura (estado, dónde conseguirla por dificultad, logros, texto del diario) |
-| Planner (rama `josemaria`, v0.6.0–0.11.0) | ✅ validado en el cliente, con mago y con Horda |
+| Planner (rama `josemaria`, v0.6.0–0.12.2) | ✅ validado en el cliente, con mago y con Horda |
 | v0.6 Cobertura legacy completa y curación | 🟡 rama `josemaria` v0.7–0.8: world bosses (6 monturas, lockout validado con Galleon) y logros con montura (lista + enlace a instancias). Rares y otros drops: solo quién y zona desde el diario (vista *Other drops*, botón Map). Kraulok por su misión de mundo (v0.11.0; abre sin errores, estados por validar cuando esté en rotación) |
 | v1.0 Release (CurseForge/Wago) | ⏳ |
 
@@ -55,7 +55,8 @@ El orden de carga está en el `.toc` y **importa**:
 | `UI/MountPreview.lua` | Detalle de montura: modelo 3D (ModelScene), estado, dónde conseguirla (fuentes del dataset con estado por dificultad y Go, u "Other drops" con Map), logros, texto del diario |
 | `UI/SettingsPanel.lua` | *Settings*: navegación, expansión máxima, minimapa, tamaño y posición de la ventana |
 | `UI/CollectionPanel.lua` | *Collection*: lista virtualizada de todo el diario, buscador, filtros, vista por expansión (solo drops del dataset) |
-| `UI/PlannerPanel.lua` | *Planner*: tabla de pasos (pools), reinicios, Reset all/dungeons/raids, Hide completed, Next step |
+| `UI/PlannerPanel.lua` | *Planner*: tabla de pasos (pools), reinicios, Clear marks, Mini window, Hide completed, Next step; clic en una montura abre su detalle con el 3D |
+| `UI/PlannerMini.lua` | Ventana mini movible (`/aplan mini`): siguiente paso (viaje, instancia, monturas clicables con modelo 3D en un popup, Go, Done, Undo) y el paso de después. Posición y estado abierto en `db.ui.miniPoint` / `miniShown` |
 | `UI/MainFrame.lua` | Ventana 720×500: cabecera de una línea (título › sección, personaje, ↻, ✕), barra lateral, sin pie. Escala en `db.ui.scale` |
 | `Bootstrap.lua` | Se carga al final: eventos, comandos `/aplan` y `/animalitos`, AddonCompartment |
 
@@ -139,6 +140,8 @@ Hecho por Josemaria Vives con Claude, guiado por el vision board del producto (`
 - Horas con el mismo reloj que el minimapa (`Lockouts:FormatClock`: hora del reino o local y 12/24 h según la opción del jugador). `date()` solo usa la zona horaria de Windows y salía desfasado.
 - Botón del minimapa: **LibDataBroker no tiene licencia**, así que no se incluye; LibDBIcon (BSD) tampoco, para no depender de LDB. El botón aparece solo si otro addon ya cargó ambas.
 - El buscador de *Farmable now* solo redibuja con el último `FarmList:Build()`; no recalcula por tecla.
+- *Farmable now* sin números en el arte de las tarjetas; "Show hidden" va arriba de la lista (pedido del jugador).
+- **Planner:** un solo botón "Clear marks" (los tres Reset solo quitaban marcas manuales, que igual caducan en el reinicio). **Ventana mini** (`Planner:Upcoming`): los dos siguientes pasos pendientes con el viaje desde donde terminó el paso anterior; "Done" marca a mano y "Undo" deshace (pila de la sesión); el tiempo restante va en el título para que quepan los botones. El popup 3D (`MountPreview:TogglePopup`) no depende de la ventana principal.
 
 **Entorno de Josemaria (Windows):** repo en `C:\Users\Josemaria Vives\animalitos_addon`, junction `AddOns\AnimalitosPlanner` → `<repo>\AnimalitosPlanner`. Python 3.13 se llama con `python` (no `python3`). En PowerShell 5.1:
 - mensajes de commit de varias líneas: escribir a un archivo y usar `git commit -F`;
