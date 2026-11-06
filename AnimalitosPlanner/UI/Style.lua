@@ -323,7 +323,8 @@ end
 
 --- On/off switch. onChange(self, checked) runs on click.
 --- API: SetChecked(bool), GetChecked(), SetEnabled(bool).
-function UI.Toggle(parent, onChange)
+--- (Not "Toggle": UI:Toggle() is the window open/close used by /aplan.)
+function UI.Switch(parent, onChange)
     local t = CreateFrame("Button", nil, parent)
     t:SetSize(30, 16)
     t.track = UI.RoundedTexture(t, "ARTWORK", 0)

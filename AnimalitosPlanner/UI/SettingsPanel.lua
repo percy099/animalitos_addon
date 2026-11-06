@@ -21,7 +21,7 @@ end
 
 -- Toggle switch with its label; clicking the label also toggles.
 local function check(parent, x, y, labelKey, onClick)
-    local cb = ns.UI.Toggle(parent, onClick)
+    local cb = ns.UI.Switch(parent, onClick)
     cb:SetPoint("TOPLEFT", x + 4, y - 4)
     cb.label = ns.UI.fs(parent, "GameFontHighlight")
     cb.label:SetPoint("LEFT", cb, "RIGHT", 8, 0)
