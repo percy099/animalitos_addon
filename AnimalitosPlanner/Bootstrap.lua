@@ -186,6 +186,9 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
     local cmd = strtrim(msg or ""):lower()
     if cmd == "" or cmd == "show" then
         ns.UI:Toggle()
+    elseif cmd == "curated" then
+        ns:Print("curated sources:")
+        ns.FarmList:DebugCurated()
     elseif cmd == "mini" then
         ns.PlannerMini:Toggle()
     elseif cmd == "probe" then

@@ -96,18 +96,47 @@ function FarmList:ResolveCurated()
                     pending = true -- item not cached yet
                 end
             end
-            if src.dungeonEncounterID and not src.journalEncounterID and EJ_GetEncounterInfoByIndex then
+            if (src.dungeonEncounterID or src.encounterIndex) and not src.journalEncounterID
+                and EJ_GetEncounterInfoByIndex then
                 for i = 1, 30 do
                     local name, _, jeid, _, _, _, deid = EJ_GetEncounterInfoByIndex(i, src.journalInstanceID)
                     if not name then break end
-                    if deid == src.dungeonEncounterID then src.journalEncounterID = jeid break end
+                    if deid and deid == src.dungeonEncounterID then src.journalEncounterID = jeid break end
+                end
+                -- Fallback: the boss's position in the journal (fixed order).
+                if not src.journalEncounterID and src.encounterIndex then
+                    local name, _, jeid = EJ_GetEncounterInfoByIndex(src.encounterIndex, src.journalInstanceID)
+                    if name then src.journalEncounterID = jeid end
                 end
                 if not src.journalEncounterID then pending = true end
             end
         end
     end
-    self.curatedTries = (self.curatedTries or 0) + 1
-    self.curatedDone = not pending or self.curatedTries >= 5
+    -- Cheap: keep retrying on later builds until everything resolved.
+    self.curatedDone = not pending
+end
+
+--- /aplan curated: how the hand-curated sources resolved (diagnostics).
+function FarmList:DebugCurated()
+    self.curatedDone = false
+    self:ResolveCurated()
+    for _, src in ipairs(ns.Data.sources) do
+        if src.curated then
+            local m = ns.MountJournal:GetMount(src.mountID)
+            print(("  %s · %s · item %d -> mount %s · dungeonEnc %s -> journalEnc %s · boss %s"):format(
+                m and m.name or "?", self:InstanceName(src.journalInstanceID), src.itemID, tostring(src.mountID),
+                tostring(src.dungeonEncounterID), tostring(src.journalEncounterID), self:BossName(src)))
+        end
+    end
+    for _, jid in ipairs({ 753, 1178 }) do
+        local list = {}
+        for i = 1, 30 do
+            local name, _, jeid, _, _, _, deid = EJ_GetEncounterInfoByIndex(i, jid)
+            if not name then break end
+            list[#list + 1] = ("%d:%s(%s/%s)"):format(i, name, tostring(jeid), tostring(deid))
+        end
+        print(("  EJ %d: %s"):format(jid, #list > 0 and table.concat(list, ", ") or "(nothing)"))
+    end
 end
 
 function FarmList:Build()
@@ -130,18 +159,40 @@ function FarmList:Build()
                 end
                 local m = e.mounts[src.mountID]
                 if not m then
-                    m = { ready = {}, locked = {}, verify = {}, source = src }
+                    m = { ready = {}, locked = {}, verify = {}, source = src, sources = {}, best = {} }
                     e.mounts[src.mountID] = m
                 end
-                if state == S.READY then
-                    table.insert(m.ready, d)
-                elseif state == S.LOCKED_OUT then
-                    table.insert(m.locked, d)
-                    m.resetAt = math.min(m.resetAt or resetAt, resetAt)
-                else
-                    table.insert(m.verify, { difficulty = d, reason = reason })
+                if not m.sources[src] then
+                    m.sources[src] = true
+                    m.sources[#m.sources + 1] = src
+                end
+                -- A mount several bosses drop (Vault of Archavon): per
+                -- difficulty the best state wins (one boss alive = Ready).
+                local rank = (state == S.READY and 1) or (state == S.LOCKED_OUT and 2) or 3
+                local prev = m.best[d]
+                if not prev or rank < prev.rank then
+                    m.best[d] = { rank = rank, reason = reason, resetAt = resetAt }
                 end
             end
+        end
+    end
+    for _, e in pairs(byInstance) do
+        for _, m in pairs(e.mounts) do
+            local diffs = {}
+            for d in pairs(m.best) do diffs[#diffs + 1] = d end
+            table.sort(diffs)
+            for _, d in ipairs(diffs) do
+                local b = m.best[d]
+                if b.rank == 1 then
+                    table.insert(m.ready, d)
+                elseif b.rank == 2 then
+                    table.insert(m.locked, d)
+                    if b.resetAt then m.resetAt = math.min(m.resetAt or b.resetAt, b.resetAt) end
+                else
+                    table.insert(m.verify, { difficulty = d, reason = b.reason })
+                end
+            end
+            m.best = nil
         end
     end
 

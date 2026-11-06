@@ -237,6 +237,7 @@ def build(raw: dict, curated: dict):
             "journalInstanceID": jid,
             "journalEncounterID": x.get("journalEncounterID"),
             "dungeonEncounterID": x.get("dungeonEncounterID"),
+            "encounterIndex": x.get("encounterIndex"),
             "difficulties": sorted(x["difficulties"]),
             "hiddenBoss": x.get("hiddenBoss"),
             "curated": True,

@@ -33,16 +33,20 @@ local function describe(r)
     for id, m in pairs(e.mounts) do
         local mj = ns.MountJournal:GetMount(id)
         local state = (#m.ready > 0 and "ready") or (#m.locked > 0 and "locked") or "verify"
-        rows[#rows + 1] = { id = id, boss = ns.FarmList:BossName(m.source), mount = mj and mj.name or ("#" .. id),
-            icon = mj and mj.icon or 134400, state = state }
+        -- One row per boss that drops it (Vault of Archavon: all four).
+        for k, src in ipairs(m.sources or { m.source }) do
+            rows[#rows + 1] = { id = id, boss = ns.FarmList:BossName(src), mount = mj and mj.name or ("#" .. id),
+                icon = mj and mj.icon or 134400, state = state, extra = k > 1 }
+        end
         for _, d in ipairs(m.ready) do ready[d] = true end
         for _, d in ipairs(m.locked) do locked[d] = true end
         if m.resetAt then resetAt = math.min(resetAt or m.resetAt, m.resetAt) end
         if m.verify[1] and not verifyReason then verifyReason = m.verify[1].reason end
     end
     table.sort(rows, function(a, b)
-        if a.boss ~= b.boss then return a.boss < b.boss end
-        return a.mount < b.mount
+        if a.mount ~= b.mount then return a.mount < b.mount end
+        if a.extra ~= b.extra then return not a.extra end -- the journal's own boss first
+        return a.boss < b.boss
     end)
 
     local diffs = next(ready) and ready or locked
@@ -436,15 +440,19 @@ function PlannerPanel:Refresh(p, entries)
             f.ach:SetText(achText)
             f.ach:ClearAllPoints()
             f.ach:SetPoint("TOPLEFT", note ~= "" and f.note or f.detail, "BOTTOMLEFT", 0, -2)
-            -- Same boss twice in a row (two mounts) is written once.
-            local lastBoss
+            -- Same boss twice in a row (two mounts) is written once; a mount
+            -- several bosses drop is written on its first row only.
+            local lastBoss, lastMount
             for i, row in ipairs(rows) do
                 local b = lineAt(f, f.bossLines, i, COL.boss, BOSS_W, C.dim)
                 b:SetText(row.boss ~= lastBoss and row.boss or "")
                 lastBoss = row.boss
                 local m = mountLineAt(f, i, COL.mount, mountWidth())
                 m.mountID = row.id
-                m.text:SetText(("|T%s:14:14:0:0|t %s%s|r"):format(row.icon, STATE_HEX[row.state], row.mount))
+                m.text:SetText(row.id == lastMount and ""
+                    or ("|T%s:14:14:0:0|t %s%s|r"):format(row.icon, STATE_HEX[row.state], row.mount))
+                m:SetShown(row.id ~= lastMount)
+                lastMount = row.id
             end
             for i = #rows + 1, #f.bossLines do f.bossLines[i]:Hide() end
             for i = #rows + 1, #f.mountLines do f.mountLines[i]:Hide() end
