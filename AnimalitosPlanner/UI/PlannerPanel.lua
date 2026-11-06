@@ -41,7 +41,7 @@ local function describeEvent(r)
     table.sort(rows, function(a, b) return a.mount < b.mount end)
     local note = (state == "locked" and L["PLAN_NOTE_LOCKED"]:format(timeLeft(ev.resetAt)))
         or (state == "verify" and L["EVENT_VERIFY"]) or ""
-    return rows, ("%s · %s"):format(ev.event or "", L["EVENT_DAILY_SHORT"]), note
+    return rows, ("%s · %s"):format(ev.event or "", L["EVENT_ONCE_DAY"]), note
 end
 
 local function describe(r)
@@ -502,7 +502,8 @@ function PlannerPanel:Refresh(p, entries)
                 local b = lineAt(f, f.bossLines, i, COL.boss, BOSS_W, C.dim)
                 b:SetText(row.boss ~= lastBoss and row.boss or "")
                 lastBoss = row.boss
-                local m = mountLineAt(f, i, COL.mount, mountWidth())
+                -- "Queue" is wider than "Go": leave it room on event rows.
+                local m = mountLineAt(f, i, COL.mount, mountWidth() - (s.event and 16 or 0))
                 m.mountID = row.id
                 m.text:SetText(row.id == lastMount and ""
                     or ("|T%s:14:14:0:0|t %s%s%s|r"):format(row.icon, ns.Collection:IsFavorite(row.id) and (ns.UI.STAR .. " ") or "", STATE_HEX[row.state], row.mount))
