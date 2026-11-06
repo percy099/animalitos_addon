@@ -220,21 +220,22 @@ function PlannerPanel:Create(parent)
     p.resets = ns.UI.fs(p, "small", C.dim)
     p.resets:SetPoint("TOPLEFT", 2, -2)
 
-    local function resetButton(textKey, which)
-        local b = ns.UI.Button(p, "secondary")
-        ns.UI.SetButtonText(b, L[textKey], 60)
-        b:SetScript("OnClick", function()
-            ns.Planner:ResetMarks(which)
-            PlannerPanel:Refresh(p)
-        end)
-        return b
-    end
-    local all = resetButton("PLAN_RESET_ALL", "all")
-    all:SetPoint("TOPLEFT", 0, -24)
-    local dungeons = resetButton("PLAN_RESET_DUNGEONS", "dungeons")
-    dungeons:SetPoint("LEFT", all, "RIGHT", 6, 0)
-    local raids = resetButton("PLAN_RESET_RAIDS", "raids")
-    raids:SetPoint("LEFT", dungeons, "RIGHT", 6, 0)
+    -- One button: clears the manual check marks (they also expire on their
+    -- own at the daily / weekly reset; game lockouts are not touched).
+    local clear = ns.UI.Button(p, "secondary")
+    ns.UI.SetButtonText(clear, L["PLAN_CLEAR_MARKS"], 60)
+    clear:SetPoint("TOPLEFT", 0, -24)
+    clear:SetScript("OnClick", function()
+        ns.Planner:ResetMarks("all")
+        PlannerPanel:Refresh(p)
+    end)
+    clear:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(L["PLAN_CLEAR_MARKS"], 1, 1, 1)
+        GameTooltip:AddLine(L["PLAN_CLEAR_MARKS_TIP"], nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    clear:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
     p.hide = ns.UI.Switch(p, function(_, checked)
         ns.Storage.db.ui.plannerHideDone = checked or nil

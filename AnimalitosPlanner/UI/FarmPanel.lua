@@ -86,13 +86,6 @@ local function newCard(p)
     c.thumb = ns.UI.ArtTexture(c, "ARTWORK", 1)
     c.thumb:SetAllPoints(c.thumbBg)
 
-    -- Badge sits on the artwork's corner, above it.
-    local badgeHost = CreateFrame("Frame", nil, c)
-    badgeHost:SetAllPoints()
-    badgeHost:SetFrameLevel(c:GetFrameLevel() + 2)
-    c.badge = ns.UI.NumberBadge(badgeHost, 20)
-    c.badge:SetPoint("TOPLEFT", THUMB_INSET + 4, -(THUMB_INSET + 4))
-
     c.hide = ns.UI.Button(c, "secondary")
     ns.UI.SetButtonText(c.hide, L["BTN_HIDE"], 62)
     c.hide:SetPoint("TOPRIGHT", -8, -8)
@@ -343,6 +336,15 @@ function FarmPanel:Refresh(p, entries, sum)
 
     if not ns.Lockouts.loaded then line(L["NOW_LOCKOUTS_LOADING"], C.muted) end
 
+    -- "Show hidden" at the top, where it is seen without scrolling.
+    if sum.hidden > 0 and not searching then
+        ns.UI.SetButtonText(p.unhide, L["BTN_UNHIDE"]:format(sum.hidden))
+        p.unhide:ClearAllPoints()
+        p.unhide:SetPoint("TOPLEFT", 0, -y)
+        p.unhide:Show()
+        y = y + 30
+    end
+
     -- Ready instances, grouped by continent
     local playerContinent = ns.FarmList:PlayerContinent()
     local index = 0
@@ -382,7 +384,6 @@ function FarmPanel:Refresh(p, entries, sum)
             c:ClearAllPoints()
             c:SetPoint("TOPLEFT", 0, -y)
             c:SetWidth(width)
-            c.badge.text:SetText(index)
 
             local near = e.near == 2 and ("  |cff8dd3a8" .. L["NEAR_HERE"] .. "|r") or ""
             c.title:SetText(ns.FarmList:InstanceName(e.jid) .. near)
@@ -419,14 +420,6 @@ function FarmPanel:Refresh(p, entries, sum)
         end
     end
     if index == 0 and not searching then line(L["FARM_EMPTY"], C.muted) end
-
-    if sum.hidden > 0 and not searching then
-        ns.UI.SetButtonText(p.unhide, L["BTN_UNHIDE"]:format(sum.hidden))
-        p.unhide:ClearAllPoints()
-        p.unhide:SetPoint("TOPLEFT", 0, -y)
-        p.unhide:Show()
-        y = y + 26
-    end
 
     -- Locked out / needs verification (same rules as FarmList:Summarize)
     local locked, verify = {}, {}
