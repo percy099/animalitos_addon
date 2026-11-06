@@ -90,6 +90,32 @@ function MJ:GetMountFromItem(itemID)
     return C_MountJournal.GetMountFromItem(itemID)
 end
 
+--- Journal source text without escape codes: old (|cAARRGGBB) and named
+--- (|cnNAME:) colors, |r, textures, atlases, links; |n becomes a new line.
+function MJ:PlainSourceText(text)
+    text = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|cn[^:]*:", ""):gsub("|r", "")
+    text = text:gsub("|T.-|t", ""):gsub("|A.-|a", ""):gsub("|H.-|h", ""):gsub("|h", "")
+    text = text:gsub("|n", "\n"):gsub("\r", "")
+    return text
+end
+
+--- /aplan unknown: mounts still without a source type, with their raw text
+--- (pipes doubled so chat shows the codes).
+function MJ:DebugUnknownSources()
+    local n = 0
+    self:ForEach(function(m)
+        if (not m.sourceType or m.sourceType == 0) and not m.shouldHideOnChar then
+            n = n + 1
+            if n <= 15 then
+                local extra = self:GetMountExtra(m.mountID)
+                local raw = extra and extra.sourceText or "(nil)"
+                print(("  %s (%d): %s"):format(m.name, m.mountID, raw:gsub("|", "||")))
+            end
+        end
+    end)
+    print(("  %d without a source type"):format(n))
+end
+
 -- Some newer mounts come with sourceType 0 ("Unknown source") although their
 -- journal text starts with a source label ("Vendor: Ando the Gat"). That first
 -- label is matched against the localized BATTLE_PET_SOURCE_n names. Cached
@@ -107,9 +133,14 @@ function MJ:InferSourceType(mountID)
     local extra = self:GetMountExtra(mountID)
     local text = extra and extra.sourceText
     if not text or text == "" then return nil end -- not loaded yet: try again later
-    text = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
-    local label = text:match("^%s*([^:|\n]+):")
-    local found = label and labelToType[strtrim(label):lower()] or false
+    -- Any label of the text that is a source name wins (in order): the
+    -- first label is not always the source (icons, "Zone:", new color codes).
+    local found = false
+    local plain = self:PlainSourceText(text)
+    for label in plain:gmatch("([^:\n]+):") do
+        local n = labelToType[strtrim(label):lower()]
+        if n then found = n break end
+    end
     inferred[mountID] = found
     return found or nil
 end

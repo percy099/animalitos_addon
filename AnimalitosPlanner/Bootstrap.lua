@@ -189,6 +189,9 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
     elseif cmd == "curated" then
         ns:Print("curated sources:")
         ns.FarmList:DebugCurated()
+    elseif cmd == "unknown" then
+        ns:Print("mounts without a source type:")
+        ns.MountJournal:DebugUnknownSources()
     elseif cmd == "mini" then
         ns.PlannerMini:Toggle()
     elseif cmd == "probe" then

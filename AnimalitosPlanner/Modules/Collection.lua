@@ -215,8 +215,7 @@ end
 local DROP_SOURCE_TYPE = 1
 
 local function stripCodes(s)
-    s = s:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|T.-|t", ""):gsub("|A.-|a", "")
-    return s
+    return ns.MountJournal:PlainSourceText(s) -- also named colors (|cn...:)
 end
 
 --- { { who, zone = {uiMapID, continent, name} | nil, extra = {text...} } }
