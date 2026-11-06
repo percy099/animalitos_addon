@@ -2,7 +2,7 @@
 -- Source: in-game /aplan scan, client 12.1.5.70783, scanned 2026-11-05 13:38:04.
 local _, ns = ...
 ns.Data = {
-    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "e328f763bdc8" },
+    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "0f946928ab0f" },
     instances = {
         [-2210] = { tier = 8, isRaid = true, legacy = true, worldBoss = true, ejInstance = 1028, encounter = 2210, lockoutModel = "worldQuest" }, -- Dunegorger Kraulok (Azeroth)
         [-1262] = { tier = 6, isRaid = true, legacy = true, worldBoss = true, ejInstance = 557, encounter = 1262, lockoutModel = "savedWorldBoss" }, -- Rukhmar (Draenor)
@@ -34,7 +34,7 @@ ns.Data = {
         [759] = { tier = 3, isRaid = true, mapID = 603, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 120, x = 0.4157, y = 0.178, continent = 113 } }, -- Ulduar
         [760] = { tier = 3, isRaid = true, mapID = 249, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 70, x = 0.5222, y = 0.7594, continent = 12 } }, -- Onyxia's Lair
         [786] = { tier = 7, isRaid = true, mapID = 1530, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 680, x = 0.4373, y = 0.5729, continent = 619 } }, -- The Nighthold
-        [860] = { tier = 7, isRaid = false, mapID = 1651, legacy = true, worldBoss = false, lockoutModel = "unknown" }, -- Return to Karazhan
+        [860] = { tier = 7, isRaid = false, mapID = 1651, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 42, x = 0.4699, y = 0.7491, continent = 13 } }, -- Return to Karazhan
         [875] = { tier = 7, isRaid = true, mapID = 1676, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 646, x = 0.6401, y = 0.2137, continent = 619 } }, -- Tomb of Sargeras
         [946] = { tier = 7, isRaid = true, mapID = 1712, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 885, x = 0.5482, y = 0.6253, continent = 905 } }, -- Antorus, the Burning Throne
         [1001] = { tier = 8, isRaid = false, mapID = 1754, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 895, x = 0.8457, y = 0.7878, continent = 876 } }, -- Freehold

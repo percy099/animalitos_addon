@@ -54,14 +54,17 @@ local function describe(r)
         -- One row per boss that drops it (Vault of Archavon: all four).
         for k, src in ipairs(m.sources or { m.source }) do
             rows[#rows + 1] = { id = id, boss = ns.FarmList:BossName(src), mount = mj and mj.name or ("#" .. id),
-                icon = mj and mj.icon or 134400, state = state, extra = k > 1 }
+                icon = mj and mj.icon or 134400, state = state, extra = k > 1, order = ns.FarmList:BossOrder(src) }
         end
         for _, d in ipairs(m.ready) do ready[d] = true end
         for _, d in ipairs(m.locked) do locked[d] = true end
         if m.resetAt then resetAt = math.min(resetAt or m.resetAt, m.resetAt) end
         if m.verify[1] and not verifyReason then verifyReason = m.verify[1].reason end
     end
+    -- Boss by boss, in the instance's order (Dragon Soul: Ultraxion, then
+    -- the two Madness mounts), then by mount name.
     table.sort(rows, function(a, b)
+        if a.order ~= b.order then return a.order < b.order end
         if a.mount ~= b.mount then return a.mount < b.mount end
         if a.extra ~= b.extra then return not a.extra end -- the journal's own boss first
         return a.boss < b.boss

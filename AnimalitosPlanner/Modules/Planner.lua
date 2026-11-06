@@ -596,6 +596,10 @@ local function mageSpellByName(name)
     local function check(id)
         return ns.Navigation:SpellName(id) == name and ns.Navigation:KnowsSpell(id) and id or nil
     end
+    -- A portal name (shown in a group): that portal.
+    for _, portal in pairs(PORTAL) do
+        if ns.Navigation:SpellName(portal) == name and ns.Navigation:KnowsSpell(portal) then return portal end
+    end
     for _, fac in pairs(MAGE) do
         for key, d in pairs(fac) do
             if key == "zone" then
@@ -658,6 +662,11 @@ end
 local function mageHop(mage, dest)
     if not (mage and dest) then return nil end
     if mage.self and ns.Navigation:KnowsSpell(dest[2]) then
+        -- In a group the click opens the portal (see TravelAction): say so.
+        local portal = PORTAL[dest[2]]
+        if IsInGroup() and portal and ns.Navigation:KnowsSpell(portal) then
+            return ns.Navigation:SpellName(portal) or ns.L["PLAN_TELEPORT"]:format(mapName(dest[1]))
+        end
         return ns.Navigation:SpellName(dest[2]) or ns.L["PLAN_TELEPORT"]:format(mapName(dest[1]))
     end
     if mage.group then return ns.L["PLAN_ASK_PORTAL"]:format(mage.group, mapName(dest[1])) end

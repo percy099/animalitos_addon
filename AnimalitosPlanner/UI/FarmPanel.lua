@@ -445,7 +445,13 @@ function FarmPanel:Refresh(p, entries, sum)
                 if #m.ready > 0 and (all or hit(mountName(id))) then ids[#ids + 1] = id end
             end
             if #ids > 0 then
-                table.sort(ids, function(a, b) return mountName(a) < mountName(b) end)
+                -- Boss order inside the instance, then name.
+                table.sort(ids, function(a, b)
+                    local oa = ns.FarmList:BossOrder(e.mounts[a].source)
+                    local ob = ns.FarmList:BossOrder(e.mounts[b].source)
+                    if oa ~= ob then return oa < ob end
+                    return mountName(a) < mountName(b)
+                end)
                 cards[#cards + 1] = { e = e, ids = ids }
             end
         end

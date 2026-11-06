@@ -128,6 +128,10 @@
     "ids": [1319]
   },
   "entranceOverrides": {
+    "860": {
+      "uiMapID": 42, "x": 0.4699, "y": 0.7491, "continent": 13,
+      "_reason": "Return to Karazhan has no entrance pin in the client scan; it uses the Karazhan door in Deadwind Pass (same point as Karazhan 745). Reported missing from the route by the player."
+    },
     "760": {
       "uiMapID": 70,
       "reason": "Onyxia's Lair is in Dustwallow Marsh; the entrance also appears near the edge of Thousand Needles (64) and the heuristic picked that one."
