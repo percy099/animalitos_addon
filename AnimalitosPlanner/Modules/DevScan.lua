@@ -306,7 +306,7 @@ function Scan:ProbeVendors()
     probing = true
     local result = { startedAt = date("%Y-%m-%d %H:%M:%S"), mountItems = 0, mapped = 0, vendors = {} }
     AnimalitosPlannerDB.vendorProbe = result
-    local items, cursor, phase, waitUntil = {}, 1, "sweep", 0
+    local items, cursor, phase, waitUntil, startedWait = {}, 1, "sweep", 0, 0
     msg("vendor probe: looking for mount items...")
     local ticker
     ticker = C_Timer.NewTicker(TICK, function()
@@ -323,10 +323,27 @@ function Scan:ProbeVendors()
             if cursor > MAX_ITEM_ID then
                 result.mountItems = #items
                 msg(("%d mount items; loading them..."):format(#items))
-                phase, waitUntil = "wait", GetTime() + 8
+                phase, waitUntil, startedWait = "wait", GetTime() + 3, GetTime()
             end
         elseif phase == "wait" then
-            if GetTime() >= waitUntil then phase = "read" end
+            -- Items load asynchronously; GetMountFromItem is nil until then.
+            -- Every 2 s: count the loaded ones, ask again for the rest; read
+            -- when all are loaded or after 90 s.
+            if GetTime() < waitUntil then return end
+            local pending = 0
+            for _, id in ipairs(items) do
+                if not C_Item.IsItemDataCachedByID(id) then
+                    pending = pending + 1
+                    C_Item.RequestLoadItemDataByID(id)
+                end
+            end
+            result.uncached = pending
+            if pending == 0 or GetTime() - startedWait > 90 then
+                phase = "read"
+            else
+                msg(("%d items still loading..."):format(pending))
+                waitUntil = GetTime() + 2
+            end
         elseif phase == "read" then
             ticker:Cancel()
             local itemOf = {}
@@ -350,7 +367,7 @@ function Scan:ProbeVendors()
                 end
             end
             result.missingVendor, result.withItem, result.withRed = missingVendor, withItem, withRed
-            msg(("%d mount items, %d mounts mapped to an item."):format(result.mountItems, result.mapped))
+            msg(("%d mount items (%d not loaded), %d mounts mapped to an item."):format(result.mountItems, result.uncached or 0, result.mapped))
             msg(("missing Vendor mounts: %d, with item: %d, with red requirement lines: %d"):format(
                 missingVendor, withItem, withRed))
             local shown = 0
