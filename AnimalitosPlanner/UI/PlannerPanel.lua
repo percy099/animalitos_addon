@@ -33,7 +33,7 @@ local function describe(r)
     for id, m in pairs(e.mounts) do
         local mj = ns.MountJournal:GetMount(id)
         local state = (#m.ready > 0 and "ready") or (#m.locked > 0 and "locked") or "verify"
-        rows[#rows + 1] = { boss = ns.FarmList:BossName(m.source), mount = mj and mj.name or ("#" .. id),
+        rows[#rows + 1] = { id = id, boss = ns.FarmList:BossName(m.source), mount = mj and mj.name or ("#" .. id),
             icon = mj and mj.icon or 134400, state = state }
         for _, d in ipairs(m.ready) do ready[d] = true end
         for _, d in ipairs(m.locked) do locked[d] = true end
@@ -189,6 +189,36 @@ local function lineAt(f, list, i, x, width, color)
     fsx:SetPoint("TOPLEFT", x, -9 - (i - 1) * LINE_H)
     fsx:Show()
     return fsx
+end
+
+-- Mount lines are buttons: click shows the mount detail with its 3D model.
+local function mountLineAt(f, i, x, width)
+    local b = f.mountLines[i]
+    if not b then
+        b = CreateFrame("Button", nil, f)
+        b:SetSize(width, LINE_H)
+        b.text = ns.UI.fs(b, "small")
+        b.text:SetAllPoints()
+        b.text:SetWordWrap(false)
+        b:SetScript("OnEnter", function(self)
+            self.text:SetAlpha(0.75)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:AddLine(L["PLAN_MOUNT_TIP"], 1, 1, 1)
+            GameTooltip:Show()
+        end)
+        b:SetScript("OnLeave", function(self)
+            self.text:SetAlpha(1)
+            GameTooltip:Hide()
+        end)
+        b:SetScript("OnClick", function(self)
+            if self.mountID then ns.MountPreview:Toggle(self.mountID) end
+        end)
+        f.mountLines[i] = b
+    end
+    b:ClearAllPoints()
+    b:SetPoint("TOPLEFT", x, -9 - (i - 1) * LINE_H)
+    b:Show()
+    return b
 end
 
 local BOSS_W = COL.mount - COL.boss - 8
@@ -412,8 +442,9 @@ function PlannerPanel:Refresh(p, entries)
                 local b = lineAt(f, f.bossLines, i, COL.boss, BOSS_W, C.dim)
                 b:SetText(row.boss ~= lastBoss and row.boss or "")
                 lastBoss = row.boss
-                local m = lineAt(f, f.mountLines, i, COL.mount, mountWidth())
-                m:SetText(("|T%s:14:14:0:0|t %s%s|r"):format(row.icon, STATE_HEX[row.state], row.mount))
+                local m = mountLineAt(f, i, COL.mount, mountWidth())
+                m.mountID = row.id
+                m.text:SetText(("|T%s:14:14:0:0|t %s%s|r"):format(row.icon, STATE_HEX[row.state], row.mount))
             end
             for i = #rows + 1, #f.bossLines do f.bossLines[i]:Hide() end
             for i = #rows + 1, #f.mountLines do f.mountLines[i]:Hide() end

@@ -121,12 +121,41 @@ local function create()
     f.sep:SetHeight(1)
     f.sep:SetColorTexture(1, 1, 1, 0.08)
 
-    f.lines = {}
+    f.lines, f.mountBtns = {}, {}
+    f:SetScript("OnHide", function() ns.MountPreview:HidePopup() end)
     -- A mage joining / leaving changes the travel steps.
     ns:On("GROUP_ROSTER_UPDATE", function()
         if f:IsShown() then ns:Debounce("mini-roster", 0.5, function() Mini:Refresh() end) end
     end)
     return f
+end
+
+local function mountButton(f, i)
+    local b = f.mountBtns[i]
+    if not b then
+        b = CreateFrame("Button", nil, f)
+        b:SetSize(INNER, 16)
+        b.text = ns.UI.fs(b, "small")
+        b.text:SetAllPoints()
+        b.text:SetWordWrap(false)
+        b:SetScript("OnEnter", function(self)
+            self.text:SetAlpha(0.75)
+            GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+            GameTooltip:AddLine(L["MINI_MOUNT_TIP"], 1, 1, 1)
+            GameTooltip:Show()
+        end)
+        b:SetScript("OnLeave", function(self)
+            self.text:SetAlpha(1)
+            GameTooltip:Hide()
+        end)
+        b:SetScript("OnClick", function(self)
+            if self.mountID then ns.MountPreview:TogglePopup(self.mountID, f) end
+        end)
+        f.mountBtns[i] = b
+    end
+    b:ClearAllPoints()
+    b:Show()
+    return b
 end
 
 local function travelLines(f, travel, color)
@@ -148,6 +177,7 @@ function Mini:Refresh()
     if not f or not f:IsShown() then return end
     local C = ns.UI.COLORS
     for _, t in ipairs(f.lines) do t:Hide() end
+    for _, b in ipairs(f.mountBtns) do b:Hide() end
     f.used = 0
     f.y = 30
 
@@ -183,14 +213,19 @@ function Mini:Refresh()
     place(f, line(f, "title", C.text), runTitle(s), #cur.travel > 0 and 6 or 0)
     local rows, detail, note = ns.PlannerPanel.Describe(s)
     place(f, line(f, "tiny", C.muted), detail, 2)
-    local mounts, seen = {}, {}
+    -- One clickable line per mount: click shows its 3D model beside the window.
+    local seen, n = {}, 0
     for _, r in ipairs(rows) do
-        if r.state == "ready" and not seen[r.mount] then
-            seen[r.mount] = true
-            mounts[#mounts + 1] = ("|T%s:14:14:0:0|t %s"):format(r.icon, r.mount)
+        if r.state == "ready" and not seen[r.id] then
+            seen[r.id] = true
+            n = n + 1
+            local b = mountButton(f, n)
+            b.mountID = r.id
+            b.text:SetText(("|T%s:14:14:0:0|t %s"):format(r.icon, r.mount))
+            b:SetPoint("TOPLEFT", PAD, -(f.y + 3))
+            f.y = f.y + 3 + 16
         end
     end
-    if #mounts > 0 then place(f, line(f, "small", C.text), table.concat(mounts, "   "), 3) end
     if note ~= "" then place(f, line(f, "tiny", C.dim), note, 2) end
 
     -- Buttons

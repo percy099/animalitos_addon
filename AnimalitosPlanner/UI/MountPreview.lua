@@ -398,6 +398,72 @@ function Preview:Refresh()
     end
 end
 
+-- Small model popup (mini window): only the 3D model, next to `anchor`.
+-- Independent of the main window, which may be closed.
+local POP_W, POP_H = 220, 200
+local function createPopup()
+    local C = ns.UI.COLORS
+    local f = CreateFrame("Frame", "AnimalitosPlannerModelPopup", UIParent, "BackdropTemplate")
+    f:SetSize(POP_W, POP_H + 30)
+    f:SetFrameStrata("MEDIUM")
+    f:SetClampedToScreen(true)
+    f:EnableMouse(true)
+    ns.UI.StylePanel(f, C.background, { border = { C.accent[1], C.accent[2], C.accent[3], 0.45 }, noSheen = true })
+    local close = ns.UI.CloseButton(f)
+    close:SetPoint("TOPRIGHT", -4, -3)
+    f.title = ns.UI.fs(f, "title")
+    f.title:SetPoint("TOPLEFT", 10, -9)
+    f.title:SetPoint("RIGHT", close, "LEFT", -4, 0)
+    f.title:SetWordWrap(false)
+    local holder = CreateFrame("Frame", nil, f, "BackdropTemplate")
+    holder:SetPoint("TOPLEFT", 6, -28)
+    holder:SetPoint("BOTTOMRIGHT", -6, 6)
+    ns.UI.StylePanel(holder)
+    local ok, scene = pcall(CreateFrame, "ModelScene", nil, holder, "ModelSceneMixinTemplate")
+    if ok and scene then
+        scene:SetPoint("TOPLEFT", 4, -4)
+        scene:SetPoint("BOTTOMRIGHT", -4, 4)
+        scene:EnableMouse(true)
+        f.scene = scene
+    end
+    f.model = CreateFrame("PlayerModel", nil, holder)
+    f.model:SetPoint("TOPLEFT", 4, -4)
+    f.model:SetPoint("BOTTOMRIGHT", -4, 4)
+    f.model:Hide()
+    f.hint = ns.UI.fs(holder, "GameFontDisableSmall")
+    f.hint:SetPoint("BOTTOMRIGHT", -6, 4)
+    f.hint:SetText(L["PREVIEW_DRAG"])
+    return f
+end
+
+--- Shows (or, same mount again, hides) the model popup beside `anchor`.
+function Preview:TogglePopup(mountID, anchor)
+    local f = self.popup
+    if f and f:IsShown() and f.mountID == mountID then
+        f:Hide()
+        return
+    end
+    self.popup = f or createPopup()
+    f = self.popup
+    local m = ns.MountJournal:GetMount(mountID)
+    f.mountID = mountID
+    f.title:SetText(m and m.name or ("#" .. mountID))
+    f:SetScale(anchor:GetEffectiveScale() / UIParent:GetEffectiveScale())
+    f:ClearAllPoints()
+    -- Beside the anchor, on the side with more room.
+    if (anchor:GetLeft() or 0) > GetScreenWidth() / 2 then
+        f:SetPoint("TOPRIGHT", anchor, "TOPLEFT", -4, 0)
+    else
+        f:SetPoint("TOPLEFT", anchor, "TOPRIGHT", 4, 0)
+    end
+    f:Show()
+    showModel(f, ns.MountJournal:GetMountExtra(mountID) or {})
+end
+
+function Preview:HidePopup()
+    if self.popup then self.popup:Hide() end
+end
+
 --- Click on the same mount again closes the preview.
 function Preview:Toggle(mountID)
     local f = self.frame
