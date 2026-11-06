@@ -654,6 +654,58 @@ local function mageHop(mage, dest)
     return nil
 end
 
+-- Hubs with a portal back to both capitals, by continent (the usual
+-- arrival city). Used when the hearthstone is not set to the capital.
+local HOME_PORTAL = {
+    any = {
+        [101] = 111,   -- Shattrath
+        [113] = 125,   -- Dalaran (Northrend)
+        [424] = 390,   -- Vale of Eternal Blossoms (Shrine)
+        [619] = 627,   -- Dalaran (Broken Isles)
+        [1550] = 1670, -- Oribos
+        [1978] = 2112, -- Valdrakken
+        [2274] = 2339, -- Dornogal
+        [2537] = 2393, -- Silvermoon City
+    },
+    Alliance = { [572] = 622, [876] = 1161 }, -- Stormshield, Boralus
+    Horde    = { [572] = 624, [875] = 1165 }, -- Warspear, Dazar'alor
+}
+local function homeHub(fac, continent)
+    return (HOME_PORTAL[fac] and HOME_PORTAL[fac][continent]) or HOME_PORTAL.any[continent]
+end
+
+-- Is the hearthstone set to this map? GetBindLocation gives the place's
+-- (localized) name.
+local function boundTo(uiMapID)
+    local bind = GetBindLocation and GetBindLocation()
+    return bind and bind ~= "" and bind == mapName(uiMapID)
+end
+
+--- Back to the capital from `here`, as a list of travel texts: mage
+--- teleport, hearthstone (only when set to the capital), the portal of the
+--- continent's hub, the hearthstone to a hub with that portal, or plain
+--- travel.
+local function homeTexts(fac, here, mage)
+    local L = ns.L
+    local capital = mapName(CAPITAL[fac])
+    local mageHome = mageHop(mage, MAGE[fac].capital)
+    if mageHome then return { mageHome } end
+    if boundTo(CAPITAL[fac]) then return { L["PLAN_HEARTH"]:format(capital) } end
+    local portal = L["PLAN_PORTAL"]:format(capital)
+    local hub = homeHub(fac, here.continent)
+    if hub then
+        if sameArea(hub, here.zone) then return { portal } end
+        return { L["PLAN_FLY"]:format(mapName(hub)), portal }
+    end
+    for _, list in pairs(HOME_PORTAL) do
+        for _, h in pairs(list) do
+            if boundTo(h) then return { L["PLAN_HEARTH"]:format(mapName(h)), portal } end
+        end
+    end
+    if here.continent == HOME_CONTINENT[fac] then return { L["PLAN_FLY"]:format(capital) } end
+    return { L["PLAN_TRAVEL_ZONE"]:format(capital) }
+end
+
 --- Travel step texts from `here` ({continent, zone}) to an entrance.
 --- Mage teleports / group portals first, then hand-written capital portals;
 --- anything unknown falls back to "Travel to ...".
@@ -732,9 +784,10 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
         return out
     end
 
-    -- Back to the capital: mage teleport / portal, else the hearthstone.
+    -- Back to the capital: mage teleport / portal, the hearthstone if set
+    -- there, else the nearest hub's portal (homeTexts).
     local mageHome = mageHop(mage, MAGE[fac].capital)
-    local home = mageHome or L["PLAN_HEARTH"]:format(capital)
+    local home = homeTexts(fac, here, mage)
 
     -- Same continent: fly, unless a capital zone portal is at hand (in the
     -- capital, or a free mage trip there: Dustwallow -> Stormwind -> Uldum).
@@ -790,11 +843,15 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
     local arrives = sameArea(landing, ent.uiMapID)
     local portal = L["PLAN_PORTAL"]:format(mapName(arrives and ent.uiMapID or landing))
     if landing == CAPITAL[fac] then
-        if not inCapital then out[#out + 1] = home end
+        if not inCapital then
+            for _, h in ipairs(home) do out[#out + 1] = h end
+        end
     elseif inCapital then
         out[#out + 1] = portal
     else
-        out[#out + 1] = L["PLAN_THEN"]:format(home, portal)
+        -- The last hop home and the capital portal on one line.
+        for i = 1, #home - 1 do out[#out + 1] = home[i] end
+        out[#out + 1] = L["PLAN_THEN"]:format(home[#home], portal)
     end
     if not arrives then out[#out + 1] = fly end
     return out
