@@ -48,7 +48,7 @@ function Collection:Scan()
     s.visibleTotal = s.collectedVisible + s.missingVisible
     table.sort(list, function(a, b) return a.name < b.name end)
     self.summary, self.list = s, list
-    self.achievements = nil -- collected flags changed; rebuild on demand
+    self.achievements, self.achByInstance = nil, nil -- collected flags changed; rebuild on demand
     return s
 end
 
@@ -86,7 +86,7 @@ function Collection:Achievements()
         self.achRetried = true
         ns.Achievements:RequestItems(uncached)
         C_Timer.After(2, function()
-            self.achievements = nil
+            self.achievements, self.achByInstance = nil, nil
             if ns.UI and ns.UI.Refresh then ns.UI:Refresh() end
         end)
     end
@@ -94,7 +94,65 @@ function Collection:Achievements()
 end
 
 function Collection:InvalidateAchievements()
-    self.achievements = nil
+    self.achievements, self.achByInstance = nil, nil
+end
+
+-- Needles to find an instance in criteria text: its name and its bosses'
+-- names (Encounter Journal, so localized). A needle that belongs to two
+-- instances is dropped; short ones (< 5 letters) too, to avoid false hits.
+local function instanceNeedles()
+    local owner = {}
+    for jid, inst in pairs(ns.Data.instances) do
+        if not inst.worldBoss then
+            local names = ns.FarmList:EncounterNames(jid)
+            names[#names + 1] = ns.FarmList:InstanceName(jid)
+            for _, n in ipairs(names) do
+                local key = n:lower()
+                if #key >= 5 then
+                    if owner[key] == nil then owner[key] = jid
+                    elseif owner[key] ~= jid then owner[key] = false end
+                end
+            end
+        end
+    end
+    local list = {}
+    for key, jid in pairs(owner) do
+        if jid then list[#list + 1] = { key = key, jid = jid } end
+    end
+    table.sort(list, function(a, b) return #a.key > #b.key end) -- most specific first
+    return list
+end
+
+--- [journalInstanceID] = { { ach = entry, missing = { criterion text... } } }
+--- for mount achievements not collected yet: each missing criterion that
+--- names one of the instance's bosses (or the instance) is linked to it.
+--- Matching is automatic and only a hint; it never changes eligibility.
+function Collection:AchievementsByInstance()
+    if self.achByInstance then return self.achByInstance end
+    local achs = self:Achievements()
+    if not achs then return {} end
+    local needles = instanceNeedles()
+    local out = {}
+    for _, a in ipairs(achs) do
+        if not a.mount.isCollected and not a.completed then
+            local perJid = {}
+            for _, c in ipairs(ns.Achievements:MissingCriteria(a.id)) do
+                for _, nd in ipairs(needles) do
+                    if c.search:find(nd.key, 1, true) then
+                        perJid[nd.jid] = perJid[nd.jid] or {}
+                        table.insert(perJid[nd.jid], c.text)
+                        break
+                    end
+                end
+            end
+            for jid, missing in pairs(perJid) do
+                out[jid] = out[jid] or {}
+                table.insert(out[jid], { ach = a, missing = missing })
+            end
+        end
+    end
+    self.achByInstance = out
+    return out
 end
 
 --- Raid/dungeon mounts of our dataset grouped by expansion (Encounter

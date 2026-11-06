@@ -213,6 +213,19 @@ function FarmList:InstanceArt(jid)
     return buttonImage
 end
 
+--- Every boss name of an instance from the Encounter Journal (all bosses,
+--- not only those with mounts).
+function FarmList:EncounterNames(jid)
+    local out = {}
+    if jid < 0 or not EJ_GetEncounterInfoByIndex then return out end
+    for i = 1, 40 do
+        local name = EJ_GetEncounterInfoByIndex(i, jid)
+        if not name then break end
+        out[#out + 1] = name
+    end
+    return out
+end
+
 --- "Raid" / "Dungeon" / "World boss".
 function FarmList:TypeName(inst)
     local L = ns.L

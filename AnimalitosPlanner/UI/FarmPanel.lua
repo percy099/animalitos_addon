@@ -390,6 +390,9 @@ function FarmPanel:Refresh(p, entries, sum)
             local zone = e.inst.entrance and C_Map.GetMapInfo(e.inst.entrance.uiMapID)
             if zone then parts[#parts + 1] = zone.name end
             parts[#parts + 1] = #ids == 1 and L["MOUNT_ONE"] or L["MOUNTS_N"]:format(#ids)
+            -- Mount achievements with criteria here (details in the Planner tooltip).
+            local links = ns.Collection:AchievementsByInstance()[e.jid]
+            if links then parts[#parts + 1] = "|cffe0a040" .. L["FARM_ACH"]:format(#links) .. "|r" end
             c.detail:SetText(table.concat(parts, " · "))
 
             local jid, isRaid = e.jid, e.inst.isRaid

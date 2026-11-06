@@ -146,6 +146,29 @@ local function newRun(p)
     f.note:SetPoint("TOPLEFT", f.detail, "BOTTOMLEFT", 0, -2)
     f.note:SetWidth(COL.boss - COL.step - 8)
     f.note:SetWordWrap(true)
+    -- Mount achievements with criteria in this instance (hover for the list).
+    f.ach = ns.UI.fs(f, "tiny", C.warning or C.dim)
+    f.ach:SetPoint("TOPLEFT", f.note, "BOTTOMLEFT", 0, -2)
+    f.ach:SetWidth(COL.boss - COL.step - 8)
+    f.ach:SetWordWrap(true)
+    f:EnableMouse(true)
+    f:SetScript("OnEnter", function(self)
+        if not self.achLinks then return end
+        local C2 = ns.UI.COLORS
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(L["PLAN_ACH_TIP_TITLE"], 1, 1, 1)
+        for _, link in ipairs(self.achLinks) do
+            local a = link.ach
+            GameTooltip:AddLine(("|T%s:14:14:0:0|t %s  (%s)"):format(a.icon or 134400, a.name, a.mount.name),
+                C2.warning[1], C2.warning[2], C2.warning[3])
+            for _, text in ipairs(link.missing) do
+                GameTooltip:AddLine("   · " .. text, 0.85, 0.85, 0.85, true)
+            end
+        end
+        GameTooltip:AddLine(L["PLAN_ACH_TIP_NOTE"], C2.tipMuted[1], C2.tipMuted[2], C2.tipMuted[3], true)
+        GameTooltip:Show()
+    end)
+    f:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
     -- One single-line font string per boss / mount (a non-wrapping font
     -- string only shows its first line, so "\n" lists were cut to one).
@@ -339,6 +362,7 @@ function PlannerPanel:Refresh(p, entries)
 
     local width = p.child:GetWidth()
     local y = 0
+    local achByInstance = ns.Collection:AchievementsByInstance()
     for _, s in ipairs(steps) do
         local f
         if s.kind == "start" then
@@ -354,6 +378,19 @@ function PlannerPanel:Refresh(p, entries)
             f.title:SetText(L[s.inst.worldBoss and "PLAN_KILL" or "PLAN_RUN"]:format(ns.FarmList:InstanceName(s.jid)))
             f.detail:SetText(detail)
             f.note:SetText(note)
+            local links = achByInstance[s.jid]
+            f.achLinks = links
+            local achText = ""
+            if links then
+                local n = 0
+                for _, link in ipairs(links) do n = n + #link.missing end
+                achText = (#links == 1)
+                    and L["PLAN_ACH_ONE"]:format(links[1].ach.name, n)
+                    or L["PLAN_ACH_MANY"]:format(#links, n)
+            end
+            f.ach:SetText(achText)
+            f.ach:ClearAllPoints()
+            f.ach:SetPoint("TOPLEFT", note ~= "" and f.note or f.detail, "BOTTOMLEFT", 0, -2)
             -- Same boss twice in a row (two mounts) is written once.
             local lastBoss
             for i, row in ipairs(rows) do
@@ -385,6 +422,7 @@ function PlannerPanel:Refresh(p, entries)
 
             local left = 8 + f.title:GetStringHeight() + 2 + f.detail:GetStringHeight()
                 + (note ~= "" and (2 + f.note:GetStringHeight()) or 0)
+                + (achText ~= "" and (2 + f.ach:GetStringHeight()) or 0)
             local right = 9 + #rows * LINE_H
             f:SetHeight(math.max(34, math.max(left, right) + 8))
         end

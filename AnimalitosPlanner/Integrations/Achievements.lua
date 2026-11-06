@@ -86,6 +86,36 @@ function Achievements:ScanMounts(mountsByName)
     return out, uncached
 end
 
+-- Criteria type 8 = "complete another achievement" (assetID = its ID).
+local CRITERIA_ACHIEVEMENT = 8
+
+--- Criteria still missing for an achievement, each with the text that says
+--- what to do: { text, search } (search = lowercase text, plus the
+--- sub-achievement's name and description for meta achievements).
+function Achievements:MissingCriteria(id)
+    local out = {}
+    local n = GetAchievementNumCriteria(id) or 0
+    for i = 1, n do
+        local text, ctype, done, _, _, _, _, assetID = GetAchievementCriteriaInfo(id, i)
+        if not done then
+            local search = text or ""
+            if ctype == CRITERIA_ACHIEVEMENT and assetID and assetID > 0 then
+                local _, subName, _, _, _, _, _, subDesc = GetAchievementInfo(assetID)
+                search = ("%s %s %s"):format(search, subName or "", subDesc or "")
+            end
+            out[#out + 1] = { text = (text ~= "" and text) or "?", search = search:lower() }
+        end
+    end
+    if n == 0 then
+        -- Single-step achievement: its description says where.
+        local _, name, _, completed, _, _, _, desc = GetAchievementInfo(id)
+        if not completed then
+            out[1] = { text = name or "?", search = ((name or "") .. " " .. (desc or "")):lower() }
+        end
+    end
+    return out
+end
+
 --- Asks the client to cache reward items (a later scan can then resolve them).
 function Achievements:RequestItems(itemIDs)
     if not (C_Item and C_Item.RequestLoadItemDataByID) then return end
