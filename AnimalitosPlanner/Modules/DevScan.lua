@@ -357,7 +357,9 @@ function Scan:ProbeVendors()
                 if not m.isCollected and m.sourceType == VENDOR_SOURCE then
                     missingVendor = missingVendor + 1
                     local itemID = itemOf[m.mountID]
-                    local entry = { name = m.name, mountID = m.mountID, itemID = itemID }
+                    local extra = ns.MountJournal:GetMountExtra(m.mountID)
+                    local entry = { name = m.name, mountID = m.mountID, itemID = itemID,
+                        source = extra and extra.sourceText } -- journal text: does it say Renown?
                     if itemID then
                         withItem = withItem + 1
                         entry.lines, entry.red = tooltipLines(itemID)
