@@ -126,21 +126,42 @@ local TRAVEL_ITEMS = {
     [572] = { item = 110560, Alliance = 582, Horde = 590 }, -- Garrison Hearthstone -> Lunarfall / Frostwall
 }
 
--- Zones you cannot fly into: reached through a portal in another zone
--- (confirmed by the player and warcraft.wiki.gg). via = uiMapID of the
--- portal's zone; where = portal position per faction (nil = not known).
+-- Extra zone portals in one faction's capital (Orgrimmar: Caverns of Time,
+-- confirmed by the player). Same shape as ZONE_PORTALS.
+local FACTION_ZONE_PORTALS = {
+    Horde = { [75] = 71, [74] = 71 }, -- Caverns of Time (Dragon Soul, ...) -> Tanaris portal
+}
+
+-- Zones you cannot fly into: reached through a portal or a ride in another
+-- zone (confirmed by the player and warcraft.wiki.gg), per faction.
+-- via = uiMapID of the portal's zone; x/y = its position (nil = unknown);
+-- text = locale key of the step (default: "Portal to <zone> ...").
 local ZONE_ACCESS = {
     [504] = { -- Isle of Thunder: Kirin Tor / Sunreaver portal in Townlong Steppes (quest chain unlock)
-        via = 388, viaContinent = 424,
-        Alliance = { x = 49.7, y = 68.7 },
+        Alliance = { via = 388, viaContinent = 424, x = 49.7, y = 68.7 },
+        Horde    = { via = 388, viaContinent = 424 },
+    },
+    [1462] = { -- Mechagon Island: Horde rides with Captain Krooz from the Dazar'alor docks
+        Horde = { via = 862, viaContinent = 875, text = "PLAN_KROOZ" },
     },
 }
 
--- Continents a faction reaches by a chain, not a capital portal.
--- Alliance -> Zandalar: Kalimdor, fly to the Echo Isles (Durotar), boat to Zuldazar.
+-- Places a faction reaches by a chain, not a capital portal. zones = only
+-- for these target zones (default: the whole continent); boat = locale key
+-- of the last step (%s = target zone when ownZone); lands = where it ends.
 local CONTINENT_ROUTES = {
     Alliance = {
+        -- Kalimdor, fly to the Echo Isles (Durotar), boat to Zuldazar.
         [875] = { via = 1, viaContinent = 12, boat = "PLAN_BOAT_ZULDAZAR", lands = 862 },
+    },
+    Horde = {
+        -- Zuldazar, then the Banshee's Wail to the Kul Tiras zone you pick
+        -- (after the war campaign unlocks it).
+        [876] = { via = 862, viaContinent = 875, boat = "PLAN_BOAT_KULTIRAS", ownZone = true },
+        -- Southern Eastern Kingdoms (Karazhan, Zul'Gurub): Shattrath, fly to
+        -- the Dark Portal, through to the Blasted Lands (route of the player).
+        [13] = { via = 100, viaContinent = 101, boat = "PLAN_DARK_PORTAL", lands = 17,
+                 zones = { [17] = true, [42] = true, [50] = true, [51] = true, [210] = true, [224] = true } },
     },
 }
 
@@ -171,6 +192,7 @@ end
 function Planner:Route()
     local fac = faction()
     if cachedRoute and cachedFaction == fac then return cachedRoute end
+    ns.FarmList:ResolveFactionEntrances() -- Horde Battle of Dazar'alor
 
     local byContinent, noEntrance = {}, {}
     for jid, inst in pairs(ns.Data.instances) do
@@ -367,6 +389,7 @@ end
 -- the other (Caverns of Time inside Tanaris).
 local function sameArea(a, b)
     if a == b then return true end
+    if not a or not b then return false end
     local ia, ib = C_Map.GetMapInfo(a), C_Map.GetMapInfo(b)
     return (ib and ib.parentMapID == a) or (ia and ia.parentMapID == b) or false
 end
@@ -392,7 +415,9 @@ end
 --- anything unknown falls back to "Travel to ...".
 function Planner:TravelTexts(fac, here, ent, mage, jid)
     local L = ns.L
-    if ent.continent == here.continent and ent.uiMapID == here.zone then return {} end
+    if ent.continent == here.continent and (ent.uiMapID == here.zone or sameArea(ent.uiMapID, here.zone)) then
+        return {} -- already there (Dazar'alor is inside Zuldazar)
+    end
 
     -- A known Mythic+ teleport goes straight to the entrance: best of all.
     if jid and jid > 0 then
@@ -402,7 +427,7 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
 
     -- Leaving a portal-only zone: take its portal back first (a mage
     -- teleport or the hearthstone also work, so only when flying out).
-    local from = ZONE_ACCESS[here.zone]
+    local from = ZONE_ACCESS[here.zone] and ZONE_ACCESS[here.zone][fac]
     if from and ent.uiMapID ~= here.zone then
         local rest = self:TravelTexts(fac, { continent = from.viaContinent, zone = from.via }, ent, mage)
         local first = rest[1]
@@ -413,23 +438,27 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
     end
 
     -- Entering a portal-only zone: go to the portal's zone, then take it.
-    local access = ZONE_ACCESS[ent.uiMapID]
+    local access = ZONE_ACCESS[ent.uiMapID] and ZONE_ACCESS[ent.uiMapID][fac]
     if access then
         local out = self:TravelTexts(fac, here, { continent = access.viaContinent, uiMapID = access.via }, mage)
-        local where = access[fac]
-        out[#out + 1] = where
-            and L["PLAN_PORTAL_AT"]:format(mapName(ent.uiMapID), mapName(access.via), where.x, where.y)
-            or L["PLAN_PORTAL_IN"]:format(mapName(ent.uiMapID), mapName(access.via))
+        if access.text then
+            out[#out + 1] = L[access.text]:format(mapName(ent.uiMapID))
+        elseif access.x then
+            out[#out + 1] = L["PLAN_PORTAL_AT"]:format(mapName(ent.uiMapID), mapName(access.via), access.x, access.y)
+        else
+            out[#out + 1] = L["PLAN_PORTAL_IN"]:format(mapName(ent.uiMapID), mapName(access.via))
+        end
         return out
     end
 
-    -- A continent reached by a chain (Alliance -> Zandalar by boat), unless
-    -- a mage teleport goes there directly.
+    -- A place reached by a chain (Alliance -> Zandalar by boat, Horde ->
+    -- Kul Tiras, Horde -> Karazhan), unless a mage teleport goes there.
     local route = CONTINENT_ROUTES[fac] and CONTINENT_ROUTES[fac][ent.continent]
+    if route and route.zones and not route.zones[ent.uiMapID] then route = nil end
     if route and ent.continent ~= here.continent and not mageHop(mage, MAGE[fac][ent.continent]) then
         local out = self:TravelTexts(fac, here, { continent = route.viaContinent, uiMapID = route.via }, mage)
-        out[#out + 1] = L[route.boat]
-        if not sameArea(route.lands, ent.uiMapID) then
+        out[#out + 1] = L[route.boat]:format(mapName(ent.uiMapID))
+        if route.lands and not sameArea(route.lands, ent.uiMapID) then
             out[#out + 1] = L["PLAN_FLY"]:format(mapName(ent.uiMapID))
         end
         return out
@@ -440,6 +469,7 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
     local inCapital = here.zone == CAPITAL[fac]
     local capital = mapName(CAPITAL[fac])
     local zonePortal = ZONE_PORTALS[ent.uiMapID]
+        or (FACTION_ZONE_PORTALS[fac] and FACTION_ZONE_PORTALS[fac][ent.uiMapID])
     local contPortal = CONTINENT_PORTALS[fac][ent.continent]
     local fly = L["PLAN_FLY"]:format(mapName(ent.uiMapID))
 

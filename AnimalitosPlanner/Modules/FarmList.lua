@@ -61,7 +61,27 @@ function FarmList:ResolveWorldBosses()
     self.resolveTries = (self.resolveTries or 0) + 1
 end
 
+-- Instances with a different entrance per faction (the dataset keeps the
+-- one the Encounter Journal gave). Source: warcraft.wiki.gg.
+local FACTION_ENTRANCES = {
+    -- Battle of Dazar'alor: Horde enters in Dazar'alor (Alliance: Boralus harbor).
+    [1176] = { Horde = { uiMapID = 1165, x = 0.388, y = 0.024, continent = 875 } },
+}
+
+--- Swaps in the player's faction entrance once per session.
+function FarmList:ResolveFactionEntrances()
+    if self.factionEntrancesDone then return end
+    local fac = UnitFactionGroup("player")
+    if not fac or fac == "Neutral" then return end
+    self.factionEntrancesDone = true
+    for jid, per in pairs(FACTION_ENTRANCES) do
+        local inst = ns.Data.instances[jid]
+        if inst and per[fac] then inst.entrance = per[fac] end
+    end
+end
+
 function FarmList:Build()
+    self:ResolveFactionEntrances()
     self:ResolveWorldBosses()
     local S = ns.Eligibility.STATES
     local byInstance, counts, mountStates = {}, {}, {}
