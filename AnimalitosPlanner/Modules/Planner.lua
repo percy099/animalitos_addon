@@ -554,10 +554,12 @@ local PORTAL = {
 }
 local HEARTHSTONE = 6948
 
--- Spell ID of a mage teleport from its (localized) name, or nil.
+-- Spell ID of a mage teleport this character knows, from its (localized)
+-- name, or nil. Alliance and Horde versions share a name ("Teleport:
+-- Shattrath" is 33690 and 35715): only a known one counts.
 local function mageSpellByName(name)
     local function check(id)
-        return ns.Navigation:SpellName(id) == name and id or nil
+        return ns.Navigation:SpellName(id) == name and ns.Navigation:KnowsSpell(id) and id or nil
     end
     for _, fac in pairs(MAGE) do
         for key, d in pairs(fac) do
@@ -591,7 +593,7 @@ function Planner:TravelAction(text)
     local first = text:match(formatPattern(L["PLAN_THEN"]))
     if first then text = first end
     local id = mageSpellByName(text)
-    if id and ns.Navigation:KnowsSpell(id) then
+    if id then
         local portal = PORTAL[id]
         if IsInGroup() and portal and ns.Navigation:KnowsSpell(portal) then
             return { type = "spell", spell = portal, name = ns.Navigation:SpellName(portal) }
