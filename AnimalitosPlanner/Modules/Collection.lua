@@ -50,6 +50,7 @@ function Collection:Scan()
     self.summary, self.list = s, list
     self:InvalidateAchievements() -- collected flags changed; rebuild on demand
     self.otherDrops = nil
+    self:InvalidateBuyable()
     return s
 end
 
@@ -347,16 +348,34 @@ function Collection:BuyInfo(mountID)
     return out
 end
 
---- Missing mounts (visible for this character) whose price can be paid now.
-function Collection:BuyableCount()
-    local n = 0
-    for _, m in ipairs(self:GetList() or {}) do
+--- Set of missing mounts (visible for this character) whose price can be
+--- paid now, and its size. Cached: rebuilt only after money, currencies,
+--- bags or the collection change (InvalidateBuyable).
+function Collection:BuyableSet()
+    if self.buyable then return self.buyable, self.buyableCount end
+    local list = self:GetList()
+    if not list then return {}, 0 end
+    local set, n = {}, 0
+    for _, m in ipairs(list) do
         if not m.isCollected then
             local info = self:BuyInfo(m.mountID)
-            if info and info.canBuy == true then n = n + 1 end
+            if info and info.canBuy == true then
+                set[m.mountID] = true
+                n = n + 1
+            end
         end
     end
+    self.buyable, self.buyableCount = set, n
+    return set, n
+end
+
+function Collection:BuyableCount()
+    local _, n = self:BuyableSet()
     return n
+end
+
+function Collection:InvalidateBuyable()
+    self.buyable, self.buyableCount = nil, nil
 end
 
 --- /aplan costs: uncollected mounts with a price, raw and parsed.
@@ -373,8 +392,8 @@ function Collection:DebugCosts()
                 if priced <= 12 then
                     local parsed = {}
                     for _, p in ipairs(info.parts) do
-                        parsed[#parsed + 1] = ("%s %s need %d have %s"):format(p.kind, tostring(p.name or p.id or ""),
-                            p.need, tostring(p.have))
+                        parsed[#parsed + 1] = ("%s %s need %s have %s"):format(p.kind, tostring(p.name or p.id or ""),
+                            tostring(p.need), tostring(p.have))
                     end
                     print(("  %s: %s -> %s"):format(m.name, table.concat(parsed, "; "), tostring(info.canBuy)))
                 end

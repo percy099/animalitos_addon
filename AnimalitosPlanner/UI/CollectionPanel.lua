@@ -681,6 +681,7 @@ function CollectionPanel:Refresh(p, entries)
     p.source:SetItems(menu)
     local buyable = src == "buyable"
     p.buyable = buyable
+    local buySet = buyable and ns.Collection:BuyableSet() or nil
     if src and not buyable and not present[src] then src = nil end
     p.source:SetText(L["COL_SOURCE_LABEL"]:format((buyable and L["COL_BUYABLE"])
         or (src and ns.MountJournal:GetSourceTypeLabel(src)) or L["COL_SOURCE_ANY"]))
@@ -718,8 +719,7 @@ function CollectionPanel:Refresh(p, entries)
             or (key == "collected" and m.isCollected)
             or (key == "favorites" and ns.Collection:IsFavorite(m.mountID))
         if keep and buyable then
-            local info = ns.Collection:BuyInfo(m.mountID)
-            keep = info ~= nil and info.canBuy == true
+            keep = buySet[m.mountID] == true
         elseif keep and src then
             keep = (m.sourceType or 0) == src
         end

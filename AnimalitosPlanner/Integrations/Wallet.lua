@@ -93,7 +93,8 @@ function W:ParseCost(text)
     -- Two vendors with the same price list it twice: keep one.
     local seen, unique = {}, {}
     for _, p in ipairs(parts) do
-        local key = ("%s:%s:%d"):format(p.kind, tostring(p.id or p.icon), p.need)
+        -- %s, not %d: gold prices in copper pass 2^31 (5 million gold = 5e10).
+        local key = ("%s:%s:%s"):format(p.kind, tostring(p.id or p.icon), tostring(p.need))
         if not seen[key] then
             seen[key] = true
             unique[#unique + 1] = p

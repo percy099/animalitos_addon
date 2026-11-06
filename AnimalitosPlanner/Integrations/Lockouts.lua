@@ -59,6 +59,20 @@ function Lockouts:Refresh()
     self.worldBosses = wb
     self.loaded = true
     self.updatedAt = now
+
+    -- Signature of what matters (who is saved where, how far): returns true
+    -- when it changed, so the window is redrawn only then. Other addons ask
+    -- for raid info often and UPDATE_INSTANCE_INFO fires for each request.
+    local sig = {}
+    for mapID, diffs in pairs(byMap) do
+        for d, r in pairs(diffs) do sig[#sig + 1] = ("%d:%d:%d"):format(mapID, d, r.encounterProgress or 0) end
+    end
+    for name in pairs(wb.names) do sig[#sig + 1] = name end
+    table.sort(sig)
+    local s = table.concat(sig, ",")
+    local changed = s ~= self.signature
+    self.signature = s
+    return changed
 end
 
 function Lockouts:Get(instanceMapID, difficultyID)

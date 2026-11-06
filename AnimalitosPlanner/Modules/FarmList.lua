@@ -83,10 +83,14 @@ end
 -- [journalInstanceID][dungeonEncounterID] = journalEncounterID, read with
 -- EJ_GetEncounterInfo(id), which works without selecting an instance in
 -- the journal (EJ_GetEncounterInfoByIndex does not). Built once.
-local encounterIndex
+local encounterIndex, encounterTriedAt
 function FarmList:JournalEncounterFor(jid, dungeonEncounterID)
     if not encounterIndex then
         if not EJ_GetEncounterInfo then return nil end
+        -- Reading 4000 encounters is not free: while the journal is not
+        -- ready, try at most every 10 seconds (not on every refresh).
+        if encounterTriedAt and GetTime() - encounterTriedAt < 10 then return nil end
+        encounterTriedAt = GetTime()
         encounterIndex = {}
         local found = 0
         for id = 1, 4000 do
@@ -184,7 +188,24 @@ function FarmList:DebugCurated()
     end
 end
 
+-- Build() is asked for by the mini window and the main window in the same
+-- refresh: the result is reused within one frame (GetTime() does not change
+-- inside a frame). Hide / Unhide clear it.
+local built, builtAt, builtCounts
+
+function FarmList:Invalidate()
+    built = nil
+end
+
 function FarmList:Build()
+    local now = GetTime()
+    if built and builtAt == now then return built, builtCounts end
+    local entries, counts = self:BuildNow()
+    built, builtAt, builtCounts = entries, now, counts
+    return entries, counts
+end
+
+function FarmList:BuildNow()
     self:ResolveCurated()
     self:ResolveFactionEntrances()
     self:ResolveWorldBosses()
@@ -336,10 +357,12 @@ function FarmList:Hide(jid, isRaid)
             or GetQuestResetTime()
     end
     hiddenTable()[jid] = time() + (secs or 86400)
+    self:Invalidate()
 end
 
 function FarmList:UnhideAll()
     wipe(hiddenTable())
+    self:Invalidate()
 end
 
 -- World bosses use negative keys: -journalEncounterID (see build_dataset.py).

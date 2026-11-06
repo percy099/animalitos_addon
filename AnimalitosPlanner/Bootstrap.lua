@@ -58,16 +58,41 @@ ns:On("PLAYER_ENTERING_WORLD", function()
 end)
 
 -- Dungeon Finder data (world event bosses: is the event on, done today?).
+-- These events fire often; redraw only when an event boss changed.
+local lastHolidays
 local function lfgChanged()
-    ns:Debounce("lfgui", 1, function() ns.UI:Refresh() end)
+    ns:Debounce("lfgui", 1, function()
+        local parts = {}
+        for _, h in ipairs((ns.Data and ns.Data.holidays) or {}) do
+            parts[#parts + 1] = tostring(ns.Holidays:Status(h.lfgDungeonID)) .. tostring(ns.Holidays:DoneToday(h.lfgDungeonID))
+        end
+        local sig = table.concat(parts, ",")
+        if sig ~= lastHolidays then
+            lastHolidays = sig
+            ns.UI:Refresh()
+        end
+    end)
 end
 ns:On("LFG_UPDATE_RANDOM_INFO", lfgChanged)
 ns:On("LFG_LOCK_INFO_RECEIVED", lfgChanged)
 
+-- Raid info: grouped (several answers in a row) and redrawn only on change.
 ns:On("UPDATE_INSTANCE_INFO", function()
-    ns.Lockouts:Refresh()
-    ns.UI:Refresh()
+    ns:Debounce("instanceinfo", 0.5, function()
+        if ns.Lockouts:Refresh() then ns.UI:Refresh() end
+    end)
 end)
+
+-- Money, currencies and bag items change what can be paid ("Can pay now").
+local function walletChanged()
+    ns.Collection:InvalidateBuyable()
+    if ns.UI.frame and ns.UI.frame:IsShown() then
+        ns:Debounce("wallet", 2, function() ns.UI:Refresh() end)
+    end
+end
+ns:On("PLAYER_MONEY", walletChanged)
+ns:On("CURRENCY_DISPLAY_UPDATE", walletChanged)
+ns:On("BAG_UPDATE_DELAYED", walletChanged)
 
 local function afterBossKill()
     ns:Debounce("raidinfo", 3, function() ns.Lockouts:Request() end)
