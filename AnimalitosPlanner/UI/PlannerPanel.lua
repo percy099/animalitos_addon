@@ -321,6 +321,7 @@ function PlannerPanel:Create(parent)
         ns.Storage.db.ui.plannerHideDone = checked or nil
         if p.bar then p.bar:SetValue(0) end
         PlannerPanel:Refresh(p)
+        ns.PlannerMini:Refresh() -- its travel follows this switch too
     end)
     p.hide:SetPoint("RIGHT", p, "TOPRIGHT", -SCROLL_W - 2, -35)
     local hideLabel = ns.UI.fs(p, "small", C.dim)

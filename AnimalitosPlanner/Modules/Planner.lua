@@ -442,7 +442,9 @@ end
 --- you are where you just finished). Returns current, after, summary:
 ---   { run = step, travel = { text... } } or nil.
 function Planner:Upcoming(entries)
-    local steps, summary = self:Build(entries, false, self:Kinds())
+    -- Same choice as the Planner's "Hide completed steps": with it on, travel
+    -- skips finished steps (from the capital), so both windows say the same.
+    local steps, summary = self:Build(entries, ns.Storage.db.ui.plannerHideDone and true or false, self:Kinds())
     local found, travel = {}, {}
     for _, s in ipairs(steps) do
         if s.kind == "travel" then
