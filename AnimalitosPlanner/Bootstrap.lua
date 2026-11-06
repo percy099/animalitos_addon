@@ -94,6 +94,10 @@ ns:On("ZONE_CHANGED_NEW_AREA", function()
 end)
 ns:On("ENCOUNTER_END", afterBossKill)
 
+-- Difficulty changed (Farmable now "Set" buttons, mini window helper).
+ns:On("PLAYER_DIFFICULTY_CHANGED", function()
+    if ns.UI.frame and ns.UI.frame:IsShown() then ns:Debounce("difficulty", 0.3, function() ns.UI:Refresh() end) end)
+
 -- "/aplan now": print the farmable-now list to chat (v0.3 test surface; the
 -- real screen arrives in v0.4).
 local MAX_READY_LINES, MAX_LOCKED_LINES = 15, 8

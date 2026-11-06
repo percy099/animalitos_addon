@@ -100,6 +100,12 @@ local function newCard(p)
     c.go = ns.UI.Button(c, "primary")
     ns.UI.SetButtonText(c.go, L["BTN_GO"], 50)
     c.go:SetPoint("RIGHT", c.hide, "LEFT", -6, 0)
+    -- "Set 25H": the difficulty the Ready mounts drop on (only when it is
+    -- not set yet; solo or group leader, outside the instance).
+    c.diff = ns.UI.Button(c, "secondary")
+    c.diff:SetPoint("RIGHT", c.go, "LEFT", -6, 0)
+    c.diff:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    c.diff:Hide()
 
     c.title = ns.UI.fs(c, "GameFontNormal")
     c.title:SetPoint("TOPLEFT", ROW_INDENT, -9)
@@ -400,6 +406,9 @@ function FarmPanel:Refresh(p, entries, sum)
                 if not ns.Holidays:OpenQueue(lfgID) then ns:Print(L["JOURNAL_COMBAT"]) end
             end)
             c.hide:Hide()
+            c.diff:Hide()
+            c.title:SetPoint("RIGHT", c.go, "LEFT", -6, 0)
+            c.detail:SetPoint("RIGHT", c.go, "LEFT", -6, 0)
             c.go:ClearAllPoints()
             c.go:SetPoint("TOPRIGHT", -8, -8)
             local rowY = CARD_HEAD_H
@@ -489,7 +498,31 @@ function FarmPanel:Refresh(p, entries, sum)
                 ns.FarmList:Hide(jid, isRaid)
                 ns.UI:Refresh()
             end)
-
+            c.hide:SetScript("OnClick", function()
+                ns.FarmList:Hide(jid, isRaid)
+                ns.UI:Refresh()
+            end)
+            local D = ns.Difficulty
+            local want = D:Pick(e)
+            local showDiff = want and D:Settable(want) and not D:IsSet(want) and D:Inside(e) == nil
+            c.diff:SetShown(showDiff and true or false)
+            if showDiff then
+                local blocked = D:Blocked()
+                ns.UI.SetButtonText(c.diff, L["MINI_DIFF_BTN"]:format(ns.FarmList:DifficultyName(want)), 70)
+                c.diff:SetEnabled(blocked == nil)
+                c.diff:SetScript("OnClick", function() D:Set(want) end)
+                c.diff:SetScript("OnEnter", function(self)
+                    GameTooltip:SetOwner(self, "ANCHOR_TOP")
+                    GameTooltip:AddLine(L["MINI_DIFF_NEED"]:format(D:Name(want)), 1, 1, 1)
+                    local tip = (blocked == "leader" and L["MINI_DIFF_LEADER"]) or (blocked == "combat" and L["JOURNAL_COMBAT"])
+                        or (blocked == "inside" and L["FARM_DIFF_INSIDE"]) or L["MINI_DIFF_TIP"]
+                    GameTooltip:AddLine(tip, 0.8, 0.8, 0.8, true)
+                    GameTooltip:Show()
+                end)
+            end
+            local rightOf = showDiff and c.diff or c.go
+            c.title:SetPoint("RIGHT", rightOf, "LEFT", -6, 0)
+            c.detail:SetPoint("RIGHT", rightOf, "LEFT", -6, 0)
             local rowY = CARD_HEAD_H
             for k, id in ipairs(ids) do
                 mountRow(c, ROW_INDENT, rowY, 8, id, e.mounts[id], jid, "ready", k % 2 == 1)
