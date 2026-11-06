@@ -359,8 +359,15 @@ function Planner:TravelTexts(fac, here, ent, mage)
     local contPortal = CONTINENT_PORTALS[fac][ent.continent]
     local fly = L["PLAN_FLY"]:format(mapName(ent.uiMapID))
 
-    -- A mage teleport straight into the zone (Tol Barad).
+    -- A mage teleport straight into the instance's zone beats flying or any
+    -- portal chain, even on the same continent (Caverns of Time -> Theramore
+    -- for Onyxia). Mage teleports work from anywhere.
     local zoneDest = MAGE[fac].zone[ent.uiMapID]
+    if not zoneDest then
+        for key, d in pairs(MAGE[fac]) do
+            if key ~= "zone" and d[1] == ent.uiMapID then zoneDest = d break end
+        end
+    end
     local hop = mageHop(mage, zoneDest)
     if hop then
         out[1] = hop
