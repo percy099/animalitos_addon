@@ -196,11 +196,27 @@ local function newRun(p)
     f.ach:SetPoint("TOPLEFT", f.note, "BOTTOMLEFT", 0, -2)
     f.ach:SetWidth(COL.boss - COL.step - 8)
     f.ach:SetWordWrap(true)
+    -- The achievement line is a link: icon, accent color, brighter on hover,
+    -- click opens the achievement in Blizzard's window.
+    f.achBtn = CreateFrame("Button", nil, f)
+    f.achBtn:SetAllPoints(f.ach)
+    local achHl = f.achBtn:CreateTexture(nil, "HIGHLIGHT")
+    achHl:SetAllPoints()
+    achHl:SetColorTexture(C.accent[1], C.accent[2], C.accent[3], 0.18)
+    f.achBtn:SetScript("OnClick", function()
+        local link = f.achLinks and f.achLinks[1]
+        if link and link.ach.id and OpenAchievementFrameToAchievement then
+            OpenAchievementFrameToAchievement(link.ach.id)
+        end
+    end)
+    f.achBtn:SetScript("OnEnter", function() f:GetScript("OnEnter")(f, true) end)
+    f.achBtn:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
     f:EnableMouse(true)
-    f:SetScript("OnEnter", function(self)
+    f:SetScript("OnEnter", function(self, fromLink)
         if not self.achLinks then return end
         local C2 = ns.UI.COLORS
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetOwner(fromLink and self.achBtn or self, "ANCHOR_RIGHT")
         GameTooltip:AddLine(L["PLAN_ACH_TIP_TITLE"], 1, 1, 1)
         for _, link in ipairs(self.achLinks) do
             local a = link.ach
@@ -211,6 +227,7 @@ local function newRun(p)
             end
         end
         GameTooltip:AddLine(L["PLAN_ACH_TIP_NOTE"], C2.tipMuted[1], C2.tipMuted[2], C2.tipMuted[3], true)
+        GameTooltip:AddLine(L["PLAN_ACH_CLICK"], C2.accent[1], C2.accent[2], C2.accent[3])
         GameTooltip:Show()
     end)
     f:SetScript("OnLeave", function() GameTooltip:Hide() end)
@@ -506,8 +523,11 @@ function PlannerPanel:Refresh(p, entries)
                 achText = (#links == 1)
                     and L["PLAN_ACH_ONE"]:format(links[1].ach.name, n)
                     or L["PLAN_ACH_MANY"]:format(#links, n)
+                -- Link look: the achievement's icon in front, an arrow after.
+                achText = ("|T%s:12:12:0:0:64:64:5:59:5:59|t %s  |cffa88ad7>|r"):format(links[1].ach.icon or 134400, achText)
             end
             f.ach:SetText(achText)
+            f.achBtn:SetShown(achText ~= "")
             f.ach:ClearAllPoints()
             f.ach:SetPoint("TOPLEFT", note ~= "" and f.note or f.detail, "BOTTOMLEFT", 0, -2)
             -- Same boss twice in a row (two mounts) is written once; a mount

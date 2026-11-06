@@ -195,9 +195,24 @@ local function secureButton(i)
     if not b then
         b = CreateFrame("Button", "AnimalitosPlannerTravel" .. i, UIParent, "SecureActionButtonTemplate")
         b:RegisterForClicks("AnyUp", "AnyDown")
+        -- Looks like a button, so it is clear it can be clicked: a tinted
+        -- pill with an accent edge and a cast cursor at the right.
+        local A = ns.UI.COLORS.accent
+        local bg = b:CreateTexture(nil, "BACKGROUND")
+        bg:SetAllPoints()
+        bg:SetColorTexture(A[1], A[2], A[3], 0.16)
+        local edge = b:CreateTexture(nil, "BORDER")
+        edge:SetPoint("TOPLEFT")
+        edge:SetPoint("BOTTOMLEFT")
+        edge:SetWidth(2)
+        edge:SetColorTexture(A[1], A[2], A[3], 0.9)
+        local cursor = b:CreateTexture(nil, "ARTWORK")
+        cursor:SetSize(14, 14)
+        cursor:SetPoint("RIGHT", -3, 0)
+        cursor:SetTexture("Interface\\CURSOR\\Cast")
         local hl = b:CreateTexture(nil, "HIGHLIGHT")
         hl:SetAllPoints()
-        hl:SetColorTexture(1, 1, 1, 0.08)
+        hl:SetColorTexture(A[1], A[2], A[3], 0.22)
         b:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:AddLine(L["MINI_TRAVEL_TIP"]:format(self.actionName or "?"), 1, 1, 1, true)
@@ -234,7 +249,10 @@ local function placeSecure(f, t, action)
     b:SetFrameLevel(f:GetFrameLevel() + 20)
     b:ClearAllPoints()
     b:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left * k - 4, top * k + 2)
-    b:SetSize((right - left) * k + 8, (top - bottom) * k + 4)
+    -- The whole row (room for the cursor glyph), not only the text.
+    local rowRight = f:GetRight() and (f:GetRight() * (f:GetEffectiveScale() / UIParent:GetEffectiveScale())) - 6
+    local width = math.max((right - left) * k + 26, rowRight and (rowRight - (left * k - 4)) or 0)
+    b:SetSize(width, (top - bottom) * k + 4)
     b:Show()
 end
 -- clickable: true for the current step (its first hop is where you are).
