@@ -19,21 +19,25 @@ local function box(parent, titleKey, top, height)
     return f
 end
 
+-- Toggle switch with its label; clicking the label also toggles.
 local function check(parent, x, y, labelKey, onClick)
-    local cb = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
-    cb:SetSize(24, 24)
-    cb:SetPoint("TOPLEFT", x, y)
+    local cb = ns.UI.Toggle(parent, onClick)
+    cb:SetPoint("TOPLEFT", x + 4, y - 4)
     cb.label = ns.UI.fs(parent, "GameFontHighlight")
-    cb.label:SetPoint("LEFT", cb, "RIGHT", 4, 1)
+    cb.label:SetPoint("LEFT", cb, "RIGHT", 8, 0)
     cb.label:SetText(L[labelKey])
-    cb:SetScript("OnClick", onClick)
     return cb
+end
+
+local function setLabel(cb, text)
+    cb.label:SetText(text)
+    cb:SetHitRectInsets(0, -(cb.label:GetStringWidth() + 8), -4, -4)
 end
 
 local function setCheckEnabled(cb, enabled)
     cb:SetEnabled(enabled)
     local c = enabled and { 1, 1, 1 } or ns.UI.COLORS.muted
-    cb.label:SetTextColor(c[1], c[2], c[3])
+    cb.label:SetTextColor(c[1], c[2], c[3], c[4] or 1)
 end
 
 local function note(parent, y, text)
@@ -97,13 +101,29 @@ function SettingsPanel:Create(parent)
     p.minimap = check(mm, 10, -30, "SET_MINIMAP_SHOW", function(self)
         ns.MinimapButton:SetShown(self:GetChecked())
     end)
+    setLabel(p.minimap, L["SET_MINIMAP_SHOW"])
     p.minimapNote = note(mm, -56, "")
     top = top - 76 - GAP
 
-    -- Window
-    local win = box(p, "SET_WINDOW", top, 40)
+    -- Window: scale slider and reset position
+    local win = box(p, "SET_WINDOW", top, 70)
     local reset = smallButton(win, L["SET_RESET_POS"], function() ns.UI:ResetPosition() end)
     reset:SetPoint("TOPRIGHT", -10, -9)
+    local scaleLabel = ns.UI.fs(win, "GameFontHighlight")
+    scaleLabel:SetPoint("TOPLEFT", 12, -40)
+    scaleLabel:SetText(L["SET_SCALE"])
+    p.scaleValue = ns.UI.fs(win, "GameFontHighlight", ns.UI.COLORS.accent)
+    p.scaleValue:SetPoint("TOPRIGHT", -12, -40)
+    p.scaleValue:SetWidth(44)
+    p.scaleValue:SetJustifyH("RIGHT")
+    p.scale = ns.UI.Slider(win, ns.UI.SCALE_MIN, ns.UI.SCALE_MAX, 0.05, 220)
+    p.scale:SetPoint("RIGHT", p.scaleValue, "LEFT", -10, 0)
+    -- Live percentage while dragging; the window rescales on release so
+    -- the slider does not move under the cursor.
+    p.scale:SetScript("OnValueChanged", function(_, v)
+        p.scaleValue:SetText(("%d%%"):format(v * 100 + 0.5))
+    end)
+    p.scale:SetScript("OnMouseUp", function(self) ns.UI:SetScale(self:GetValue()) end)
 
     -- About
     local about = ns.UI.fs(p, "GameFontDisableSmall")
@@ -117,7 +137,9 @@ function SettingsPanel:Refresh(p)
     p.native:SetChecked(mode == "native")
     p.tomtom:SetChecked(mode == "tomtom")
     setCheckEnabled(p.tomtom, ns.Navigation:IsTomTomAvailable())
-    p.tomtom.label:SetText(ns.Navigation:IsTomTomAvailable() and L["SET_NAV_TOMTOM"] or L["SET_NAV_TOMTOM_MISSING"])
+    setLabel(p.native, L["SET_NAV_NATIVE"])
+    setLabel(p.tomtom, ns.Navigation:IsTomTomAvailable() and L["SET_NAV_TOMTOM"] or L["SET_NAV_TOMTOM_MISSING"])
+    p.scale:SetValue(ns.UI:GetScale())
 
     local maxTier = ns.Storage.db.settings.maxTier or 10
     p.tierName:SetText(ns.FarmList:TierName(maxTier))

@@ -16,7 +16,8 @@ local ROW_H = 22
 local THUMB_W = 92  -- instance artwork on the left of each card
 local THUMB_INSET = 6
 local ROW_INDENT = THUMB_INSET + THUMB_W + 10
-local SCROLL_W = 24
+local SCROLL_W = 14 -- thin scroll bar + gap
+local SEARCH_H = 24
 local RIGHT_MARGIN = 8 -- keeps cards off the scroll bar
 local PLUS = "Interface\\Buttons\\UI-PlusButton-Up"
 local MINUS = "Interface\\Buttons\\UI-MinusButton-Up"
@@ -202,23 +203,23 @@ local function releaseAll(p)
 end
 
 -- Grouping --------------------------------------------------------------------
--- Visible ready instances grouped by entrance continent (0 = no entrance).
--- Player's continent first, then by number of mounts; "no location" last.
--- Inside a group the FarmList order (proximity, mounts, expansion) is kept.
-local function groupByContinent(entries, playerContinent)
+-- Cards to draw grouped by entrance continent (0 = no entrance). Each card
+-- is { e = entry, ids = mount IDs to list }. Player's continent first, then
+-- by number of mounts; "no location" last. Inside a group the FarmList
+-- order (proximity, mounts, expansion) is kept.
+local function groupByContinent(cards, playerContinent)
     local groups, byKey = {}, {}
-    for _, e in ipairs(entries) do
-        if e.readyCount > 0 and not e.hidden then
-            local key = (e.inst.entrance and e.inst.entrance.continent) or 0
-            local g = byKey[key]
-            if not g then
-                g = { key = key, entries = {}, mounts = 0 }
-                byKey[key] = g
-                groups[#groups + 1] = g
-            end
-            g.entries[#g.entries + 1] = e
-            g.mounts = g.mounts + e.readyCount
+    for _, card in ipairs(cards) do
+        local e = card.e
+        local key = (e.inst.entrance and e.inst.entrance.continent) or 0
+        local g = byKey[key]
+        if not g then
+            g = { key = key, entries = {}, mounts = 0 }
+            byKey[key] = g
+            groups[#groups + 1] = g
         end
+        g.entries[#g.entries + 1] = card
+        g.mounts = g.mounts + #card.ids
     end
     table.sort(groups, function(a, b)
         if (a.key == 0) ~= (b.key == 0) then return b.key == 0 end
@@ -241,12 +242,24 @@ function FarmPanel:Create(parent)
     local p = CreateFrame("Frame", nil, parent)
     p:SetAllPoints()
 
-    local scroll = CreateFrame("ScrollFrame", nil, p, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 0, 0)
+    -- Search: filters by mount, instance or zone name while typing. Only the
+    -- list is redrawn (with the last Build), so typing stays cheap.
+    p.query = ""
+    p.search = ns.UI.SearchBox(p, L["SEARCH_HINT"], function(text)
+        p.query = strtrim(text):lower()
+        if p.bar then p.bar:SetValue(0) end
+        if p.lastEntries then FarmPanel:Refresh(p, p.lastEntries, p.lastSum) end
+    end)
+    p.search:SetPoint("TOPLEFT", 0, 0)
+    p.search:SetPoint("TOPRIGHT", -SCROLL_W, 0)
+
+    local scroll = CreateFrame("ScrollFrame", nil, p)
+    scroll:SetPoint("TOPLEFT", 0, -(SEARCH_H + 8))
     scroll:SetPoint("BOTTOMRIGHT", -SCROLL_W, 0)
     local child = CreateFrame("Frame", nil, scroll)
     child:SetSize(ns.UI.CONTENT_WIDTH - SCROLL_W, 1)
     scroll:SetScrollChild(child)
+    p.bar = ns.UI.ThinScrollBar(scroll)
 
     p.scroll, p.child = scroll, child
     p.pools, p.used = {}, {}
@@ -266,6 +279,19 @@ function FarmPanel:Refresh(p, entries, sum)
     local C = ns.UI.COLORS
     releaseAll(p)
     p.unhide:Hide()
+    p.lastEntries, p.lastSum = entries, sum
+
+    -- Search filter (plain, case-insensitive substring).
+    local q = p.query or ""
+    local searching = q ~= ""
+    local function hit(s) return s and s:lower():find(q, 1, true) ~= nil end
+    local function instanceHit(e)
+        if hit(ns.FarmList:InstanceName(e.jid)) then return true end
+        local ent = e.inst.entrance
+        if not ent then return false end
+        local zone = C_Map.GetMapInfo(ent.uiMapID)
+        return hit(zone and zone.name) or hit(continentName(ent.continent or 0))
+    end
 
     local width = p.child:GetWidth() - RIGHT_MARGIN
     local y = 0
@@ -320,7 +346,21 @@ function FarmPanel:Refresh(p, entries, sum)
     -- Ready instances, grouped by continent
     local playerContinent = ns.FarmList:PlayerContinent()
     local index = 0
-    for gi, g in ipairs(groupByContinent(entries, playerContinent)) do
+    local cards = {}
+    for _, e in ipairs(entries) do
+        if e.readyCount > 0 and not e.hidden then
+            local all = not searching or instanceHit(e)
+            local ids = {}
+            for id, m in pairs(e.mounts) do
+                if #m.ready > 0 and (all or hit(mountName(id))) then ids[#ids + 1] = id end
+            end
+            if #ids > 0 then
+                table.sort(ids, function(a, b) return mountName(a) < mountName(b) end)
+                cards[#cards + 1] = { e = e, ids = ids }
+            end
+        end
+    end
+    for gi, g in ipairs(groupByContinent(cards, playerContinent)) do
         if gi > 1 then y = y + GROUP_GAP - CARD_GAP end
         local h = take(p, "headers")
         h:ClearAllPoints()
@@ -335,7 +375,8 @@ function FarmPanel:Refresh(p, entries, sum)
         h:Show()
         y = y + h:GetHeight() + 6
 
-        for _, e in ipairs(g.entries) do
+        for _, card in ipairs(g.entries) do
+            local e, ids = card.e, card.ids
             index = index + 1
             local c = take(p, "cards")
             c:ClearAllPoints()
@@ -348,7 +389,7 @@ function FarmPanel:Refresh(p, entries, sum)
             local parts = { e.inst.isRaid and L["TYPE_RAID"] or L["TYPE_DUNGEON"] }
             local zone = e.inst.entrance and C_Map.GetMapInfo(e.inst.entrance.uiMapID)
             if zone then parts[#parts + 1] = zone.name end
-            parts[#parts + 1] = e.readyCount == 1 and L["MOUNT_ONE"] or L["MOUNTS_N"]:format(e.readyCount)
+            parts[#parts + 1] = #ids == 1 and L["MOUNT_ONE"] or L["MOUNTS_N"]:format(#ids)
             c.detail:SetText(table.concat(parts, " · "))
 
             local jid, isRaid = e.jid, e.inst.isRaid
@@ -359,11 +400,6 @@ function FarmPanel:Refresh(p, entries, sum)
                 ns.UI:Refresh()
             end)
 
-            local ids = {}
-            for id, m in pairs(e.mounts) do
-                if #m.ready > 0 then ids[#ids + 1] = id end
-            end
-            table.sort(ids, function(a, b) return mountName(a) < mountName(b) end)
             local rowY = CARD_HEAD_H
             for k, id in ipairs(ids) do
                 mountRow(c, ROW_INDENT, rowY, 8, id, e.mounts[id], jid, "ready", k % 2 == 1)
@@ -379,9 +415,9 @@ function FarmPanel:Refresh(p, entries, sum)
             y = y + h + CARD_GAP
         end
     end
-    if index == 0 then line(L["FARM_EMPTY"], C.muted) end
+    if index == 0 and not searching then line(L["FARM_EMPTY"], C.muted) end
 
-    if sum.hidden > 0 then
+    if sum.hidden > 0 and not searching then
         ns.UI.SetButtonText(p.unhide, L["BTN_UNHIDE"]:format(sum.hidden))
         p.unhide:ClearAllPoints()
         p.unhide:SetPoint("TOPLEFT", 0, -y)
@@ -392,8 +428,9 @@ function FarmPanel:Refresh(p, entries, sum)
     -- Locked out / needs verification (same rules as FarmList:Summarize)
     local locked, verify = {}, {}
     for _, e in ipairs(entries) do
+        local all = not searching or instanceHit(e)
         for id, m in pairs(e.mounts) do
-            if #m.ready == 0 then
+            if #m.ready == 0 and (all or hit(mountName(id))) then
                 if #m.locked > 0 then
                     locked[#locked + 1] = { id = id, m = m, jid = e.jid }
                 elseif #m.verify > 0 then
@@ -413,7 +450,7 @@ function FarmPanel:Refresh(p, entries, sum)
         s:SetPoint("TOPLEFT", 0, -y)
         s:SetWidth(width)
         s.key = key
-        local open = expanded()[key]
+        local open = searching or expanded()[key] -- search results are always shown
         s.icon:SetTexture(open and MINUS or PLUS)
         s.text:SetText(("%s (%d)"):format(L[titleKey], #items))
         s.text:SetTextColor(color[1], color[2], color[3])
@@ -428,6 +465,10 @@ function FarmPanel:Refresh(p, entries, sum)
     end
     section("locked", "SECTION_LOCKED", locked, C.warning, "locked")
     section("verify", "SECTION_VERIFY", verify, C.muted, "verify")
+
+    if searching and index == 0 and #locked == 0 and #verify == 0 then
+        line(L["SEARCH_NONE"]:format(p.search:GetText()), C.muted)
+    end
 
     p.child:SetHeight(math.max(y, 1))
 end

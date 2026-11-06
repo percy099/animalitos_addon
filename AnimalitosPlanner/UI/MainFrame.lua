@@ -48,7 +48,9 @@ end
 local function paintNav(b)
     local alpha = b.isSelected and NAV_ALPHA.selected or (b.isHover and NAV_ALPHA.hover) or NAV_ALPHA.normal
     b.label:SetTextColor(1, 1, 1, alpha)
-    b.icon:SetAlpha(alpha)
+    -- Monochrome icons: white glyphs, accent when selected.
+    local c = b.isSelected and COLORS.accent or COLORS.text
+    b.icon:SetVertexColor(c[1], c[2], c[3], alpha)
     b.selected:SetShown(b.isSelected)
     b.bar:SetShown(b.isSelected)
     b.hover:SetShown(b.isHover and not b.isSelected)
@@ -75,8 +77,12 @@ local function navButton(parent, section)
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetSize(18, 18)
     b.icon:SetPoint("LEFT", 12, 0)
-    b.icon:SetTexture(section.icon)
+    UI.Glyph(b.icon, section.icon)
     b.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92) -- crop the icon border
+    local mask = b:CreateMaskTexture()
+    mask:SetTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+    mask:SetAllPoints(b.icon)
+    b.icon:AddMaskTexture(mask)
 
     b.badge = fs(b, "small", COLORS.success)
     b.badge:SetPoint("RIGHT", -10, 0)
@@ -119,6 +125,7 @@ function UI:Create()
         local point, _, relPoint, x, y = self:GetPoint()
         ns.Storage.db.ui.point = { point, relPoint, x, y }
     end)
+    f:SetScale(self:GetScale())
     self:RestorePosition(f)
     tinsert(UISpecialFrames, f:GetName()) -- close with ESC
 
@@ -227,6 +234,20 @@ function UI:RestorePosition(f)
     else
         f:SetPoint("CENTER")
     end
+end
+
+-- Window scale (Settings). The mount preview is a child, so it follows.
+UI.SCALE_MIN, UI.SCALE_MAX = 0.8, 1.3
+
+function UI:GetScale()
+    local s = tonumber(ns.Storage.db.ui.scale) or 1
+    return math.max(UI.SCALE_MIN, math.min(UI.SCALE_MAX, s))
+end
+
+function UI:SetScale(s)
+    s = math.floor(s * 20 + 0.5) / 20
+    ns.Storage.db.ui.scale = (s ~= 1) and s or nil
+    if self.frame then self.frame:SetScale(self:GetScale()) end
 end
 
 function UI:ResetPosition()

@@ -171,11 +171,16 @@ local function createRingTile(p, top)
 end
 
 -- State tiles -----------------------------------------------------------------
+-- Icons are client files shown as monochrome glyphs in the stat's color.
 local STATS = {
-    { key = "missing", label = "STAT_MISSING", color = { 1, 1, 1 } },
-    { key = "ready",   label = "STAT_READY",   color = "success", opensFarm = true },
-    { key = "locked",  label = "STAT_LOCKED",  color = "warning", opensFarm = true },
-    { key = "verify",  label = "STAT_VERIFY",  color = "muted",   opensFarm = true },
+    { key = "missing", label = "STAT_MISSING", color = { 1, 1, 1 },
+      icon = "Interface\\Icons\\Ability_Mount_RidingHorse", round = true },
+    { key = "ready",   label = "STAT_READY",   color = "success", opensFarm = true,
+      icon = "Interface\\RaidFrame\\ReadyCheck-Ready" },
+    { key = "locked",  label = "STAT_LOCKED",  color = "warning", opensFarm = true,
+      icon = "Interface\\LFGFrame\\UI-LFG-ICON-LOCK" },
+    { key = "verify",  label = "STAT_VERIFY",  color = "muted",   opensFarm = true,
+      icon = "Interface\\RaidFrame\\ReadyCheck-Waiting" },
 }
 
 local function createStatTiles(p, top)
@@ -195,6 +200,17 @@ local function createStatTiles(p, top)
         t.label:SetWidth(w - 12)
         t.label:SetJustifyH("CENTER")
         t.label:SetText(L[stat.label])
+        local icon = t:CreateTexture(nil, "ARTWORK")
+        icon:SetSize(16, 16)
+        icon:SetPoint("TOPLEFT", 8, -8)
+        ns.UI.Glyph(icon, stat.icon, { color[1], color[2], color[3], 0.75 })
+        if stat.round then
+            icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+            local m = t:CreateMaskTexture()
+            m:SetTexture(CIRCLE, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+            m:SetAllPoints(icon)
+            icon:AddMaskTexture(m)
+        end
         if stat.opensFarm then
             t:EnableMouse(true)
             t:SetScript("OnMouseUp", function() ns.UI:SelectTab("farm") end)

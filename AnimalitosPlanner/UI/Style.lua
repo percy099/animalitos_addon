@@ -316,3 +316,169 @@ function UI.NumberBadge(parent, size)
     b.text:SetJustifyH("CENTER")
     return b
 end
+
+-- ---------------------------------------------------------------------------
+-- Controls: toggle switch, slider, thin scroll bar, search box
+-- ---------------------------------------------------------------------------
+
+--- On/off switch. onChange(self, checked) runs on click.
+--- API: SetChecked(bool), GetChecked(), SetEnabled(bool).
+function UI.Toggle(parent, onChange)
+    local t = CreateFrame("Button", nil, parent)
+    t:SetSize(30, 16)
+    t.track = UI.RoundedTexture(t, "ARTWORK", 0)
+    t.knob = UI.Circle(t, "OVERLAY", 12, { 1, 1, 1 })
+    t.checked = false
+    local function paint(self)
+        local a = COLORS.accent
+        local on = self:IsEnabled() and 1 or 0.35
+        self.knob:ClearAllPoints()
+        if self.checked then
+            self.track:SetVertexColor(a[1], a[2], a[3], 0.95 * on)
+            self.knob:SetPoint("RIGHT", -2, 0)
+        else
+            self.track:SetVertexColor(1, 1, 1, (self.hover and 0.24 or 0.14) * on)
+            self.knob:SetPoint("LEFT", 2, 0)
+        end
+        self.knob:SetVertexColor(1, 1, 1, on)
+    end
+    function t:SetChecked(v)
+        self.checked = v and true or false
+        paint(self)
+    end
+    function t:GetChecked() return self.checked end
+    t:SetScript("OnClick", function(self)
+        self:SetChecked(not self.checked)
+        if onChange then onChange(self, self.checked) end
+    end)
+    t:SetScript("OnEnter", function(self) self.hover = true; paint(self) end)
+    t:SetScript("OnLeave", function(self) self.hover = false; paint(self) end)
+    t:SetScript("OnEnable", paint)
+    t:SetScript("OnDisable", paint)
+    paint(t)
+    return t
+end
+
+--- Horizontal slider: thin track, accent fill up to a round knob.
+function UI.Slider(parent, minV, maxV, step, width)
+    local s = CreateFrame("Slider", nil, parent)
+    s:SetOrientation("HORIZONTAL")
+    s:SetSize(width, 16)
+    s:SetMinMaxValues(minV, maxV)
+    s:SetValueStep(step)
+    s:SetObeyStepOnDrag(true)
+    local track = s:CreateTexture(nil, "BACKGROUND")
+    track:SetPoint("LEFT")
+    track:SetPoint("RIGHT")
+    track:SetHeight(4)
+    track:SetColorTexture(1, 1, 1, 0.14)
+    local thumb = s:CreateTexture(nil, "OVERLAY")
+    thumb:SetTexture(CIRCLE)
+    thumb:SetSize(14, 14)
+    s:SetThumbTexture(thumb)
+    local a = COLORS.accent
+    local fill = s:CreateTexture(nil, "ARTWORK")
+    fill:SetPoint("LEFT", track)
+    fill:SetPoint("RIGHT", thumb, "CENTER")
+    fill:SetHeight(4)
+    fill:SetColorTexture(a[1], a[2], a[3], 0.9)
+    s:SetScript("OnEnter", function() thumb:SetVertexColor(a[1], a[2], a[3], 1) end)
+    s:SetScript("OnLeave", function() thumb:SetVertexColor(1, 1, 1, 1) end)
+    return s
+end
+
+--- Thin scroll bar for a plain ScrollFrame, placed to its right. Also
+--- handles the mouse wheel. Hidden when everything fits.
+function UI.ThinScrollBar(scroll)
+    local bar = CreateFrame("Slider", nil, scroll:GetParent())
+    bar:SetOrientation("VERTICAL")
+    bar:SetWidth(6)
+    bar:SetPoint("TOPLEFT", scroll, "TOPRIGHT", 6, -2)
+    bar:SetPoint("BOTTOMLEFT", scroll, "BOTTOMRIGHT", 6, 2)
+    local track = bar:CreateTexture(nil, "BACKGROUND")
+    track:SetAllPoints()
+    track:SetColorTexture(1, 1, 1, 0.05)
+    local thumb = bar:CreateTexture(nil, "OVERLAY")
+    thumb:SetColorTexture(1, 1, 1, 1)
+    thumb:SetSize(6, 40)
+    thumb:SetVertexColor(1, 1, 1, 0.25)
+    bar:SetThumbTexture(thumb)
+    bar:SetMinMaxValues(0, 0)
+    bar:SetValue(0)
+    bar:Hide()
+
+    bar:SetScript("OnValueChanged", function(_, v) scroll:SetVerticalScroll(v) end)
+    bar:SetScript("OnEnter", function() thumb:SetVertexColor(1, 1, 1, 0.45) end)
+    bar:SetScript("OnLeave", function() thumb:SetVertexColor(1, 1, 1, 0.25) end)
+    scroll:SetScript("OnScrollRangeChanged", function(self, _, range)
+        range = range or self:GetVerticalScrollRange()
+        bar:SetMinMaxValues(0, range)
+        local h = self:GetHeight()
+        thumb:SetHeight(math.max(24, h * h / (h + range)))
+        if bar:GetValue() > range then bar:SetValue(range) end
+        bar:SetShown(range > 0.5)
+    end)
+    scroll:EnableMouseWheel(true)
+    scroll:SetScript("OnMouseWheel", function(_, delta)
+        bar:SetValue(bar:GetValue() - delta * 40)
+    end)
+    return bar
+end
+
+--- Search field with magnifier, placeholder and clear button.
+--- onChange(text) runs on every change; ESC clears, then drops focus.
+function UI.SearchBox(parent, placeholder, onChange)
+    local box = CreateFrame("EditBox", nil, parent, "BackdropTemplate")
+    box:SetHeight(24)
+    box:SetAutoFocus(false)
+    box:SetFontObject(UI.FONTS.small)
+    box:SetTextColor(1, 1, 1, 1)
+    box:SetTextInsets(24, 22, 0, 0)
+    box:SetMaxLetters(40)
+    local a = COLORS.accent
+    UI.StylePanel(box, { 0, 0, 0, 0.25 }, { noSheen = true })
+
+    local icon = box:CreateTexture(nil, "OVERLAY")
+    icon:SetTexture("Interface\\Common\\UI-Searchbox-Icon")
+    icon:SetSize(14, 14)
+    icon:SetPoint("LEFT", 6, -1)
+    icon:SetVertexColor(1, 1, 1, 0.55)
+
+    local hint = fs(box, "small", COLORS.muted)
+    hint:SetPoint("LEFT", 24, 0)
+    hint:SetText(placeholder or "")
+
+    local clear = UI.CloseButton(box)
+    clear:SetSize(18, 18)
+    clear:SetPoint("RIGHT", -3, 0)
+    clear:Hide()
+    clear:SetScript("OnClick", function()
+        box:SetText("")
+        box:ClearFocus()
+    end)
+
+    local function border(focused)
+        UI.SetPanelColors(box, { 0, 0, 0, 0.25 }, focused and { a[1], a[2], a[3], 0.8 } or COLORS.border)
+    end
+    box:SetScript("OnEditFocusGained", function() border(true) end)
+    box:SetScript("OnEditFocusLost", function() border(false) end)
+    box:SetScript("OnEnterPressed", box.ClearFocus)
+    box:SetScript("OnEscapePressed", function(self)
+        if self:GetText() ~= "" then self:SetText("") else self:ClearFocus() end
+    end)
+    box:SetScript("OnTextChanged", function(self)
+        local text = self:GetText()
+        hint:SetShown(text == "")
+        clear:SetShown(text ~= "")
+        if onChange then onChange(text) end
+    end)
+    return box
+end
+
+--- Client icon file shown as a monochrome glyph tinted with `color`.
+function UI.Glyph(tex, file, color)
+    tex:SetTexture(file)
+    tex:SetDesaturated(true)
+    local c = color or COLORS.text
+    tex:SetVertexColor(c[1], c[2], c[3], c[4] or 1)
+end
