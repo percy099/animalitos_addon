@@ -139,4 +139,6 @@ ns.Data = {
         { lfgDungeonID = 287, event = "EVENT_BREWFEST", mounts = { { mountID = 202, itemID = 33977 }, { mountID = 226, itemID = 37828 } } }, -- Coren Direbrew
         { lfgDungeonID = 288, event = "EVENT_LOVE", mounts = { { mountID = 352, itemID = 50250 } } }, -- The Crown Chemical Co.
     },
+    mountItems = {
+    },
 }
