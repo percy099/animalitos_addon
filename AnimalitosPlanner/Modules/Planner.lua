@@ -38,6 +38,88 @@ local HUBS = {
     },
 }
 local CAPITAL = { Alliance = 84, Horde = 85 }
+local HOME_CONTINENT = { Alliance = 13, Horde = 12 }
+
+-- Travel hints (hand-written; assumes the hearthstone is set to the
+-- capital, like SimpleArmory). Values are the uiMapID the portal lands
+-- in; names come from the client, so they are localized.
+-- Zone portals: Cataclysm earthshrines in both capitals.
+local ZONE_PORTALS = {
+    [207] = 207, -- Deepholm (The Stonecore)
+    [249] = 249, -- Uldum (Vortex Pinnacle, Throne of the Four Winds, Lost City)
+    [198] = 198, -- Mount Hyjal
+    [241] = 241, -- Twilight Highlands (Bastion of Twilight, Grim Batol)
+    [244] = 244, -- Tol Barad (Baradin Hold)
+    [204] = 203, -- Abyssal Depths (Throne of the Tides) -> Vashj'ir portal
+}
+-- Continent portals from the capital's portal room. Entries marked (?) are
+-- not verified in game yet; a missing entry falls back to "Travel to ...".
+local CONTINENT_PORTALS = {
+    Alliance = {
+        [12] = 71,     -- Caverns of Time (Tanaris)
+        [948] = 207,   -- Deepholm
+        [101] = 111,   -- Shattrath
+        [113] = 125,   -- Dalaran (Northrend)
+        [424] = 371,   -- Jade Forest
+        [572] = 622,   -- Stormshield (Ashran)
+        [619] = 630,   -- Azsuna
+        [876] = 1161,  -- Boralus (?)
+        [1550] = 1670, -- Oribos
+        [1978] = 2112, -- Valdrakken
+        [2274] = 2339, -- Dornogal
+        [2537] = 2393, -- Silvermoon City (?)
+    },
+    Horde = {
+        [948] = 207,   -- Deepholm
+        [101] = 111,   -- Shattrath
+        [113] = 125,   -- Dalaran (Northrend)
+        [424] = 371,   -- Jade Forest
+        [572] = 624,   -- Warspear (Ashran)
+        [619] = 630,   -- Azsuna
+        [875] = 862,   -- Zuldazar
+        [1550] = 1670, -- Oribos
+        [1978] = 2112, -- Valdrakken
+        [2274] = 2339, -- Dornogal
+        [2537] = 2393, -- Silvermoon City (?)
+    },
+}
+
+-- Mage teleports by destination continent: { landing uiMapID, spellID }.
+-- Used when the player is a mage (spell known) or a mage is in the group
+-- (assumed to have the matching portal). Zone entries win over continents.
+local MAGE = {
+    Alliance = {
+        capital = { 84, 3561 },          -- Teleport: Stormwind
+        zone = { [244] = { 244, 88342 } }, -- Tol Barad
+        [12] = { 70, 49359 },            -- Theramore (Dustwallow Marsh)
+        [101] = { 111, 33690 },          -- Shattrath
+        [113] = { 125, 53140 },          -- Dalaran (Northrend)
+        [424] = { 390, 132621 },         -- Vale of Eternal Blossoms
+        [572] = { 622, 176248 },         -- Stormshield
+        [619] = { 627, 224869 },         -- Dalaran (Broken Isles)
+        [876] = { 1161, 281403 },        -- Boralus
+        [1550] = { 1670, 344587 },       -- Oribos
+        [1978] = { 2112, 395277 },       -- Valdrakken
+        [2274] = { 2339, 446540 },       -- Dornogal
+    },
+    Horde = {
+        capital = { 85, 3567 },          -- Teleport: Orgrimmar
+        zone = { [244] = { 244, 88344 } }, -- Tol Barad
+        [13] = { 51, 49358 },            -- Stonard (Swamp of Sorrows)
+        [101] = { 111, 35715 },          -- Shattrath
+        [113] = { 125, 53140 },          -- Dalaran (Northrend)
+        [424] = { 390, 132627 },         -- Vale of Eternal Blossoms
+        [572] = { 624, 176242 },         -- Warspear
+        [619] = { 627, 224869 },         -- Dalaran (Broken Isles)
+        [875] = { 1165, 281404 },        -- Dazar'alor
+        [1550] = { 1670, 344587 },       -- Oribos
+        [1978] = { 2112, 395277 },       -- Valdrakken
+        [2274] = { 2339, 446540 },       -- Dornogal
+    },
+}
+
+-- Rough minutes for the "time left" estimate (shown with "≈").
+local MINUTES = { raid = 15, dungeon = 10, travel = 4 }
 
 local function faction()
     local f = UnitFactionGroup("player")
@@ -214,24 +296,118 @@ function Planner:Build(entries, hideCompleted)
     local fac = faction()
     local steps = { { kind = "start", text = capitalName(fac) } }
     -- The route starts in the capital: Stormwind (Eastern Kingdoms) or Orgrimmar (Kalimdor).
-    local lastContinent, lastZone = (fac == "Horde") and 12 or 13, CAPITAL[fac]
+    local here = { continent = HOME_CONTINENT[fac], zone = CAPITAL[fac] }
+    local travelMinutes = 0
+    local mage = self:MageContext()
+    summary.mage = mage
     for _, r in ipairs(runs) do
         if not (hideCompleted and r.done) then
             local ent = r.inst.entrance
             if ent then
-                if ent.continent ~= lastContinent then
-                    local info = C_Map.GetMapInfo(ent.continent)
-                    local zone = C_Map.GetMapInfo(ent.uiMapID)
-                    steps[#steps + 1] = { kind = "travel", text = ns.L["PLAN_TRAVEL_CONTINENT"]:format(
-                        info and info.name or "?", zone and zone.name or "?") }
-                elseif ent.uiMapID ~= lastZone then
-                    local zone = C_Map.GetMapInfo(ent.uiMapID)
-                    steps[#steps + 1] = { kind = "travel", text = ns.L["PLAN_TRAVEL_ZONE"]:format(zone and zone.name or "?") }
+                local texts = self:TravelTexts(fac, here, ent, mage)
+                for _, text in ipairs(texts) do
+                    steps[#steps + 1] = { kind = "travel", text = text }
                 end
-                lastContinent, lastZone = ent.continent, ent.uiMapID
+                if not r.done then travelMinutes = travelMinutes + #texts * MINUTES.travel end
+                here.continent, here.zone = ent.continent, ent.uiMapID
             end
             steps[#steps + 1] = r
         end
     end
+
+    -- Rough time left: pending runs plus the travel in front of them.
+    local m = travelMinutes
+    for _, r in ipairs(runs) do
+        if not r.done then m = m + (r.inst.isRaid and MINUTES.raid or MINUTES.dungeon) end
+    end
+    summary.minutes = m
     return steps, summary
+end
+
+local function mapName(uiMapID)
+    local info = uiMapID and C_Map.GetMapInfo(uiMapID)
+    return info and info.name or "?"
+end
+
+--- Who can open mage teleports/portals right now: { self = bool, group = name|nil }.
+function Planner:MageContext()
+    local _, class = UnitClass("player")
+    return { self = class == "MAGE", group = ns.Navigation:GroupMage() }
+end
+
+-- Text for a mage hop to dest = { uiMapID, spellID }, or nil if nobody can do it.
+local function mageHop(mage, dest)
+    if not (mage and dest) then return nil end
+    if mage.self and ns.Navigation:KnowsSpell(dest[2]) then
+        return ns.Navigation:SpellName(dest[2]) or ns.L["PLAN_TELEPORT"]:format(mapName(dest[1]))
+    end
+    if mage.group then return ns.L["PLAN_ASK_PORTAL"]:format(mage.group, mapName(dest[1])) end
+    return nil
+end
+
+--- Travel step texts from `here` ({continent, zone}) to an entrance.
+--- Mage teleports / group portals first, then hand-written capital portals;
+--- anything unknown falls back to "Travel to ...".
+function Planner:TravelTexts(fac, here, ent, mage)
+    local L = ns.L
+    local out = {}
+    if ent.continent == here.continent and ent.uiMapID == here.zone then return out end
+
+    local inCapital = here.zone == CAPITAL[fac]
+    local capital = mapName(CAPITAL[fac])
+    local zonePortal = ZONE_PORTALS[ent.uiMapID]
+    local contPortal = CONTINENT_PORTALS[fac][ent.continent]
+    local fly = L["PLAN_FLY"]:format(mapName(ent.uiMapID))
+
+    -- A mage teleport straight into the zone (Tol Barad).
+    local zoneDest = MAGE[fac].zone[ent.uiMapID]
+    local hop = mageHop(mage, zoneDest)
+    if hop then
+        out[1] = hop
+        return out
+    end
+
+    -- Same continent and no capital portal that helps: just fly.
+    if ent.continent == here.continent and not (inCapital and zonePortal) then
+        out[1] = fly
+        return out
+    end
+
+    -- Another continent with a mage city (no zone portal is closer).
+    if ent.continent ~= here.continent and not zonePortal then
+        local dest = MAGE[fac][ent.continent]
+        hop = mageHop(mage, dest)
+        if hop then
+            out[1] = hop
+            if dest[1] ~= ent.uiMapID then out[2] = fly end
+            return out
+        end
+    end
+
+    -- Back to the capital: mage teleport / portal, else the hearthstone.
+    local home = mageHop(mage, MAGE[fac].capital) or L["PLAN_HEARTH"]:format(capital)
+
+    local landing
+    if zonePortal then
+        landing = zonePortal
+    elseif contPortal then
+        landing = contPortal
+    elseif ent.continent == HOME_CONTINENT[fac] then
+        landing = CAPITAL[fac] -- the hearthstone itself is the "portal"
+    end
+
+    if not landing then
+        out[1] = L["PLAN_TRAVEL_CONTINENT"]:format(mapName(ent.continent), mapName(ent.uiMapID))
+        return out
+    end
+
+    if landing == CAPITAL[fac] then
+        if not inCapital then out[#out + 1] = home end
+    elseif inCapital then
+        out[#out + 1] = L["PLAN_PORTAL"]:format(mapName(landing))
+    else
+        out[#out + 1] = L["PLAN_THEN"]:format(home, L["PLAN_PORTAL"]:format(mapName(landing)))
+    end
+    if landing ~= ent.uiMapID then out[#out + 1] = fly end
+    return out
 end

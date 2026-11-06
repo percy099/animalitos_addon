@@ -59,7 +59,8 @@ local function describe(r)
     elseif isRaid and (diffs[3] or diffs[4] or diffs[5] or diffs[6]) then
         notes[#notes + 1] = L["PLAN_NOTE_SHARED"]
     elseif not isRaid and diffs[2] then
-        notes[#notes + 1] = L["PLAN_NOTE_HEROIC"]
+        -- Legacy normal dungeons have no lockout, only the 10 instances/hour cap.
+        notes[#notes + 1] = diffs[1] and L["PLAN_NOTE_HEROIC_NORMAL"] or L["PLAN_NOTE_HEROIC"]
     end
     if not next(ready) and not next(locked) and verifyReason then notes[#notes + 1] = verifyReason end
 
@@ -231,6 +232,9 @@ function PlannerPanel:Create(parent)
 
     p.progress = ns.UI.fs(p, "small", C.dim)
     p.progress:SetPoint("TOPLEFT", 2, -58)
+    p.progress:SetPoint("RIGHT", p.next, "LEFT", -12, 0)
+    p.progress:SetJustifyH("LEFT")
+    p.progress:SetWordWrap(false)
     local track = p:CreateTexture(nil, "ARTWORK")
     track:SetPoint("TOPLEFT", 0, -76)
     track:SetPoint("RIGHT", p.next, "LEFT", -12, 0)
@@ -275,6 +279,13 @@ function PlannerPanel:Create(parent)
     p.pools, p.used = {}, {}
     for kind in pairs(FACTORIES) do p.pools[kind] = {} end
 
+    -- A mage joining / leaving the group changes the travel steps (not the order).
+    ns:On("GROUP_ROSTER_UPDATE", function()
+        if p:IsVisible() and p.lastEntries then
+            ns:Debounce("planner-roster", 0.5, function() PlannerPanel:Refresh(p) end)
+        end
+    end)
+
     p.empty = ns.UI.fs(child, "GameFontHighlightSmall", C.muted)
     p.empty:SetPoint("TOPLEFT", 4, -40)
     p.empty:SetPoint("RIGHT", -4, 0)
@@ -301,7 +312,16 @@ function PlannerPanel:Refresh(p, entries)
     local steps, sum = ns.Planner:Build(entries, hideDone)
     p.nextJid = sum.nextJid
     p.next:SetEnabled(sum.nextJid ~= nil)
-    p.progress:SetFormattedText(L["PLAN_PROGRESS"], sum.done, sum.total)
+    local text = L["PLAN_PROGRESS"]:format(sum.done, sum.total)
+    if sum.minutes and sum.minutes > 0 then
+        text = text .. "  ·  " .. L["PLAN_TIME_LEFT"]:format(SecondsToTime(sum.minutes * 60, true, nil, 2))
+    end
+    if sum.mage and sum.mage.self then
+        text = text .. "  ·  " .. L["PLAN_MAGE_SELF"]
+    elseif sum.mage and sum.mage.group then
+        text = text .. "  ·  " .. L["PLAN_MAGE_GROUP"]:format(sum.mage.group)
+    end
+    p.progress:SetText(text)
     p.fill:SetWidth(math.max(1, p.trackW * (sum.total > 0 and sum.done / sum.total or 0)))
 
     local width = p.child:GetWidth()

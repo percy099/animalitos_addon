@@ -103,6 +103,35 @@ function Navigation:WorldPos(uiMapID, x, y)
     return continentID, wx, wy
 end
 
+--- True if the player knows the spell (mage teleports for the planner).
+function Navigation:KnowsSpell(spellID)
+    local fn = (C_SpellBook and C_SpellBook.IsSpellKnown) or IsSpellKnown or IsPlayerSpell
+    if not fn then return false end
+    local ok, known = pcall(fn, spellID)
+    return ok and known and true or false
+end
+
+--- Localized spell name, or nil.
+function Navigation:SpellName(spellID)
+    if C_Spell and C_Spell.GetSpellName then return C_Spell.GetSpellName(spellID) end
+    return GetSpellInfo and (GetSpellInfo(spellID)) or nil
+end
+
+--- Name of another mage in the player's group (party or raid), or nil.
+function Navigation:GroupMage()
+    local n = GetNumGroupMembers and GetNumGroupMembers() or 0
+    if n == 0 then return nil end
+    local prefix = IsInRaid() and "raid" or "party"
+    for i = 1, n do
+        local unit = prefix .. i
+        if UnitExists(unit) and not UnitIsUnit(unit, "player") then
+            local _, class = UnitClass(unit)
+            if class == "MAGE" and UnitIsConnected(unit) then return (UnitName(unit)) end
+        end
+    end
+    return nil
+end
+
 function Navigation:SetMode(mode)
     if mode == "tomtom" and not tomtomAvailable() then
         ns:Print(L["NAV_TOMTOM_MISSING"])
