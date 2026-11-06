@@ -18,6 +18,7 @@ function MJ:GetMount(mountID)
           isFactionSpecific, faction, shouldHideOnChar, isCollected, id =
         C_MountJournal.GetMountInfoByID(mountID)
     if not name then return nil end
+    if not sourceType or sourceType == 0 then sourceType = MJ:InferSourceType(id or mountID) or sourceType end
     return {
         mountID = id or mountID,
         name = name,
@@ -87,6 +88,30 @@ end
 function MJ:GetMountFromItem(itemID)
     if not (itemID and C_MountJournal.GetMountFromItem) then return nil end
     return C_MountJournal.GetMountFromItem(itemID)
+end
+
+-- Some newer mounts come with sourceType 0 ("Unknown source") although their
+-- journal text starts with a source label ("Vendor: Ando the Gat"). That first
+-- label is matched against the localized BATTLE_PET_SOURCE_n names. Cached
+-- per mount (false = no match).
+local inferred, labelToType = {}, nil
+function MJ:InferSourceType(mountID)
+    if inferred[mountID] ~= nil then return inferred[mountID] or nil end
+    if not labelToType then
+        labelToType = {}
+        for n = 1, 20 do
+            local label = _G["BATTLE_PET_SOURCE_" .. n]
+            if label then labelToType[label:lower()] = n end
+        end
+    end
+    local extra = self:GetMountExtra(mountID)
+    local text = extra and extra.sourceText
+    if not text or text == "" then return nil end -- not loaded yet: try again later
+    text = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+    local label = text:match("^%s*([^:|\n]+):")
+    local found = label and labelToType[strtrim(label):lower()] or false
+    inferred[mountID] = found
+    return found or nil
 end
 
 --- Localized label for a Mount Journal sourceType index.
