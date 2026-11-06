@@ -50,12 +50,27 @@ end
 
 --- Price parts in a journal text, or nil when it has none:
 --- { { kind = "gold", need = copper },
----   { kind = "currency", id, name, icon, need },
+---   { kind = "currency" | "item", id, name, icon, need },
 ---   { kind = "unknown", icon, need } }
 function W:ParseCost(text)
     if not text or text == "" then return nil end
     local plain = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|cn[^:]*:", ""):gsub("|r", "")
     local parts, copper = {}, 0
+    -- Linked prices name the currency or item exactly:
+    --   "3940 |Hcurrency:3056|h|T...icon...|t|h"
+    for amount, kind, id in plain:gmatch("([%d][%d,%.]*)%s*|H(%a+):(%d+)") do
+        local n, cid = tonumber((amount:gsub("[^%d]", ""))), tonumber(id)
+        if n and cid and kind == "currency" and C_CurrencyInfo then
+            local info = C_CurrencyInfo.GetCurrencyInfo(cid)
+            parts[#parts + 1] = { kind = "currency", id = cid, name = info and info.name,
+                icon = info and info.iconFileID, need = n }
+        elseif n and cid and kind == "item" then
+            local name = C_Item and C_Item.GetItemNameByID and C_Item.GetItemNameByID(cid)
+            local icon = C_Item and C_Item.GetItemIconByID and C_Item.GetItemIconByID(cid)
+            parts[#parts + 1] = { kind = "item", id = cid, name = name, icon = icon, need = n }
+        end
+    end
+    plain = plain:gsub("|H.-|h.-|h", "") -- links read above; the rest is "number + icon"
     for amount, tex in plain:gmatch("([%d][%d,%.]*)%s*|T([^:|]+)[^|]*|t") do
         local n = tonumber((amount:gsub("[^%d]", "")))
         if n then
@@ -85,14 +100,21 @@ function W:Have(part)
         local info = C_CurrencyInfo.GetCurrencyInfo(part.id)
         return info and info.quantity or 0
     end
+    if part.kind == "item" and C_Item and C_Item.GetItemCount then
+        return C_Item.GetItemCount(part.id, true) -- bags and bank
+    end
     return nil
 end
 
---- Text for an amount: gold with coin icons, a currency with its icon.
+local function big(n)
+    return BreakUpLargeNumbers and BreakUpLargeNumbers(n) or tostring(n)
+end
+
+--- Text for an amount: gold (whole gold, coin icon), a currency or item with its icon.
 function W:Format(part, amount)
     if part.kind == "gold" then
-        return GetCoinTextureString and GetCoinTextureString(amount) or tostring(math.floor(amount / 10000))
+        return ("%s|TInterface\\MoneyFrame\\UI-GoldIcon:12:12:2:0|t"):format(big(math.floor(amount / 10000)))
     end
-    local n = BreakUpLargeNumbers and BreakUpLargeNumbers(amount) or tostring(amount)
+    local n = big(amount)
     return ("%s |T%s:14:14:0:0|t"):format(n, tostring(part.icon or 134400))
 end

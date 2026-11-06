@@ -349,28 +349,28 @@ end
 
 --- /aplan costs: uncollected mounts with a price, raw and parsed.
 function Collection:DebugCosts()
-    local n = 0
+    -- Priced mounts with what was read; then how many could not be read.
+    local priced, buyable, unreadable = 0, 0, 0
     for _, m in ipairs(self:GetList() or {}) do
         if not m.isCollected then
-            local extra = ns.MountJournal:GetMountExtra(m.mountID)
-            local text = extra and extra.sourceText or ""
-            if text:find("|T", 1, true) then
-                n = n + 1
-                if n <= 12 then
-                    local raw = text:match("[^|]*%d[%d,%.]*%s*|T[^|]*|t[^|]*") or text
-                    local info = self:BuyInfo(m.mountID)
+            local info = self:BuyInfo(m.mountID)
+            if info then
+                priced = priced + 1
+                if info.canBuy == true then buyable = buyable + 1 end
+                if info.canBuy == nil then unreadable = unreadable + 1 end
+                if priced <= 12 then
                     local parsed = {}
-                    for _, p in ipairs(info and info.parts or {}) do
+                    for _, p in ipairs(info.parts) do
                         parsed[#parsed + 1] = ("%s %s need %d have %s"):format(p.kind, tostring(p.name or p.id or ""),
                             p.need, tostring(p.have))
                     end
-                    print(("  %s: %s -> %s"):format(m.name, (raw:gsub("|", "||")),
-                        #parsed > 0 and table.concat(parsed, "; ") or "(no price)"))
+                    print(("  %s: %s -> %s"):format(m.name, table.concat(parsed, "; "), tostring(info.canBuy)))
                 end
             end
         end
     end
-    print(("  %d missing mounts with an icon in their text"):format(n))
+    print(("  %d missing mounts with a price, %d payable now, %d with a part not identified"):format(
+        priced, buyable, unreadable))
 end
 
 -- Favorites -------------------------------------------------------------------
