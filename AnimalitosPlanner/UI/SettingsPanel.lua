@@ -129,6 +129,14 @@ function SettingsPanel:Create(parent)
     local about = ns.UI.fs(p, "GameFontDisableSmall")
     about:SetPoint("BOTTOMLEFT", 4, 4)
     about:SetText(L["SET_ABOUT"]:format(ns.VERSION))
+    -- Dataset info (was in the window footer)
+    local dataset = ns.UI.fs(p, "GameFontDisableSmall")
+    dataset:SetPoint("BOTTOMLEFT", about, "TOPLEFT", 0, 3)
+    if ns.Data and ns.Data.sources then
+        dataset:SetFormattedText(L["DATASET_LOADED"], #ns.Data.sources, ns.Data.version.client)
+    else
+        dataset:SetText(L["DATASET_NONE"])
+    end
     return p
 end
 

@@ -140,7 +140,22 @@ def gear(x, y):
     return d <= (28 if tooth else 21)
 
 
-NAV_ICONS = {"home": home, "farm": horseshoe, "collection": book, "settings": gear}
+def refresh(x, y):
+    cx, cy, ro, ri = 32, 32, 25, 17
+    d = math.hypot(x - cx, y - cy)
+    ang = math.degrees(math.atan2(y - cy, x - cx))
+    arc = ri <= d <= ro and not (-85 < ang < -20)
+    # Arrowhead at the arc's end (angle -20), pointing into the gap.
+    t = math.radians(-20)
+    bx, by = cx + (ro + ri) / 2 * math.cos(t), cy + (ro + ri) / 2 * math.sin(t)
+    tx, ty = math.sin(t), -math.cos(t)  # tangent toward the gap
+    nx, ny = math.cos(t), math.sin(t)
+    head = in_poly(x, y, [(bx + nx * 11, by + ny * 11), (bx - nx * 11, by - ny * 11),
+                          (bx + tx * 13, by + ty * 13)])
+    return arc or head
+
+
+NAV_ICONS = {"home": home, "farm": horseshoe, "collection": book, "settings": gear, "refresh": refresh}
 
 
 if __name__ == "__main__":

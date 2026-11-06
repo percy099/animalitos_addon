@@ -1,10 +1,10 @@
-## Interface: 120105
+﻿## Interface: 120105
 ## Title: AnimalitosPlanner
 ## Notes: Mount collection and farming planner.
-## Notes-esES: Planificador de colección y farmeo de monturas.
-## Notes-esMX: Planificador de colección y farmeo de monturas.
+## Notes-esES: Planificador de colecciÃ³n y farmeo de monturas.
+## Notes-esMX: Planificador de colecciÃ³n y farmeo de monturas.
 ## Author: AnimalitosPlanner Team
-## Version: 0.4.11
+## Version: 0.4.12
 ## Category: Collections
 ## IconTexture: Interface\AddOns\AnimalitosPlanner\Media\icon
 ## SavedVariables: AnimalitosPlannerDB

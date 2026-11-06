@@ -12,8 +12,7 @@ local fs = UI.fs
 UI.WIDTH, UI.HEIGHT = 720, 500
 local WIDTH, HEIGHT = UI.WIDTH, UI.HEIGHT
 local PAD = 10
-local HEADER_H = 56
-local FOOTER_H = 38
+local HEADER_H = 40 -- one compact line; there is no footer
 local SIDEBAR_W = 160
 local NAV_BUTTON_H = 32
 UI.CONTENT_WIDTH = WIDTH - SIDEBAR_W - PAD * 3
@@ -126,7 +125,7 @@ function UI:Create()
     self:RestorePosition(f)
     tinsert(UISpecialFrames, f:GetName()) -- close with ESC
 
-    -- Header: darker band, logo, title, character line, accent glow line
+    -- Header (one line): logo, title › section ... character, refresh, close
     local band = UI.RoundedTexture(f, "BACKGROUND", 1)
     band:ClearAllPoints()
     band:SetPoint("TOPLEFT", UI.px(1), -UI.px(1))
@@ -135,33 +134,61 @@ function UI:Create()
     band:SetVertexColor(0, 0, 0, 0.28)
 
     local close = UI.CloseButton(f)
-    close:SetPoint("TOPRIGHT", -8, -8)
+    close:SetPoint("RIGHT", f, "TOPRIGHT", -8, -HEADER_H / 2)
+
+    local refresh = CreateFrame("Button", nil, f)
+    refresh:SetSize(22, 22)
+    refresh:SetPoint("RIGHT", close, "LEFT", -4, 0)
+    local glyph = refresh:CreateTexture(nil, "ARTWORK")
+    glyph:SetSize(14, 14)
+    glyph:SetPoint("CENTER")
+    glyph:SetTexture(MEDIA .. "nav-refresh")
+    glyph:SetVertexColor(1, 1, 1, 0.55)
+    refresh:SetScript("OnEnter", function(self)
+        glyph:SetVertexColor(1, 1, 1, 1)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(L["REFRESH"], 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    refresh:SetScript("OnLeave", function()
+        glyph:SetVertexColor(1, 1, 1, 0.55)
+        GameTooltip:Hide()
+    end)
+    refresh:SetScript("OnClick", function()
+        ns.Collection:Scan()
+        ns.Lockouts:Request()
+        UI:Refresh()
+    end)
 
     local logo = f:CreateTexture(nil, "ARTWORK")
-    logo:SetSize(38, 38)
-    logo:SetPoint("TOPLEFT", PAD + 2, -9)
+    logo:SetSize(26, 26)
+    logo:SetPoint("LEFT", f, "TOPLEFT", PAD + 2, -HEADER_H / 2)
     logo:SetTexture("Interface\\AddOns\\AnimalitosPlanner\\Media\\icon")
 
     local title = fs(f, "large")
-    title:SetPoint("TOPLEFT", logo, "TOPRIGHT", 10, -3)
+    title:SetPoint("LEFT", logo, "RIGHT", 9, 0)
     title:SetText(L["TITLE"])
 
+    f.crumb = fs(f, "body", COLORS.dim)
+    f.crumb:SetPoint("LEFT", title, "RIGHT", 8, -1)
+
     f.character = fs(f, "small", COLORS.dim)
-    f.character:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -4)
+    f.character:SetPoint("RIGHT", refresh, "LEFT", -10, 0)
+    f.character:SetJustifyH("RIGHT")
 
     UI.GlowLine(f, -HEADER_H)
 
     -- Sidebar
     local sidebar = CreateFrame("Frame", nil, f, "BackdropTemplate")
     sidebar:SetPoint("TOPLEFT", PAD, -(HEADER_H + PAD))
-    sidebar:SetPoint("BOTTOMLEFT", PAD, FOOTER_H)
+    sidebar:SetPoint("BOTTOMLEFT", PAD, PAD)
     sidebar:SetWidth(SIDEBAR_W)
     UI.StylePanel(sidebar, { 0, 0, 0, 0.25 })
 
     -- Content area
     local content = CreateFrame("Frame", nil, f)
     content:SetPoint("TOPLEFT", sidebar, "TOPRIGHT", PAD, 0)
-    content:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -PAD, FOOTER_H)
+    content:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -PAD, PAD)
 
     f.panels = {
         farm = ns.FarmPanel:Create(content),
@@ -181,24 +208,6 @@ function UI:Create()
         f.nav[section.key] = b
     end
 
-    -- Footer
-    local refresh = UI.Button(f, "secondary")
-    UI.SetButtonText(refresh, L["REFRESH"], 96)
-    refresh:SetPoint("BOTTOMRIGHT", -PAD, 9)
-    refresh:SetScript("OnClick", function()
-        ns.Collection:Scan()
-        ns.Lockouts:Request()
-        UI:Refresh()
-    end)
-
-    local dataset = fs(f, "tiny", COLORS.muted)
-    dataset:SetPoint("BOTTOMLEFT", PAD + 4, 15)
-    if ns.Data and ns.Data.sources then
-        dataset:SetFormattedText(L["DATASET_LOADED"], #ns.Data.sources, ns.Data.version.client)
-    else
-        dataset:SetText(L["DATASET_NONE"])
-    end
-
     f:SetScript("OnShow", function()
         ns.Lockouts:Request() -- fresh lockouts on every open; UPDATE_INSTANCE_INFO refreshes again
         UI:Refresh()
@@ -213,6 +222,9 @@ function UI:SelectTab(tab)
     if tab == "summary" then tab = "home" end -- pre-redesign name
     if not f.panels[tab] then tab = DEFAULT_SECTION end
     ns.Storage.db.ui.tab = tab
+    for _, s in ipairs(SECTIONS) do
+        if s.key == tab then f.crumb:SetText("›  " .. L[s.label]) end
+    end
     for key, panel in pairs(f.panels) do
         local on = key == tab
         panel:SetShown(on)
@@ -256,8 +268,11 @@ end
 function UI:Refresh()
     local f = self.frame
     if not f or not f:IsShown() then return end
-    local className = UnitClass("player")
-    f.character:SetText(("%s · %s · %s"):format(UnitName("player"), UnitLevel("player") or "", className or ""))
+    local _, classFile = UnitClass("player")
+    local cc = classFile and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]
+    local name = UnitName("player") or ""
+    if cc and cc.colorStr then name = ("|c%s%s|r"):format(cc.colorStr, name) end
+    f.character:SetText(("%s  %s"):format(name, UnitLevel("player") or ""))
     local entries = ns.FarmList:Build()
     local sum = ns.FarmList:Summarize(entries)
     f.nav.farm.badge:SetText(sum.ready > 0 and tostring(sum.ready) or "")
