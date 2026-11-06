@@ -19,8 +19,10 @@ function Collection:Scan()
         missingBySource = {}, -- [sourceType] = count
         scannedAt = time(),
     }
+    local list = {}
     local ok = ns.MountJournal:ForEach(function(m)
         s.total = s.total + 1
+        if not m.shouldHideOnChar then list[#list + 1] = m end
         if m.isCollected then
             s.collected = s.collected + 1
             if m.shouldHideOnChar then
@@ -40,12 +42,21 @@ function Collection:Scan()
         end
     end)
     if not ok then
-        self.summary = nil
+        self.summary, self.list = nil, nil
         return nil
     end
     s.visibleTotal = s.collectedVisible + s.missingVisible
-    self.summary = s
+    table.sort(list, function(a, b) return a.name < b.name end)
+    self.summary, self.list = s, list
     return s
+end
+
+--- Mounts the journal shows for this character (same set as its counter),
+--- sorted by name. Each item is a MountJournal:GetMount record. nil if the
+--- journal is not ready yet.
+function Collection:GetList()
+    if not self.list then self:Scan() end
+    return self.list
 end
 
 --- Missing-by-source as a list sorted by count (descending).

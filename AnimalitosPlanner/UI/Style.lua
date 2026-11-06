@@ -476,6 +476,48 @@ function UI.SearchBox(parent, placeholder, onChange)
     return box
 end
 
+--- Segmented control: one choice among a few. items = { {key=, text=}, ... }.
+--- onSelect(key) runs on click. API: seg:SetSelected(key).
+function UI.Segmented(parent, items, onSelect)
+    local seg = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    seg:SetHeight(24)
+    UI.StylePanel(seg, { 0, 0, 0, 0.25 }, { noSheen = true })
+    local a = COLORS.accent
+    seg.buttons = {}
+    local x = 2
+    local function paint(b)
+        local on = b.key == seg.selected
+        b.fill:SetShown(on)
+        b.label:SetTextColor(1, 1, 1, on and 1 or (b.hover and 0.86 or 0.62))
+    end
+    for _, it in ipairs(items) do
+        local b = CreateFrame("Button", nil, seg)
+        b.key = it.key
+        b.fill = UI.RoundedTexture(b, "BACKGROUND", 1)
+        b.fill:SetVertexColor(a[1], a[2], a[3], 0.35)
+        b.label = fs(b, "small")
+        b.label:SetPoint("CENTER")
+        b.label:SetText(it.text)
+        local w = math.max(56, b.label:GetStringWidth() + 22)
+        b:SetSize(w, 20)
+        b:SetPoint("LEFT", x, 0)
+        x = x + w + 2
+        b:SetScript("OnEnter", function(self) self.hover = true; paint(self) end)
+        b:SetScript("OnLeave", function(self) self.hover = false; paint(self) end)
+        b:SetScript("OnClick", function(self)
+            seg:SetSelected(self.key)
+            if onSelect then onSelect(self.key) end
+        end)
+        seg.buttons[#seg.buttons + 1] = b
+    end
+    seg:SetWidth(x)
+    function seg:SetSelected(key)
+        self.selected = key
+        for _, b in ipairs(self.buttons) do paint(b) end
+    end
+    return seg
+end
+
 --- Client icon file shown as a monochrome glyph tinted with `color`.
 function UI.Glyph(tex, file, color)
     tex:SetTexture(file)
