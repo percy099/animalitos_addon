@@ -174,7 +174,7 @@ end
 -- Icons are client files shown as monochrome glyphs in the stat's color.
 local STATS = {
     { key = "missing", label = "STAT_MISSING", color = { 1, 1, 1 },
-      icon = "Interface\\Icons\\Ability_Mount_RidingHorse", round = true },
+      icon = "Interface\\AddOns\\AnimalitosPlanner\\Media\\nav-farm" }, -- our horseshoe glyph
     { key = "ready",   label = "STAT_READY",   color = "success", opensFarm = true,
       icon = "Interface\\RaidFrame\\ReadyCheck-Ready" },
     { key = "locked",  label = "STAT_LOCKED",  color = "warning", opensFarm = true,
@@ -204,13 +204,6 @@ local function createStatTiles(p, top)
         icon:SetSize(16, 16)
         icon:SetPoint("TOPLEFT", 8, -8)
         ns.UI.Glyph(icon, stat.icon, { color[1], color[2], color[3], 0.75 })
-        if stat.round then
-            icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-            local m = t:CreateMaskTexture()
-            m:SetTexture(CIRCLE, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-            m:SetAllPoints(icon)
-            icon:AddMaskTexture(m)
-        end
         if stat.opensFarm then
             t:EnableMouse(true)
             t:SetScript("OnMouseUp", function() ns.UI:SelectTab("farm") end)
