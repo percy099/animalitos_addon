@@ -101,6 +101,21 @@ local function priceOf(mountID)
     return parts or {}
 end
 
+-- A requirement the item tooltip does not show, curated by hand in
+-- overrides.json (ns.Data.vendorReqs[itemID]): reputation per faction,
+-- with an optional race that skips it (Armored Vorquins and Dracthyr).
+local function curatedLine(cur)
+    local _, raceFile = UnitRace("player")
+    local factionID = cur.reputation[UnitFactionGroup("player") or ""]
+    local data = factionID and C_Reputation and C_Reputation.GetFactionDataByID
+        and C_Reputation.GetFactionDataByID(factionID)
+    local standing = _G["FACTION_STANDING_LABEL" .. cur.standing] or tostring(cur.standing)
+    local text = (ITEM_REQ_REPUTATION or "Requires %s - %s"):format(data and data.name or "?", standing)
+    if cur.exceptRace and raceFile == cur.exceptRace then return { text = text, met = true } end
+    if not data then return { text = text, met = nil } end
+    return { text = text, met = (data.reaction or 0) >= cur.standing }
+end
+
 local function renownText(rank, name, have)
     return ns.L["REQ_RENOWN"]:format(rank, name, have)
 end
@@ -168,6 +183,8 @@ function R:Get(mountID)
             end
         end
     end
+    local cur = ns.Data.vendorReqs and ns.Data.vendorReqs[itemID]
+    if cur then reqs[#reqs + 1] = curatedLine(cur) end
     remix = fromJournal(mountID, reqs) or remix
     if next(wantedAch) and not achIndex then buildAchIndex() end
 

@@ -139,6 +139,11 @@ ns.Data = {
         { lfgDungeonID = 287, event = "EVENT_BREWFEST", mounts = { { mountID = 202, itemID = 33977 }, { mountID = 226, itemID = 37828 } } }, -- Coren Direbrew
         { lfgDungeonID = 288, event = "EVENT_LOVE", mounts = { { mountID = 352, itemID = 50250 } } }, -- The Crown Chemical Co.
     },
+    vendorReqs = {
+        [198809] = { reputation = { Alliance = 2524, Horde = 2523 }, standing = 8, exceptRace = "Dracthyr" },
+        [198810] = { reputation = { Alliance = 2524, Horde = 2523 }, standing = 8, exceptRace = "Dracthyr" },
+        [198811] = { reputation = { Alliance = 2524, Horde = 2523 }, standing = 8, exceptRace = "Dracthyr" },
+    },
     mountItems = {
         [6]=5656, [9]=2411, [11]=2414, [14]=1132, [16]=260916, [18]=5655, [19]=5665, [20]=5668,
         [21]=5864, [24]=5873, [25]=5872, [26]=8631, [27]=8588, [31]=8632, [32]=8630, [34]=8629,

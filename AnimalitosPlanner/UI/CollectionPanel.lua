@@ -234,7 +234,7 @@ local function render(p)
             elseif p.mode == "drops" then
                 fillRow(r, m.mount, index, nil, m.label)
             else
-                -- "Vendor: nothing missing": requirements and price met, or none.
+                -- "Ready to buy": requirements and price met, or none.
                 -- The price when there is one, else whether it asks for anything.
                 local req = p.vendorOk and p.vendorOk[m.mountID]
                 local label = req and (req.price or ((req.status == "met") and L["REQ_MET_SHORT"] or L["REQ_NONE_SHORT"])) or nil
@@ -651,7 +651,7 @@ function CollectionPanel:Refresh(p, entries)
 
     -- Source menu: "All sources" + every source with how many are missing.
     local src = sourceKey()
-    -- "Vendor: nothing missing": missing vendor mounts whose requirements
+    -- "Ready to buy": missing vendor mounts whose requirements
     -- (reputation, renown, faction, class) this character meets or that
     -- ask for nothing. Built in the background; "..." until ready.
     local vendorOk = src == "vendorok"

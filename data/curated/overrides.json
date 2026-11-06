@@ -29,7 +29,19 @@
         "reason": "Same as Emalon" }
     ]
   },
-  "holidayBosses": {
+  "vendorRequirements": {
+    "_reason": "Requirements a vendor asks for that the mount item's tooltip does not show (Requirements.lua cannot read them). Checked by hand on warcraft.wiki.gg / Wowhead. reputation = factionID per player faction (UnitFactionGroup), standing = reaction (8 = Exalted), exceptRace = race file name that skips the requirement.",
+    "list": [
+      {
+        "name": "Armored Vorquin mounts",
+        "itemIDs": [198809, 198810, 198811],
+        "reputation": { "Alliance": 2524, "Horde": 2523 },
+        "standing": 8,
+        "exceptRace": "Dracthyr",
+        "reason": "Armored Vorquin Leystrider 198809, Swift Armored Vorquin 198810, Majestic Armored Vorquin 198811 (Treysh / Tethalash, 80 gold): non-Dracthyr must be Exalted with Obsidian Warders (Alliance, faction=2524) or Dark Talons (Horde, faction=2523). warcraft.wiki.gg item pages, faction IDs on Wowhead. Reported in game: the tooltip shows nothing."
+      }
+    ]
+  },  "holidayBosses": {
     "_reason": "World event bosses with a mount, queued from the Dungeon Finder once a day while their event is on. lfgDungeonID = LFGDungeons ID (warcraft.wiki.gg LfgDungeonID: 285 The Headless Horseman, 287 Coren Direbrew, 288 The Crown Chemical Co.). The event is on when the client lists that queue; done today = GetLFGDungeonRewards. Items checked on Wowhead; mountID re-checked in game from the item.",
     "list": [
       { "name": "The Headless Horseman", "lfgDungeonID": 285, "event": "EVENT_HALLOWS_END",
