@@ -80,6 +80,28 @@ function FarmList:ResolveFactionEntrances()
     end
 end
 
+-- [journalInstanceID][dungeonEncounterID] = journalEncounterID, read with
+-- EJ_GetEncounterInfo(id), which works without selecting an instance in
+-- the journal (EJ_GetEncounterInfoByIndex does not). Built once.
+local encounterIndex
+function FarmList:JournalEncounterFor(jid, dungeonEncounterID)
+    if not encounterIndex then
+        if not EJ_GetEncounterInfo then return nil end
+        encounterIndex = {}
+        local found = 0
+        for id = 1, 4000 do
+            local name, _, jeid, _, _, ejInst, deid = EJ_GetEncounterInfo(id)
+            if name and ejInst and deid then
+                encounterIndex[ejInst] = encounterIndex[ejInst] or {}
+                encounterIndex[ejInst][deid] = jeid or id
+                found = found + 1
+            end
+        end
+        if found == 0 then encounterIndex = nil return nil end -- journal not ready; retry later
+    end
+    return encounterIndex[jid] and encounterIndex[jid][dungeonEncounterID]
+end
+
 --- Hand-curated sources (overrides.json extraSources): check the mount ID
 --- against the item and find the journal encounter from its dungeon
 --- encounter ID (EJ data, so localized). Retried until both resolve.
@@ -96,18 +118,8 @@ function FarmList:ResolveCurated()
                     pending = true -- item not cached yet
                 end
             end
-            if (src.dungeonEncounterID or src.encounterIndex) and not src.journalEncounterID
-                and EJ_GetEncounterInfoByIndex then
-                for i = 1, 30 do
-                    local name, _, jeid, _, _, _, deid = EJ_GetEncounterInfoByIndex(i, src.journalInstanceID)
-                    if not name then break end
-                    if deid and deid == src.dungeonEncounterID then src.journalEncounterID = jeid break end
-                end
-                -- Fallback: the boss's position in the journal (fixed order).
-                if not src.journalEncounterID and src.encounterIndex then
-                    local name, _, jeid = EJ_GetEncounterInfoByIndex(src.encounterIndex, src.journalInstanceID)
-                    if name then src.journalEncounterID = jeid end
-                end
+            if src.dungeonEncounterID and not src.journalEncounterID then
+                src.journalEncounterID = self:JournalEncounterFor(src.journalInstanceID, src.dungeonEncounterID)
                 if not src.journalEncounterID then pending = true end
             end
         end
@@ -130,10 +142,9 @@ function FarmList:DebugCurated()
     end
     for _, jid in ipairs({ 753, 1178 }) do
         local list = {}
-        for i = 1, 30 do
-            local name, _, jeid, _, _, _, deid = EJ_GetEncounterInfoByIndex(i, jid)
-            if not name then break end
-            list[#list + 1] = ("%d:%s(%s/%s)"):format(i, name, tostring(jeid), tostring(deid))
+        for id = 1, 4000 do
+            local name, _, _, _, _, ejInst, deid = EJ_GetEncounterInfo(id)
+            if name and ejInst == jid then list[#list + 1] = ("%s(%d/%s)"):format(name, id, tostring(deid)) end
         end
         print(("  EJ %d: %s"):format(jid, #list > 0 and table.concat(list, ", ") or "(nothing)"))
     end

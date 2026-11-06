@@ -2,7 +2,7 @@
 -- Source: in-game /aplan scan, client 12.1.5.70783, scanned 2026-11-05 13:38:04.
 local _, ns = ...
 ns.Data = {
-    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "414769b8a903" },
+    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "9a36badeb64f" },
     instances = {
         [-2210] = { tier = 8, isRaid = true, legacy = true, worldBoss = true, ejInstance = 1028, encounter = 2210, lockoutModel = "worldQuest" }, -- Dunegorger Kraulok (Azeroth)
         [-1262] = { tier = 6, isRaid = true, legacy = true, worldBoss = true, ejInstance = 557, encounter = 1262, lockoutModel = "savedWorldBoss" }, -- Rukhmar (Draenor)
@@ -130,8 +130,8 @@ ns.Data = {
         { mountID = 248, itemID = 43951, journalInstanceID = 279, difficulties = { 2 }, hiddenBoss = "BOSS_INFINITE_CORRUPTOR", curated = true }, -- Reins of the Bronze Drake - The Culling of Stratholme (curated)
         { mountID = 883, itemID = 142552, journalInstanceID = 860, difficulties = { 23 }, hiddenBoss = "BOSS_NIGHTBANE", curated = true }, -- Smoldering Ember Wyrm - Return to Karazhan (curated)
         { mountID = 1227, itemID = 168830, journalInstanceID = 1178, dungeonEncounterID = 2260, difficulties = { 23 }, curated = true }, -- Aerial Unit R-21/X - Operation: Mechagon (curated)
-        { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1127, encounterIndex = 2, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Emalon) - Vault of Archavon (curated)
-        { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1128, encounterIndex = 3, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Koralon) - Vault of Archavon (curated)
-        { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1129, encounterIndex = 4, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Toravon) - Vault of Archavon (curated)
+        { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1127, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Emalon) - Vault of Archavon (curated)
+        { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1128, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Koralon) - Vault of Archavon (curated)
+        { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1129, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Toravon) - Vault of Archavon (curated)
     },
 }
