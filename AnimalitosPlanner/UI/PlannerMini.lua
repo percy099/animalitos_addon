@@ -16,6 +16,7 @@ local MAX_TRAVEL = 4 -- travel lines shown per step (the rest as "+n")
 local function db() return ns.Storage.db.ui end
 
 Mini.undoStack = {} -- jids marked with Done in this session, newest last
+local hideSecure -- defined with the travel buttons below; used by create()
 
 -- Drops entries that are no longer marked (unticked in the Planner, reset).
 local function pruneUndo()
@@ -128,7 +129,15 @@ local function create()
     f.sep:SetColorTexture(1, 1, 1, 0.08)
 
     f.lines, f.mountBtns = {}, {}
-    f:SetScript("OnHide", function() ns.MountPreview:HidePopup() end)
+    f:SetScript("OnHide", function()
+        ns.MountPreview:HidePopup()
+        if not InCombatLockdown() then hideSecure() end
+    end)
+    -- Secure travel buttons: away during combat, back after it.
+    ns:On("PLAYER_REGEN_DISABLED", hideSecure)
+    ns:On("PLAYER_REGEN_ENABLED", function()
+        if f:IsShown() then Mini:Refresh() end
+    end)
     -- A mage joining / leaving changes the travel steps.
     ns:On("GROUP_ROSTER_UPDATE", function()
         if f:IsShown() then ns:Debounce("mini-roster", 0.5, function() Mini:Refresh() end) end
@@ -164,13 +173,63 @@ local function mountButton(f, i)
     return b
 end
 
-local function travelLines(f, travel, color)
+-- Clickable travel lines (teleport, portal, hearthstone, travel toys):
+-- casting needs secure buttons. They live on UIParent, not on the mini
+-- window, so the window never becomes protected; when combat starts they
+-- are hidden and unanchored (still allowed in PLAYER_REGEN_DISABLED) and
+-- they come back with the refresh after combat.
+local secure = {}
+function hideSecure() -- the local declared at the top
+    for _, b in ipairs(secure) do
+        b:Hide()
+        b:ClearAllPoints()
+    end
+end
+
+local function secureButton(i)
+    local b = secure[i]
+    if not b then
+        b = CreateFrame("Button", "AnimalitosPlannerTravel" .. i, UIParent, "SecureActionButtonTemplate")
+        b:RegisterForClicks("AnyUp", "AnyDown")
+        local hl = b:CreateTexture(nil, "HIGHLIGHT")
+        hl:SetAllPoints()
+        hl:SetColorTexture(1, 1, 1, 0.08)
+        b:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:AddLine(L["MINI_TRAVEL_TIP"]:format(self.actionName or "?"), 1, 1, 1, true)
+            GameTooltip:Show()
+        end)
+        b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+        secure[i] = b
+    end
+    return b
+end
+
+-- clickable: true for the current step (its first hop is where you are).
+local function travelLines(f, travel, color, clickable)
     for i, text in ipairs(travel) do
         if i > MAX_TRAVEL then
             place(f, line(f, "tiny", color), ("   +%d"):format(#travel - MAX_TRAVEL), 1)
             break
         end
-        place(f, line(f, "small", color), ("|T%s:14:14:0:0:64:64:5:59:5:59|t  %s"):format(ns.Planner:TravelIcon(text), text), 2)
+        local action = clickable and not InCombatLockdown() and ns.Planner:TravelAction(text)
+        local t = line(f, "small", action and ns.UI.COLORS.text or color)
+        place(f, t, ("|T%s:14:14:0:0:64:64:5:59:5:59|t  %s"):format(ns.Planner:TravelIcon(text), text), 2)
+        if action then
+            f.secureUsed = f.secureUsed + 1
+            local b = secureButton(f.secureUsed)
+            b:SetAttribute("type", action.type)
+            b:SetAttribute("spell", action.spell)
+            b:SetAttribute("toy", action.toy)
+            b:SetAttribute("item", action.item)
+            b.actionName = action.name
+            b:SetFrameStrata(f:GetFrameStrata())
+            b:SetFrameLevel(f:GetFrameLevel() + 20)
+            b:ClearAllPoints()
+            b:SetPoint("TOPLEFT", t, "TOPLEFT", -4, 2)
+            b:SetPoint("BOTTOMRIGHT", t, "BOTTOMRIGHT", 4, -2)
+            b:Show()
+        end
     end
 end
 
@@ -223,6 +282,8 @@ function Mini:Refresh()
     for _, t in ipairs(f.lines) do t:Hide() end
     for _, b in ipairs(f.mountBtns) do b:Hide() end
     f.used = 0
+    f.secureUsed = 0
+    if not InCombatLockdown() then hideSecure() end
     f.y = 30
 
     local entries = ns.FarmList:Build()
@@ -252,9 +313,12 @@ function Mini:Refresh()
     end
 
     -- Current step: how to get there, the instance, its mounts.
-    travelLines(f, cur.travel, C.dim)
     local s = cur.run
-    place(f, line(f, "title", C.text), runTitle(s), #cur.travel > 0 and 6 or 0)
+    -- Already inside the instance: the way there is no longer needed.
+    local inside = not s.event and s.e and ns.Difficulty:Inside(s.e) ~= nil
+    local travel = inside and {} or cur.travel
+    travelLines(f, travel, C.dim, true)
+    place(f, line(f, "title", C.text), runTitle(s), #travel > 0 and 6 or 0)
     local rows, detail, note = ns.PlannerPanel.Describe(s)
     place(f, line(f, "tiny", C.muted), detail, 2)
     -- At the entrance or inside: the difficulty the mounts drop on, and the

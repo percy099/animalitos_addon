@@ -542,6 +542,82 @@ function Planner:TravelIcon(text)
     return spellIcon(text) or ICON.portal
 end
 
+-- Clickable travel ------------------------------------------------------------
+-- Mage teleport -> the matching portal (cast instead when in a group).
+-- Checked with KnowsSpell before use, so a wrong ID only means "teleport".
+local PORTAL = {
+    [3561] = 10059, [3567] = 11417, [88342] = 88345, [88344] = 88346,
+    [49359] = 49360, [49358] = 49361, [33690] = 33691, [35715] = 35717,
+    [53140] = 53142, [132621] = 132620, [132627] = 132626, [176248] = 176246,
+    [176242] = 176244, [224869] = 224871, [281403] = 281400, [281404] = 281402,
+    [344587] = 344597, [395277] = 395289, [446540] = 446534,
+}
+local HEARTHSTONE = 6948
+
+-- Spell ID of a mage teleport from its (localized) name, or nil.
+local function mageSpellByName(name)
+    local function check(id)
+        return ns.Navigation:SpellName(id) == name and id or nil
+    end
+    for _, fac in pairs(MAGE) do
+        for key, d in pairs(fac) do
+            if key == "zone" then
+                for _, z in pairs(d) do
+                    if check(z[2]) then return z[2] end
+                end
+            elseif check(d[2]) then
+                return d[2]
+            end
+        end
+    end
+    return nil
+end
+
+local function itemAction(itemID)
+    if PlayerHasToy and PlayerHasToy(itemID) then return { type = "toy", toy = itemID } end
+    local count = C_Item and C_Item.GetItemCount and C_Item.GetItemCount(itemID) or 0
+    if count > 0 then return { type = "item", item = "item:" .. itemID } end
+    return nil
+end
+
+--- What clicking a travel step does, or nil (fly, ride, capital portals):
+--- { type = "spell", spell } | { type = "toy", toy } | { type = "item", item },
+--- plus name for the tooltip. Only what this character has. A mage in a
+--- group gets the portal (the whole group can take it).
+function Planner:TravelAction(text)
+    local L = ns.L
+    if not text then return nil end
+    -- "A  »  B" (hearth / teleport home, then a capital portal): A is clickable.
+    local first = text:match(formatPattern(L["PLAN_THEN"]))
+    if first then text = first end
+    local id = mageSpellByName(text)
+    if id and ns.Navigation:KnowsSpell(id) then
+        local portal = PORTAL[id]
+        if IsInGroup() and portal and ns.Navigation:KnowsSpell(portal) then
+            return { type = "spell", spell = portal, name = ns.Navigation:SpellName(portal) }
+        end
+        return { type = "spell", spell = id, name = text }
+    end
+    local arg = text:match(formatPattern(L["PLAN_CAST"]))
+    if arg then return { type = "spell", spell = arg, name = arg } end -- Mythic+ "Path of ..."
+    arg = text:match(formatPattern(L["PLAN_USE_ITEM"]))
+    if arg then
+        for _, ti in pairs(TRAVEL_ITEMS) do
+            if ns.Navigation:ItemName(ti.item) == arg then
+                local a = itemAction(ti.item)
+                if a then a.name = arg end
+                return a
+            end
+        end
+    end
+    if text:match(formatPattern(L["PLAN_HEARTH"])) then
+        local a = itemAction(HEARTHSTONE)
+        if a then a.name = ns.Navigation:ItemName(HEARTHSTONE) end
+        return a
+    end
+    return nil
+end
+
 local function mageHop(mage, dest)
     if not (mage and dest) then return nil end
     if mage.self and ns.Navigation:KnowsSpell(dest[2]) then

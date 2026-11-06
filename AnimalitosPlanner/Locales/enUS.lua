@@ -83,6 +83,7 @@ L["MINI_DIFF_WRONG"] = "You are on %s, the mounts need %s: leave the instance to
 L["MINI_DIFF_BTN"] = "Set %s"
 L["MINI_DIFF_TIP"] = "Changes your difficulty before you go in (solo or as group leader)."
 L["MINI_DIFF_LEADER"] = "Only the group leader can change the difficulty."
+L["MINI_TRAVEL_TIP"] = "Click: %s"
 L["MINI_TIP"] = "Click: open the Planner · Drag: move"
 L["PLAN_CLEAR_MARKS_TIP"] = "Unticks the steps you marked done by hand. Marks also clear on their own at the daily (dungeons) or weekly (raids) reset. Your game lockouts are not changed."
 L["PLAN_HIDE_DONE"] = "Hide completed steps"
