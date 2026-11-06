@@ -98,6 +98,17 @@ local function createGreeting(p)
     p.updated = ns.UI.fs(head, "GameFontHighlightSmall", C.muted)
     p.updated:SetPoint("TOPRIGHT", update, "BOTTOMRIGHT", 0, -3)
     p.updated:SetJustifyH("RIGHT")
+    p.updated:SetTextColor(1, 1, 1, 0.72)
+    ns.UI.Shadow(p.updated)
+
+    -- Darken the banner's right end so the button and label stay readable.
+    local bg = C.background
+    local scrim = head:CreateTexture(nil, "BACKGROUND", nil, 0)
+    scrim:SetPoint("TOPRIGHT")
+    scrim:SetPoint("BOTTOMRIGHT")
+    scrim:SetWidth(190)
+    scrim:SetColorTexture(1, 1, 1, 1)
+    scrim:SetGradient("HORIZONTAL", CreateColor(bg[1], bg[2], bg[3], 0), CreateColor(bg[1], bg[2], bg[3], 0.75))
 end
 
 -- Collection ring -------------------------------------------------------------
@@ -227,7 +238,7 @@ local function createStart(p, top)
         r.art:SetPoint("TOPLEFT")
         r.art:SetPoint("BOTTOMLEFT")
         r.art:SetWidth(START_ART_W)
-        r.art:SetAlpha(0.7)
+        r.art:SetAlpha(0.55)
         local s = C.surface
         local fade = r:CreateTexture(nil, "BACKGROUND", nil, 2)
         fade:SetPoint("TOPRIGHT", r.art)
@@ -257,6 +268,10 @@ local function createStart(p, top)
         r.detail:SetPoint("TOPLEFT", r.name, "BOTTOMLEFT", 0, -2)
         r.detail:SetPoint("RIGHT", r.count, "LEFT", -6, 0)
         r.detail:SetWordWrap(false)
+        r.detail:SetTextColor(1, 1, 1, 0.72) -- a bit brighter than muted: it sits on artwork
+        ns.UI.Shadow(r.name)
+        ns.UI.Shadow(r.detail)
+        ns.UI.Shadow(r.badge.text)
         p.startRows[i] = r
     end
 

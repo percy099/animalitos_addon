@@ -245,6 +245,12 @@ function UI.Upper(s)
     return (s:gsub("\195[\128-\191]", UPPER):upper())
 end
 
+--- Soft drop shadow for text placed over artwork.
+function UI.Shadow(fontString)
+    fontString:SetShadowOffset(1, -1)
+    fontString:SetShadowColor(0, 0, 0, 0.9)
+end
+
 --- "2 mounts · 1 instance" with singular/plural handled.
 function UI.CountsText(mounts, instances)
     local L = ns.L
