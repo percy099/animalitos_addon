@@ -11,7 +11,7 @@ ns.PlannerPanel = PlannerPanel
 local SCROLL_W = 14
 local LIST_TOP = 92
 local LINE_H = 15
-local COL = { done = 6, num = 30, step = 56, boss = 236, mount = 350 } -- x offsets
+local COL = { done = 6, num = 44, step = 64, boss = 240, mount = 352 } -- x offsets
 local GO_W = 40
 
 local function timeLeft(resetAt)
@@ -54,9 +54,9 @@ local function describe(r)
 
     local notes = {}
     if not next(ready) and next(locked) then
+        -- Locked: when it resets is the only thing that matters today.
         notes[#notes + 1] = L["PLAN_NOTE_LOCKED"]:format(timeLeft(resetAt))
-    end
-    if isRaid and (diffs[3] or diffs[4] or diffs[5] or diffs[6]) then
+    elseif isRaid and (diffs[3] or diffs[4] or diffs[5] or diffs[6]) then
         notes[#notes + 1] = L["PLAN_NOTE_SHARED"]
     elseif not isRaid and diffs[2] then
         notes[#notes + 1] = L["PLAN_NOTE_HEROIC"]
@@ -146,19 +146,29 @@ local function newRun(p)
     f.note:SetWidth(COL.boss - COL.step - 8)
     f.note:SetWordWrap(true)
 
-    f.boss = ns.UI.fs(f, "small", C.dim)
-    f.boss:SetPoint("TOPLEFT", COL.boss, -9)
-    f.boss:SetWidth(COL.mount - COL.boss - 8)
-    f.boss:SetWordWrap(false)
-    f.boss:SetSpacing(LINE_H - 13)
-    f.mount = ns.UI.fs(f, "small")
-    f.mount:SetPoint("TOPLEFT", COL.mount, -9)
-    -- Fixed width (not anchored to the Go button) so multi-line text can grow down.
-    f.mount:SetWidth(ns.UI.CONTENT_WIDTH - SCROLL_W - COL.mount - GO_W - 14)
-    f.mount:SetWordWrap(false)
-    f.mount:SetSpacing(LINE_H - 13)
+    -- One single-line font string per boss / mount (a non-wrapping font
+    -- string only shows its first line, so "\n" lists were cut to one).
+    f.bossLines, f.mountLines = {}, {}
     return f
 end
+
+local function lineAt(f, list, i, x, width, color)
+    local fsx = list[i]
+    if not fsx then
+        fsx = ns.UI.fs(f, "small", color)
+        fsx:SetWidth(width)
+        fsx:SetWordWrap(false)
+        list[i] = fsx
+    end
+    fsx:ClearAllPoints()
+    fsx:SetPoint("TOPLEFT", x, -9 - (i - 1) * LINE_H)
+    fsx:Show()
+    return fsx
+end
+
+local BOSS_W = COL.mount - COL.boss - 8
+-- UI.CONTENT_WIDTH is set by MainFrame.lua, which loads after this file.
+local function mountWidth() return ns.UI.CONTENT_WIDTH - SCROLL_W - COL.mount - GO_W - 14 end
 
 local FACTORIES = { start = newStart, travel = newTravel, run = newRun }
 
@@ -311,13 +321,17 @@ function PlannerPanel:Refresh(p, entries)
             f.title:SetText(L["PLAN_RUN"]:format(ns.FarmList:InstanceName(s.jid)))
             f.detail:SetText(detail)
             f.note:SetText(note)
-            local bosses, mounts = {}, {}
-            for _, row in ipairs(rows) do
-                bosses[#bosses + 1] = row.boss
-                mounts[#mounts + 1] = ("|T%s:14:14:0:0|t %s%s|r"):format(row.icon, STATE_HEX[row.state], row.mount)
+            -- Same boss twice in a row (two mounts) is written once.
+            local lastBoss
+            for i, row in ipairs(rows) do
+                local b = lineAt(f, f.bossLines, i, COL.boss, BOSS_W, C.dim)
+                b:SetText(row.boss ~= lastBoss and row.boss or "")
+                lastBoss = row.boss
+                local m = lineAt(f, f.mountLines, i, COL.mount, mountWidth())
+                m:SetText(("|T%s:14:14:0:0|t %s%s|r"):format(row.icon, STATE_HEX[row.state], row.mount))
             end
-            f.boss:SetText(table.concat(bosses, "\n"))
-            f.mount:SetText(table.concat(mounts, "\n"))
+            for i = #rows + 1, #f.bossLines do f.bossLines[i]:Hide() end
+            for i = #rows + 1, #f.mountLines do f.mountLines[i]:Hide() end
 
             f.check.mark:SetShown(s.done)
             local jid, isRaid, auto = s.jid, s.inst.isRaid, s.auto
@@ -338,7 +352,7 @@ function PlannerPanel:Refresh(p, entries)
 
             local left = 8 + f.title:GetStringHeight() + 2 + f.detail:GetStringHeight()
                 + (note ~= "" and (2 + f.note:GetStringHeight()) or 0)
-            local right = 9 + math.max(f.boss:GetStringHeight(), f.mount:GetStringHeight())
+            local right = 9 + #rows * LINE_H
             f:SetHeight(math.max(34, math.max(left, right) + 8))
         end
         f:ClearAllPoints()
