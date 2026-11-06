@@ -272,6 +272,7 @@ function UI:Refresh()
     if f.panels.settings:IsShown() then ns.SettingsPanel:Refresh(f.panels.settings) end
     if f.panels.collection:IsShown() then ns.CollectionPanel:Refresh(f.panels.collection, entries) end
     if f.panels.planner:IsShown() then ns.PlannerPanel:Refresh(f.panels.planner, entries) end
+    ns.MountPreview:Refresh()
 end
 
 --- Shows the window on a given section (used by the minimap button).
