@@ -118,14 +118,31 @@ end
 --- show up in GetSavedWorldBossInfo) can be Ready; others need verification.
 function Eligibility:EvaluateWorldBoss(src, inst)
     local boss = encounterName(src.journalEncounterID) or "?"
-    if inst.lockoutModel ~= "savedWorldBoss" then
-        return S.VERIFY, L["REASON_WB_UNKNOWN"]
-    end
+    local names = worldBossNames(src.journalEncounterID)
     local ids = { src.journalEncounterID }
     if src.dungeonEncounterID then ids[2] = src.dungeonEncounterID end
-    local resetAt = ns.Lockouts:WorldBossKilled(worldBossNames(src.journalEncounterID), ids)
+    -- Listed under Raid Info > World Bosses: killed, whatever the model.
+    local resetAt = ns.Lockouts:WorldBossKilled(names, ids)
     if resetAt then
         return S.LOCKED_OUT, L["REASON_KILLED"]:format(boss), resetAt
+    end
+
+    if inst.lockoutModel == "worldQuest" then
+        -- Rotating boss marked by its world quest (Kraulok).
+        local state, at = ns.Lockouts:WorldQuestBoss(src.journalEncounterID, names,
+            inst.entrance and inst.entrance.uiMapID)
+        if state == "done" then
+            return S.LOCKED_OUT, L["REASON_WQ_DONE"]:format(boss), at
+        elseif state == "active" then
+            return S.READY, L["REASON_WQ_ACTIVE"]:format(boss)
+        elseif state == "inactive" then
+            return S.UNAVAILABLE, L["REASON_WQ_ROTATION"]
+        end
+        return S.VERIFY, L["REASON_WQ_UNKNOWN"]
+    end
+
+    if inst.lockoutModel ~= "savedWorldBoss" then
+        return S.VERIFY, L["REASON_WB_UNKNOWN"]
     end
     return S.READY, L["REASON_WB_ALIVE"]:format(boss)
 end

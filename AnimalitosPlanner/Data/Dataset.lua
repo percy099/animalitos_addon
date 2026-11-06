@@ -2,9 +2,9 @@
 -- Source: in-game /aplan scan, client 12.1.5.70783, scanned 2026-11-05 13:38:04.
 local _, ns = ...
 ns.Data = {
-    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "068fe01b2116" },
+    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "11f192eb1623" },
     instances = {
-        [-2210] = { tier = 8, isRaid = true, legacy = true, worldBoss = true, ejInstance = 1028, encounter = 2210, lockoutModel = "unknown" }, -- Dunegorger Kraulok (Azeroth)
+        [-2210] = { tier = 8, isRaid = true, legacy = true, worldBoss = true, ejInstance = 1028, encounter = 2210, lockoutModel = "worldQuest" }, -- Dunegorger Kraulok (Azeroth)
         [-1262] = { tier = 6, isRaid = true, legacy = true, worldBoss = true, ejInstance = 557, encounter = 1262, lockoutModel = "savedWorldBoss" }, -- Rukhmar (Draenor)
         [-826] = { tier = 5, isRaid = true, legacy = true, worldBoss = true, ejInstance = 322, encounter = 826, lockoutModel = "savedWorldBoss" }, -- Oondasta (Pandaria)
         [-814] = { tier = 5, isRaid = true, legacy = true, worldBoss = true, ejInstance = 322, encounter = 814, lockoutModel = "savedWorldBoss" }, -- Nalak, The Storm Lord (Pandaria)

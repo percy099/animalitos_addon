@@ -8,7 +8,9 @@
   "worldBossLockouts": {
     "_reason": "EJ pseudo-instance -> how the weekly kill is known. savedWorldBoss = listed by GetSavedWorldBossInfo (Raid Info 'World Bosses'). Mists and Draenor world bosses appear there; to be confirmed in game. Missing = unknown (Verification Required): Battle for Azeroth world bosses use hidden weekly quests instead.",
     "322": "savedWorldBoss",
-    "557": "savedWorldBoss"
+    "557": "savedWorldBoss",
+    "_reason1028": "Battle for Azeroth world bosses (Kraulok) rotate weekly and are marked by an epic world quest named after the boss: worldQuest = the addon finds that quest on the boss's map, remembers its ID and reads active / completed (icy-veins.com, Blizzard forums).",
+    "1028": "worldQuest"
   },
   "excludeInstances": {
     "_reason": "Not real instances (Mythic+ keystone aggregate).",

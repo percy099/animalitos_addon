@@ -240,8 +240,11 @@ end
 
 -- State colors and labels (same meaning as everywhere in the window).
 local S = function() return ns.Eligibility.STATES end
-local function stateStyle(state)
+local function stateStyle(state, reason)
     local C, st = ns.UI.COLORS, S()
+    if state == st.UNAVAILABLE and reason == L["REASON_WQ_ROTATION"] then
+        return C.muted, L["STATUS_NOT_THIS_WEEK"]
+    end
     if state == st.READY then return C.success, L["STATUS_READY"] end
     if state == st.LOCKED_OUT then return C.warning, L["STAT_LOCKED"] end
     if state == st.COLLECTED then return C.accent, L["STATUS_COLLECTED"] end
@@ -307,7 +310,7 @@ local function build(f, mountID, m, extra)
             text(lay, table.concat(parts, " · "), "small", C.dim, 0, 1, GO_W + 6)
             if not (m and m.isCollected) then
                 for _, r in ipairs(b.rows) do
-                    local c, stateLabel = stateStyle(r.state)
+                    local c, stateLabel = stateStyle(r.state, r.reason)
                     local line = ("%s%s|r  %s%s|r"):format("|cffffffff", ns.FarmList:DifficultyName(r.d), hex(c), stateLabel)
                     if r.state == st.LOCKED_OUT then
                         line = line .. "  |cff999999" .. L["NOW_RESETS_IN"]:format(resetText(r.resetAt)) .. "|r"

@@ -36,6 +36,11 @@ ns:On("ACHIEVEMENT_EARNED", function()
     end)
 end)
 
+-- A world quest done (Kraulok's) changes a world boss to Locked.
+ns:On("QUEST_TURNED_IN", function()
+    ns:Debounce("quests", 1, function() ns.UI:Refresh() end)
+end)
+
 ns:On("NEW_MOUNT_ADDED", function()
     ns:Debounce("scan", 0.5, function()
         ns.Collection:Scan()

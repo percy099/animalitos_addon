@@ -81,6 +81,62 @@ function Lockouts:WorldBossKilled(names, ids)
     return nil
 end
 
+-- World-quest world bosses (Battle for Azeroth: Kraulok) -------------------
+-- The boss is up when its epic world quest (named after it) is on the map;
+-- completing it is the weekly kill. The quest ID is found by name on the
+-- boss's map and remembered account-wide (AnimalitosPlannerDB.worldQuests),
+-- because a completed world quest leaves the map.
+
+local function questTitle(questID)
+    local t = C_TaskQuest and C_TaskQuest.GetQuestInfoByQuestID and C_TaskQuest.GetQuestInfoByQuestID(questID)
+    if not t and C_QuestLog.GetTitleForQuestID then t = C_QuestLog.GetTitleForQuestID(questID) end
+    return t
+end
+
+local function questsOnMap(uiMapID)
+    local fn = (C_TaskQuest and (C_TaskQuest.GetQuestsOnMap or C_TaskQuest.GetQuestsForPlayerByMapID))
+    if not fn then return {} end
+    local ok, list = pcall(fn, uiMapID)
+    return ok and list or {}
+end
+
+--- Looks for the boss's world quest on uiMapID; returns its questID or nil.
+local function findWorldQuest(names, uiMapID)
+    local wanted = {}
+    for _, n in ipairs(names) do wanted[n:lower()] = true end
+    for _, info in ipairs(questsOnMap(uiMapID)) do
+        local id = info.questID or info.questId
+        local title = id and questTitle(id)
+        if title and wanted[title:lower()] then return id end
+    end
+    return nil
+end
+
+--- State of a world-quest world boss: "done" (+ resetAt), "active",
+--- "inactive" (not in this week's rotation) or nil (unknown: never seen).
+function Lockouts:WorldQuestBoss(encounterID, names, uiMapID)
+    local db = ns.Storage.db
+    db.worldQuests = db.worldQuests or {}
+    local questID = db.worldQuests[encounterID]
+    if not questID and uiMapID then
+        questID = findWorldQuest(names, uiMapID)
+        if questID then db.worldQuests[encounterID] = questID end
+    end
+    if not questID then return nil end
+
+    if C_QuestLog.IsQuestFlaggedCompleted(questID) then
+        local _, weekly = self:GetResetTimes()
+        return "done", weekly and (time() + weekly) or nil
+    end
+    local active
+    if C_TaskQuest and C_TaskQuest.IsActive then
+        active = C_TaskQuest.IsActive(questID)
+    else
+        active = uiMapID and findWorldQuest(names, uiMapID) == questID
+    end
+    return active and "active" or "inactive"
+end
+
 --- Seconds until the daily and weekly resets (nil when the client cannot tell).
 function Lockouts:GetResetTimes()
     local daily = (C_DateAndTime.GetSecondsUntilDailyReset and C_DateAndTime.GetSecondsUntilDailyReset())
