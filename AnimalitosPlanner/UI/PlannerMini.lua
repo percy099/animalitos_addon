@@ -15,6 +15,16 @@ local MAX_TRAVEL = 4 -- travel lines shown per step (the rest as "+n")
 
 local function db() return ns.Storage.db.ui end
 
+Mini.undoStack = {} -- jids marked with Done in this session, newest last
+
+-- Drops entries that are no longer marked (unticked in the Planner, reset).
+local function pruneUndo()
+    local s = Mini.undoStack
+    for i = #s, 1, -1 do
+        if not ns.Planner:IsManuallyDone(s[i]) then table.remove(s, i) end
+    end
+end
+
 -- Font strings are reused from a small pool, laid out top to bottom.
 local function line(f, font, color)
     f.used = f.used + 1
@@ -85,8 +95,27 @@ local function create()
     ns.UI.SetButtonText(f.go, L["BTN_GO"], 48)
     f.done = ns.UI.Button(f, "secondary")
     ns.UI.SetButtonText(f.done, L["MINI_DONE"], 60)
-    f.time = ns.UI.fs(f, "tiny", C.muted)
-    f.time:SetJustifyH("RIGHT")
+    -- Undo: unticks the last steps marked with Done here (a stack, so a
+    -- few accidental clicks can be undone one by one).
+    f.undo = ns.UI.Button(f, "secondary")
+    ns.UI.SetButtonText(f.undo, L["MINI_UNDO"], 56)
+    f.undo:SetScript("OnClick", function()
+        local jid = table.remove(Mini.undoStack)
+        if jid then
+            ns.Planner:SetManuallyDone(jid, nil, false)
+            Mini:Refresh()
+            ns.UI:Refresh()
+        end
+    end)
+    f.undo:SetScript("OnEnter", function(self)
+        local jid = Mini.undoStack[#Mini.undoStack]
+        if not jid then return end
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(L["MINI_UNDO_TIP"]:format(ns.FarmList:InstanceName(jid)), 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    f.undo:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
 
     f.sep = f:CreateTexture(nil, "ARTWORK")
     f.sep:SetHeight(1)
@@ -124,14 +153,25 @@ function Mini:Refresh()
 
     local entries = ns.FarmList:Build()
     local cur, after, sum = ns.Planner:Upcoming(entries, db().plannerWorldBosses and true or false)
-    f.head:SetText(ns.UI.Upper(L["MINI_NEXT"]) .. ("   |cffffffff%d / %d|r"):format(sum.done, sum.total))
+    -- Header: progress and a short time left (the button row has no room).
+    local left = ""
+    if sum.minutes and sum.minutes > 0 then
+        left = "   |cff8c8899" .. L["PLAN_TIME_LEFT"]:format(SecondsToTime(sum.minutes * 60, true, nil, 1)) .. "|r"
+    end
+    f.head:SetText(ns.UI.Upper(L["MINI_NEXT"]) .. ("   |cffffffff%d / %d|r"):format(sum.done, sum.total) .. left)
 
     if not cur then
         place(f, line(f, "small", C.muted),
             ns.Lockouts.loaded and L["PLAN_EMPTY"] or L["NOW_LOCKOUTS_LOADING"], 0)
         f.go:Hide()
         f.done:Hide()
-        f.time:Hide()
+        -- Everything done: Undo stays reachable for the last click.
+        pruneUndo()
+        f.undo:ClearAllPoints()
+        f.undo:SetPoint("TOPLEFT", PAD, -(f.y + 6))
+        f.undo:SetShown(#Mini.undoStack > 0)
+        if #Mini.undoStack > 0 then f.y = f.y + 30 end
+
         f.sep:Hide()
         f:SetHeight(f.y + PAD + 4)
         return
@@ -165,6 +205,7 @@ function Mini:Refresh()
     f.done:SetPoint("LEFT", f.go, "RIGHT", 6, 0)
     f.done:SetScript("OnClick", function()
         ns.Planner:SetManuallyDone(jid, isRaid, true)
+        table.insert(Mini.undoStack, jid)
         Mini:Refresh()
         ns.UI:Refresh()
     end)
@@ -175,11 +216,11 @@ function Mini:Refresh()
     end)
     f.done:SetScript("OnLeave", function() GameTooltip:Hide() end)
     f.done:Show()
-    f.time:ClearAllPoints()
-    f.time:SetPoint("RIGHT", f, "TOPRIGHT", -PAD, -(f.y + 11))
-    f.time:SetText(sum.minutes and sum.minutes > 0
-        and L["PLAN_TIME_LEFT"]:format(SecondsToTime(sum.minutes * 60, true, nil, 2)) or "")
-    f.time:Show()
+    pruneUndo()
+    f.undo:ClearAllPoints()
+    f.undo:SetPoint("LEFT", f.done, "RIGHT", 6, 0)
+    f.undo:SetShown(#Mini.undoStack > 0)
+
     f.y = f.y + 22
 
     -- The step after it, dimmer.
