@@ -52,8 +52,8 @@ local ZONE_PORTALS = {
     [244] = 244, -- Tol Barad (Baradin Hold)
     [204] = 203, -- Abyssal Depths (Throne of the Tides) -> Vashj'ir portal
 }
--- Continent portals from the capital's portal room. Entries marked (?) are
--- not verified in game yet; a missing entry falls back to "Travel to ...".
+-- Continent portals from the capital's portal room (verified in game for
+-- Stormwind); a missing entry falls back to "Travel to ...".
 local CONTINENT_PORTALS = {
     Alliance = {
         [12] = 71,     -- Caverns of Time (Tanaris)
@@ -63,11 +63,11 @@ local CONTINENT_PORTALS = {
         [424] = 371,   -- Jade Forest
         [572] = 622,   -- Stormshield (Ashran)
         [619] = 630,   -- Azsuna
-        [876] = 1161,  -- Boralus (?)
+        [876] = 1161,  -- Boralus
         [1550] = 1670, -- Oribos
         [1978] = 2112, -- Valdrakken
         [2274] = 2339, -- Dornogal
-        [2537] = 2393, -- Silvermoon City (?)
+        [2537] = 2393, -- Silvermoon City
     },
     Horde = {
         [948] = 207,   -- Deepholm
@@ -80,7 +80,7 @@ local CONTINENT_PORTALS = {
         [1550] = 1670, -- Oribos
         [1978] = 2112, -- Valdrakken
         [2274] = 2339, -- Dornogal
-        [2537] = 2393, -- Silvermoon City (?)
+        [2537] = 2393, -- Silvermoon City
     },
 }
 
@@ -373,9 +373,13 @@ function Planner:TravelTexts(fac, here, ent, mage)
         return out
     end
 
-    -- Another continent with a mage city (no zone portal is closer).
-    if ent.continent ~= here.continent and not zonePortal then
-        local dest = MAGE[fac][ent.continent]
+    -- Another continent with a mage city (no zone portal is closer). Only
+    -- when it lands in the instance's zone, at the capital portal's own
+    -- destination, or there is no capital portal: Theramore + flying to
+    -- Tanaris is worse than Stormwind + the Caverns of Time portal.
+    local dest = MAGE[fac][ent.continent]
+    local useful = dest and (dest[1] == ent.uiMapID or not contPortal or dest[1] == contPortal)
+    if ent.continent ~= here.continent and not zonePortal and useful then
         hop = mageHop(mage, dest)
         if hop then
             out[1] = hop
