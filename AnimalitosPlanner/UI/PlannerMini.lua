@@ -182,7 +182,7 @@ function Mini:Refresh()
     f.y = 30
 
     local entries = ns.FarmList:Build()
-    local cur, after, sum = ns.Planner:Upcoming(entries, db().plannerWorldBosses and true or false)
+    local cur, after, sum = ns.Planner:Upcoming(entries)
     -- Header: progress and a short time left (the button row has no room).
     local left = ""
     if sum.minutes and sum.minutes > 0 then

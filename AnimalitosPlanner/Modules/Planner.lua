@@ -317,11 +317,42 @@ end
 ---   step = { kind = "start", text } | { kind = "travel", text }
 ---        | { kind = "run", jid, inst, e, number, done, auto }
 ---   summary = { total, done, nextJid }
-function Planner:Build(entries, hideCompleted, withWorldBosses)
+--- Kind of a dataset instance for the Planner filter.
+local function kindOf(inst)
+    if inst.worldBoss then return "worldBoss" end
+    return inst.isRaid and "raid" or "dungeon"
+end
+
+--- Which kinds the Planner shows: { raid, dungeon, worldBoss } booleans,
+--- saved in db.ui.plannerKinds. Default: raids and dungeons (world bosses
+--- are many and opt-in; the old plannerWorldBosses switch carries over).
+function Planner:Kinds()
+    local ui = ns.Storage.db.ui
+    if not ui.plannerKinds then
+        ui.plannerKinds = { raid = true, dungeon = true, worldBoss = ui.plannerWorldBosses and true or false }
+        ui.plannerWorldBosses = nil
+    end
+    return ui.plannerKinds
+end
+
+--- Turns one kind on or off; at least one stays on.
+function Planner:SetKind(kind, on)
+    local k = self:Kinds()
+    if not on then
+        local others = 0
+        for key, v in pairs(k) do if v and key ~= kind then others = others + 1 end end
+        if others == 0 then return false end
+    end
+    k[kind] = on and true or false
+    return true
+end
+
+function Planner:Build(entries, hideCompleted, kinds)
+    kinds = kinds or self:Kinds()
     local byJid = {}
     for _, e in ipairs(entries or {}) do
-        -- World bosses only when the player opts in (the route order stays the same).
-        if withWorldBosses or not e.inst.worldBoss then byJid[e.jid] = e end
+        -- Only the kinds the player picked (the route order stays the same).
+        if kinds[kindOf(e.inst)] then byJid[e.jid] = e end
     end
 
     local runs = {}
@@ -384,8 +415,8 @@ end
 --- mini window. Travel starts where the previous step ends (done or not:
 --- you are where you just finished). Returns current, after, summary:
 ---   { run = step, travel = { text... } } or nil.
-function Planner:Upcoming(entries, withWorldBosses)
-    local steps, summary = self:Build(entries, false, withWorldBosses)
+function Planner:Upcoming(entries)
+    local steps, summary = self:Build(entries, false, self:Kinds())
     local found, travel = {}, {}
     for _, s in ipairs(steps) do
         if s.kind == "travel" then

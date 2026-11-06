@@ -303,16 +303,41 @@ function PlannerPanel:Create(parent)
     hideLabel:SetPoint("RIGHT", p.hide, "LEFT", -8, 0)
     hideLabel:SetText(L["PLAN_HIDE_DONE"])
 
-    -- World bosses are many and optional: off by default, opt in here.
-    p.wb = ns.UI.Switch(p, function(_, checked)
-        ns.Storage.db.ui.plannerWorldBosses = checked or nil
-        if p.bar then p.bar:SetValue(0) end
-        PlannerPanel:Refresh(p)
-    end)
-    p.wb:SetPoint("RIGHT", p, "TOPRIGHT", -SCROLL_W - 2, -9)
-    local wbLabel = ns.UI.fs(p, "small", C.dim)
-    wbLabel:SetPoint("RIGHT", p.wb, "LEFT", -8, 0)
-    wbLabel:SetText(L["PLAN_WORLD_BOSSES"])
+    -- What the route includes: three toggle chips, any combination (at
+    -- least one). World bosses are many: off by default.
+    p.kinds = {}
+    local prev
+    for i = 3, 1, -1 do -- laid out right to left
+        local key = ({ "raid", "dungeon", "worldBoss" })[i]
+        local label = ({ "PLAN_KIND_RAID", "PLAN_KIND_DUNGEON", "PLAN_KIND_WB" })[i]
+        local b = CreateFrame("Button", nil, p, "BackdropTemplate")
+        b:SetHeight(20)
+        b.text = ns.UI.fs(b, "small")
+        b.text:SetPoint("CENTER")
+        b.text:SetText(L[label])
+        b:SetWidth(b.text:GetStringWidth() + 18)
+        if prev then b:SetPoint("RIGHT", prev, "LEFT", -4, 0)
+        else b:SetPoint("RIGHT", p, "TOPRIGHT", -SCROLL_W - 2, -9) end
+        b.key = key
+        b:SetScript("OnClick", function(self)
+            local on = not ns.Planner:Kinds()[self.key]
+            if ns.Planner:SetKind(self.key, on) then
+                if p.bar then p.bar:SetValue(0) end
+                PlannerPanel:Refresh(p)
+            end
+        end)
+        b:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+            GameTooltip:AddLine(L["PLAN_KINDS_TIP"], 1, 1, 1, true)
+            GameTooltip:Show()
+        end)
+        b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+        p.kinds[key] = b
+        prev = b
+    end
+    local kindsLabel = ns.UI.fs(p, "small", C.dim)
+    kindsLabel:SetPoint("RIGHT", prev, "LEFT", -8, 0)
+    kindsLabel:SetText(L["PLAN_KINDS"])
 
     p.next = ns.UI.Button(p, "primary")
     ns.UI.SetButtonText(p.next, L["PLAN_NEXT"], 96)
@@ -399,10 +424,16 @@ function PlannerPanel:Refresh(p, entries)
 
     local hideDone = ns.Storage.db.ui.plannerHideDone and true or false
     p.hide:SetChecked(hideDone)
-    local withWB = ns.Storage.db.ui.plannerWorldBosses and true or false
-    p.wb:SetChecked(withWB)
+    local kinds = ns.Planner:Kinds()
+    local a = C.accent
+    for key, b in pairs(p.kinds) do
+        local on = kinds[key]
+        ns.UI.StylePanel(b, on and { a[1], a[2], a[3], 0.35 } or { 0, 0, 0, 0.25 },
+            { border = on and { a[1], a[2], a[3], 0.9 } or { 1, 1, 1, 0.15 }, noSheen = true })
+        b.text:SetTextColor(1, 1, 1, on and 1 or 0.55)
+    end
 
-    local steps, sum = ns.Planner:Build(entries, hideDone, withWB)
+    local steps, sum = ns.Planner:Build(entries, hideDone, kinds)
     p.nextJid = sum.nextJid
     p.next:SetEnabled(sum.nextJid ~= nil)
     local text = L["PLAN_PROGRESS"]:format(sum.done, sum.total)
