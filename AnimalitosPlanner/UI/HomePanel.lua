@@ -54,10 +54,12 @@ local function createGreeting(p)
     p.banner:SetPoint("TOPRIGHT")
     p.banner:SetPoint("BOTTOMRIGHT")
     p.banner:SetWidth(BANNER_W)
-    p.banner:SetAlpha(0.55)
+    p.banner:SetAlpha(0.85)
     local bg = C.background
     local fade = head:CreateTexture(nil, "BACKGROUND", nil, -1)
-    fade:SetAllPoints(p.banner)
+    fade:SetPoint("TOPLEFT", p.banner)
+    fade:SetPoint("BOTTOMLEFT", p.banner)
+    fade:SetWidth(BANNER_W * 0.45) -- only the left edge fades; the rest stays visible
     fade:SetColorTexture(1, 1, 1, 1)
     fade:SetGradient("HORIZONTAL", CreateColor(bg[1], bg[2], bg[3], 1), CreateColor(bg[1], bg[2], bg[3], 0))
 
@@ -225,12 +227,14 @@ local function createStart(p, top)
         r.art:SetPoint("TOPLEFT")
         r.art:SetPoint("BOTTOMLEFT")
         r.art:SetWidth(START_ART_W)
-        r.art:SetAlpha(0.5)
+        r.art:SetAlpha(0.7)
         local s = C.surface
         local fade = r:CreateTexture(nil, "BACKGROUND", nil, 2)
-        fade:SetAllPoints(r.art)
+        fade:SetPoint("TOPRIGHT", r.art)
+        fade:SetPoint("BOTTOMRIGHT", r.art)
+        fade:SetWidth(START_ART_W * 0.6) -- art stays clear behind the number, fades under the name
         fade:SetColorTexture(1, 1, 1, 1)
-        fade:SetGradient("HORIZONTAL", CreateColor(0, 0, 0, 0.25),
+        fade:SetGradient("HORIZONTAL", CreateColor(0, 0, 0, 0),
             CreateColor(s[1] * 0.82, s[2] * 0.82, s[3] * 0.82, 1))
 
         r.badge = ns.UI.NumberBadge(r, 20)
