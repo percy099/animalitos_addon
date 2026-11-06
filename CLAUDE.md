@@ -20,6 +20,7 @@ La especificación vigente es `docs/` (v1.2, en español). El documento más út
 | v0.5 Colección virtualizada, Detalle de montura | ✅ rama `josemaria`: Colección (List, Boss drops, Achievements, Other drops) y Detalle de montura (estado, dónde conseguirla por dificultad, logros, texto del diario) |
 | Planner (rama `josemaria`, v0.6.0–0.12.2) | ✅ validado en el cliente, con mago y con Horda |
 | v0.6 Cobertura legacy completa y curación | 🟡 rama `josemaria` v0.7–0.8: world bosses (6 monturas, lockout validado con Galleon) y logros con montura (lista + enlace a instancias). Rares y otros drops: solo quién y zona desde el diario (vista *Other drops*, botón Map). Kraulok por su misión de mundo (v0.11.0; abre sin errores, estados por validar cuando esté en rotación) |
+| Rama `josemaria` v0.13–0.24 | ✅ validado en el cliente: iconos de viaje, menú *Show:* del Planner (raid/mazmorra/world boss/favoritos), favoritos del addon, inferencia de fuente, jefes de eventos de temporada, requisitos y precio de vendedor (*Ready to buy*), ayuda de dificultad, viaje con clic en la mini, pasada de rendimiento |
 | v1.0 Release (CurseForge/Wago) | ⏳ |
 
 ## 3. Entorno
@@ -39,7 +40,11 @@ El orden de carga está en el `.toc` y **importa**:
 | `Data/Dataset.lua` | **GENERADO**, no se edita a mano. `ns.Data = { version, instances[jid], sources[] }` |
 | `Storage/SavedVariables.lua` | `AnimalitosPlannerDB` (por cuenta), versión de esquema, `migrations[n]` y `fillDefaults` |
 | `Integrations/MountJournal.lua` | Único lugar con llamadas a `C_MountJournal` |
-| `Integrations/Lockouts.lua` | Instancias guardadas → `byMap[instanceMapID][difficultyID] = { killed[bossName], resetAt }` |
+| `Integrations/Lockouts.lua` | Instancias guardadas → `byMap[instanceMapID][difficultyID] = { killed[bossName], resetAt }`. `Refresh()` devuelve si cambió algo (firma): solo entonces se redibuja |
+| `Integrations/Holidays.lua` | Jefes de eventos de temporada por el buscador de mazmorras (LFG 285/287/288): activo = la cola aparece en `GetLFGRandomDungeonInfo`; hecho hoy = `GetLFGDungeonRewards`; `OpenQueue`. `/aplan events test` los simula activos |
+| `Integrations/Wallet.lua` | Precio desde el texto del diario (oro, monedas enlazadas (`Hcurrency:`), objetos (`Hitem:`), monedas por icono) y cuánto tiene el personaje |
+| `Integrations/Requirements.lua` | Requisitos de vendedor: tooltip del objeto de la montura (`C_TooltipInfo`, rojo = no cumple), renombre y logro del texto del diario, requisitos curados (`ns.Data.vendorReqs`), precio (Wallet). Remix se ignora. `VendorSet()` en segundo plano para *Ready to buy* |
+| `Integrations/Difficulty.lua` | Dificultad: `Pick` (la que da más monturas Ready), `Inside`, `IsSet`, `Set` (legacy = modo 14/15 + tamaño 3/4), `Blocked` (combate, dentro, no líder) |
 | `Modules/Collection.lua` | Totales; el número principal coincide con el diario de Blizzard (visibles para el personaje) |
 | `Modules/Eligibility.lua` | Estado por (fuente, dificultad): `ready`, `lockedOut`, `verificationRequired`, `unavailable`, `collected`, `outOfScope` |
 | `Modules/FarmList.lua` | Agrupa por instancia, ordena (zona actual → continente → número de monturas → expansión) y oculta hasta el reset |
@@ -56,7 +61,7 @@ El orden de carga está en el `.toc` y **importa**:
 | `UI/SettingsPanel.lua` | *Settings*: navegación, expansión máxima, minimapa, tamaño y posición de la ventana |
 | `UI/CollectionPanel.lua` | *Collection*: lista virtualizada de todo el diario, buscador, filtros, vista por expansión (solo drops del dataset) |
 | `UI/PlannerPanel.lua` | *Planner*: tabla de pasos (pools), reinicios, Clear marks, Mini window, Hide completed, Next step; clic en una montura abre su detalle con el 3D |
-| `UI/PlannerMini.lua` | Ventana mini movible (`/aplan mini`): siguiente paso (viaje, instancia, monturas clicables con modelo 3D en un popup, Go, Done, Undo) y el paso de después. Posición y estado abierto en `db.ui.miniPoint` / `miniShown` |
+| `UI/PlannerMini.lua` | Ventana mini movible (`/aplan mini`): siguiente paso (viaje, instancia, monturas clicables con modelo 3D en un popup, Go, Done, Undo) y el paso de después. En la entrada o dentro: dificultad (con botón) y jefe de cada montura; dentro no muestra el viaje. Líneas de viaje con clic (botones seguros, ver §10). Posición y estado abierto en `db.ui.miniPoint` / `miniShown` |
 | `UI/MainFrame.lua` | Ventana 720×500: cabecera de una línea (título › sección, personaje, ↻, ✕), barra lateral, sin pie. Escala en `db.ui.scale` |
 | `Bootstrap.lua` | Se carga al final: eventos, comandos `/aplan` y `/animalitos`, AddonCompartment |
 
@@ -100,6 +105,8 @@ Sin el juego:  python3 pipeline/build_dataset.py --from-raw data/raw/scan-12.1.5
   - 2 entradas dudosas: Vortex Pinnacle (Uldum, probablemente bien) y Nerub-ar Palace.
 - **Drops curados** (`extraSources` en `overrides.json`): monturas de jefes que el EJ no lista (Bronze Drake, Smoldering Ember Wyrm, Aerial Unit R-21/X, los otros 3 jefes de Vault of Archavon). Verificados a mano en Wowhead y warcraft.wiki.gg; en el juego `FarmList:ResolveCurated` comprueba el mountID desde el objeto y busca el journalEncounterID por dungeonEncounterID. Jefes ocultos (`hiddenBoss`) quedan siempre en To verify. Un segundo `/aplan scan` (2026-11-06, otra cuenta) dio **los mismos drops** y menos entradas (170 contra 181), así que se mantuvo el scan anterior.
 - Datos de terceros: **no importar** Rarity, SimpleArmory ni HandyNotes sin revisar su licencia (somos MIT). Wowhead solo para verificar a mano; nunca scraping.
+- **Objetos de montura:** `/aplan scan items` (~1 minuto) recorre los IDs de objeto con `GetItemInfoInstant` (subclase Mount), los carga y los relaciona con `GetMountFromItem` → `AnimalitosPlannerDB.mountItems` → `data/raw/mountitems-<build>.json` → `ns.Data.mountItems[mountID] = itemID` (1 591 monturas). **Ojo:** pasar el archivo de SavedVariables al pipeline también reescribe `data/raw/scan-*.json` con el scan de esa cuenta; si es más viejo, restáuralo con `git checkout` y vuelve a generar con `--from-raw` (que toma el `mountitems-*.json` más reciente).
+- `holidayBosses` (jefes de eventos con su lfgDungeonID) y `vendorRequirements` (requisitos que el tooltip no muestra; hoy: las 3 Armored Vorquin, Exalted con Obsidian Warders/Dark Talons salvo Dracthyr) también viven en `overrides.json`, con `reason`.
 - `pipeline/savedvars.py` parsea SavedVariables. Ojo: el cliente escribe `nil,` como relleno en los arrays.
 
 ## 7. Ciclo de validación con el jugador
@@ -147,5 +154,12 @@ Hecho por Josemaria Vives con Claude, guiado por el vision board del producto (`
 **Entorno de Josemaria (Windows):** repo en `C:\Users\Josemaria Vives\animalitos_addon`, junction `AddOns\AnimalitosPlanner` → `<repo>\AnimalitosPlanner`. Python 3.13 se llama con `python` (no `python3`). En PowerShell 5.1:
 - mensajes de commit de varias líneas: escribir a un archivo y usar `git commit -F`;
 - no usar `Get-Content`/`Set-Content` para reescribir el `.toc` u otros archivos con acentos: los lee como ANSI y los guarda con BOM. Usar `[System.IO.File]::ReadAllText/WriteAllText` con UTF-8 sin BOM.
+
+**Decisiones v0.13–0.24 (con el jugador):**
+- Ideas de producto elegidas: 3 (eventos de temporada), 8 (vendedor) y 4 (ayuda de instancia). La 1 (lockouts de alts) se descartó: casi todas las monturas son de cuenta.
+- **Favoritos** propios del addon (`db.favorites`): los del diario de Blizzard solo sirven para monturas ya conseguidas.
+- **Vendedor:** el jugador descartó primero "puedes pagarla" porque dependía de reputación que no se leía; quedó *requisitos + precio*. Lo que el juego no dice en ningún lado va a `vendorRequirements` a mano; si una montura sale en *Ready to buy* y el vendedor no la vende, se agrega ahí. Nombre de la lista: *Ready to buy* / *Listas para comprar* (el jugador rechazó "Vendor: nothing missing").
+- **Viaje con clic:** los hechizos solo se lanzan desde `SecureActionButtonTemplate`. Los botones viven en `UIParent` y se colocan por **coordenadas de pantalla** sobre la línea; anclarlos al texto de la mini rompió la ventana. Se ocultan en `PLAYER_REGEN_DISABLED` (todavía se permite ahí) y vuelven al salir de combate. Teletransportes con el mismo nombre en Alianza y Horda (Shattrath, Tol Barad, Valle) se resuelven con `KnowsSpell`; un mago en grupo lanza el portal (tabla `PORTAL` en `Planner.lua`).
+- **Rendimiento:** `FarmList:Build()` se reutiliza dentro del mismo frame; `UPDATE_INSTANCE_INFO` y los eventos del buscador solo redibujan si cambió algo. Ojo con `("%d"):format` y valores grandes (precios en cobre pasan de 2^31): usa `%s`.
 
 **Pendiente:** abrir el PR `main...josemaria` y que el equipo lo revise; probar los textos en esES/esMX.
