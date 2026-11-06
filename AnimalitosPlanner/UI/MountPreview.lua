@@ -52,21 +52,48 @@ local function create()
     f.hint:SetJustifyH("RIGHT")
     f.hint:SetText(L["PREVIEW_DRAG"])
 
-    f.desc = ns.UI.fs(f, "GameFontHighlightSmall", C.muted)
-    f.desc:SetPoint("TOPLEFT", holder, "BOTTOMLEFT", 2, -20)
-    f.desc:SetWidth(W - 24)
-    f.desc:SetWordWrap(true)
-    f.desc:SetMaxLines(7)
-
-    f.source = ns.UI.fs(f, "GameFontHighlightSmall")
-    f.source:SetPoint("TOPLEFT", f.desc, "BOTTOMLEFT", 0, -8)
-    f.source:SetWidth(W - 24)
-    f.source:SetWordWrap(true)
-    f.source:SetMaxLines(5)
-
     f.journal = ns.UI.Button(f, "primary")
     ns.UI.SetButtonText(f.journal, L["BTN_OPEN_JOURNAL"], 160)
     f.journal:SetPoint("BOTTOM", 0, 12)
+
+    -- Description + source scroll (mouse wheel) between the model and the
+    -- button, so long texts never run under the button.
+    local scroll = CreateFrame("ScrollFrame", nil, f)
+    scroll:SetPoint("TOPLEFT", holder, "BOTTOMLEFT", 2, -20)
+    scroll:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -10, 12 + 22 + 8)
+    local child = CreateFrame("Frame", nil, scroll)
+    child:SetSize(W - 24, 1)
+    scroll:SetScrollChild(child)
+    scroll:EnableMouseWheel(true)
+    scroll:SetScript("OnMouseWheel", function(self, delta)
+        local max = self:GetVerticalScrollRange()
+        self:SetVerticalScroll(math.min(max, math.max(0, self:GetVerticalScroll() - delta * 28)))
+    end)
+    f.scroll, f.scrollChild = scroll, child
+
+    f.desc = ns.UI.fs(child, "GameFontHighlightSmall", C.muted)
+    f.desc:SetPoint("TOPLEFT")
+    f.desc:SetWidth(W - 28)
+    f.desc:SetWordWrap(true)
+
+    f.source = ns.UI.fs(child, "GameFontHighlightSmall")
+    f.source:SetPoint("TOPLEFT", f.desc, "BOTTOMLEFT", 0, -8)
+    f.source:SetWidth(W - 28)
+    f.source:SetWordWrap(true)
+
+    -- "More below" fade at the bottom edge while there is text left to scroll.
+    local bg = C.background
+    f.more = f:CreateTexture(nil, "OVERLAY")
+    f.more:SetPoint("BOTTOMLEFT", scroll, "BOTTOMLEFT", -2, 0)
+    f.more:SetPoint("BOTTOMRIGHT", scroll, "BOTTOMRIGHT")
+    f.more:SetHeight(18)
+    f.more:SetColorTexture(1, 1, 1, 1)
+    f.more:SetGradient("VERTICAL", CreateColor(bg[1], bg[2], bg[3], 1), CreateColor(bg[1], bg[2], bg[3], 0))
+    local function updateMore(self)
+        f.more:SetShown(self:GetVerticalScroll() < self:GetVerticalScrollRange() - 1)
+    end
+    scroll:SetScript("OnVerticalScroll", updateMore)
+    scroll:SetScript("OnScrollRangeChanged", updateMore) -- range settles after layout
     return f
 end
 
@@ -117,6 +144,9 @@ function Preview:Show(mountID)
     f.title:SetText(m and m.name or ("#" .. mountID))
     f.desc:SetText(extra.description or "")
     f.source:SetText(extra.sourceText or "")
+    f.scrollChild:SetHeight(f.desc:GetStringHeight() + 8 + f.source:GetStringHeight())
+    f.scroll:SetVerticalScroll(0)
+    f.scroll:UpdateScrollChildRect()
     f.journal:SetScript("OnClick", function()
         if not ns.MountJournal:OpenInJournal(mountID) then ns:Print(L["JOURNAL_COMBAT"]) end
     end)
