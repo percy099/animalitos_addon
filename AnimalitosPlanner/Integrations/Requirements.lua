@@ -1,6 +1,6 @@
 -- What a vendor asks for before selling a mount, and whether this character
--- has it. The price is not checked (player's decision: gold is never the
--- problem). Sources, all from the client:
+-- has it, price included (gold, currencies, items: Wallet). Sources, all
+-- from the client:
 --   * the mount item's tooltip (item from ns.Data.mountItems, built by
 --     /aplan scan items): reputation, faction, class, race and skill lines.
 --     The client paints them red when not met.
@@ -88,6 +88,19 @@ local function buildAchIndex()
     end)
 end
 
+local priceCache = {} -- [mountID] = parts (the text does not change)
+local function priceOf(mountID)
+    local parts = priceCache[mountID]
+    if parts == nil then
+        local extra = ns.MountJournal:GetMountExtra(mountID)
+        local text = extra and extra.sourceText
+        if not text or text == "" then return {} end -- not loaded yet: try again later
+        parts = ns.Wallet:ParseCost(text) or false
+        priceCache[mountID] = parts
+    end
+    return parts or {}
+end
+
 local function renownText(rank, name, have)
     return ns.L["REQ_RENOWN"]:format(rank, name, have)
 end
@@ -158,6 +171,26 @@ function R:Get(mountID)
     remix = fromJournal(mountID, reqs) or remix
     if next(wantedAch) and not achIndex then buildAchIndex() end
 
+    -- The price (gold, currencies, items) against what this character has.
+    -- Parsed once per mount; "have" is read again after each invalidation.
+    local price = {}
+    for _, p in ipairs(priceOf(mountID)) do
+        local have = ns.Wallet:Have(p)
+        local line
+        if have == nil or p.kind == "unknown" then
+            line, have = ns.Wallet:Format(p, p.need), nil
+        elseif have >= p.need then
+            line = ns.L["REQ_PRICE_OK"]:format(ns.Wallet:Format(p, p.need), ns.Wallet:Format(p, have))
+        else
+            line = ns.L["REQ_PRICE_MISSING"]:format(ns.Wallet:Format(p, p.need), ns.Wallet:Format(p, p.need - have))
+        end
+        if p.name then line = line .. "  |cff999999" .. p.name .. "|r" end
+        local met = nil
+        if have ~= nil then met = have >= p.need end
+        reqs[#reqs + 1] = { text = line, met = met, price = true }
+        price[#price + 1] = ns.Wallet:Format(p, p.need)
+    end
+
     local status
     if remix then
         status = "remix"
@@ -168,7 +201,7 @@ function R:Get(mountID)
         end
         status = missing and "missing" or unknown and "unknown" or (#reqs > 0 and "met") or "none"
     end
-    local result = { status = status, reqs = reqs }
+    local result = { status = status, reqs = reqs, price = #price > 0 and table.concat(price, " + ") or nil }
     cache[mountID] = result
     return result
 end
@@ -188,7 +221,7 @@ function R:VendorSet()
                 ns.Collection.Tick()
                 local r = self:Get(m.mountID)
                 if r and (r.status == "met" or r.status == "none") then
-                    set[m.mountID] = r.status
+                    set[m.mountID] = r -- { status, reqs, price }
                     n = n + 1
                 end
             end
@@ -218,6 +251,9 @@ end
 ns:On("UPDATE_FACTION", changed)
 ns:On("MAJOR_FACTION_RENOWN_LEVEL_CHANGED", changed)
 ns:On("NEW_MOUNT_ADDED", changed)
+ns:On("PLAYER_MONEY", changed)
+ns:On("CURRENCY_DISPLAY_UPDATE", changed)
+ns:On("BAG_UPDATE_DELAYED", changed)
 ns:On("ACHIEVEMENT_EARNED", function()
     achIndex = nil
     changed()

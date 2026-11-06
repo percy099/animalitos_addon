@@ -234,9 +234,10 @@ local function render(p)
             elseif p.mode == "drops" then
                 fillRow(r, m.mount, index, nil, m.label)
             else
-                -- "Vendor: nothing missing": requirements met or none.
-                local st = p.vendorOk and p.vendorOk[m.mountID]
-                local label = st and ((st == "met") and L["REQ_MET_SHORT"] or L["REQ_NONE_SHORT"]) or nil
+                -- "Vendor: nothing missing": requirements and price met, or none.
+                -- The price when there is one, else whether it asks for anything.
+                local req = p.vendorOk and p.vendorOk[m.mountID]
+                local label = req and (req.price or ((req.status == "met") and L["REQ_MET_SHORT"] or L["REQ_NONE_SHORT"])) or nil
                 fillRow(r, m, index, p.farm and p.farm[m.mountID], label)
             end
             r:Show()
