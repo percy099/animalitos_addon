@@ -18,12 +18,14 @@ local SIDEBAR_W = 160
 local NAV_BUTTON_H = 32
 UI.CONTENT_WIDTH = WIDTH - SIDEBAR_W - PAD * 3
 
--- Sidebar sections, in display order. Icons are client icon files.
+-- Sidebar sections, in display order. Icons are our own flat glyphs
+-- (pipeline/gen_ui_textures.py): house, horseshoe, open book, gear.
+local MEDIA = "Interface\\AddOns\\AnimalitosPlanner\\Media\\"
 local SECTIONS = {
-    { key = "home",       label = "NAV_HOME",       icon = "Interface\\Icons\\INV_Misc_Map_01" },
-    { key = "farm",       label = "NAV_FARM",       icon = "Interface\\Icons\\Ability_Mount_RidingHorse" },
-    { key = "collection", label = "NAV_COLLECTION", icon = "Interface\\Icons\\INV_Misc_Book_09" },
-    { key = "settings",   label = "NAV_SETTINGS",   icon = "Interface\\Icons\\Trade_Engineering" },
+    { key = "home",       label = "NAV_HOME",       icon = MEDIA .. "nav-home" },
+    { key = "farm",       label = "NAV_FARM",       icon = MEDIA .. "nav-farm" },
+    { key = "collection", label = "NAV_COLLECTION", icon = MEDIA .. "nav-collection" },
+    { key = "settings",   label = "NAV_SETTINGS",   icon = MEDIA .. "nav-settings" },
 }
 local DEFAULT_SECTION = "farm"
 
@@ -75,14 +77,9 @@ local function navButton(parent, section)
     b.bar:SetColorTexture(a[1], a[2], a[3], 1)
 
     b.icon = b:CreateTexture(nil, "ARTWORK")
-    b.icon:SetSize(18, 18)
-    b.icon:SetPoint("LEFT", 12, 0)
-    UI.Glyph(b.icon, section.icon)
-    b.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92) -- crop the icon border
-    local mask = b:CreateMaskTexture()
-    mask:SetTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-    mask:SetAllPoints(b.icon)
-    b.icon:AddMaskTexture(mask)
+    b.icon:SetSize(16, 16)
+    b.icon:SetPoint("LEFT", 13, 0)
+    b.icon:SetTexture(section.icon) -- white glyph, tinted in paintNav
 
     b.badge = fs(b, "small", COLORS.success)
     b.badge:SetPoint("RIGHT", -10, 0)
