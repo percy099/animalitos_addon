@@ -16,8 +16,9 @@ La especificación vigente es `docs/` (v1.2, en español). El documento más út
 | v0.2 Dataset desde el scan en el juego + pipeline | ✅ 67 fuentes, 66 monturas, 50 instancias |
 | v0.3 Lockouts + elegibilidad + `/aplan now` / `go` / `why` | ✅ validada en el cliente (Dragon Soul, Firelands, ICC, Ulduar, Utgarde Pinnacle) |
 | v0.4 Pestaña "Farmeable ahora" (tarjetas, Ir, Ocultar hasta el reset) | 🟡 funciona; **pendiente**: la flecha del waypoint nativo no se vio (diagnosticar con `/aplan navdebug`, ver §9) y reordenar a mano |
-| Rediseño de la UI (rama `josemaria`, v0.4.7–0.4.13) | 🟡 validado en el cliente; pendiente revisar y fusionar con un PR (ver §10) |
-| v0.5 Colección virtualizada, Detalle de montura | ⏳ (Ajustes y botón del minimapa ya están, sin Ace3) |
+| Rediseño de la UI (rama `josemaria`, v0.4.7–0.6.5) | 🟡 validado en el cliente; pendiente revisar y fusionar con un PR (ver §10) |
+| v0.5 Colección virtualizada, Detalle de montura | 🟡 Colección hecha en la rama `josemaria` (lista, filtros, vista por expansión); falta el Detalle de montura |
+| Planner (rama `josemaria`, v0.6.0–0.6.5) | ✅ validado en el cliente, también con mago |
 | v0.6 Cobertura legacy completa y curación | ⏳ |
 | v1.0 Release (CurseForge/Wago) | ⏳ |
 
@@ -42,6 +43,7 @@ El orden de carga está en el `.toc` y **importa**:
 | `Modules/Collection.lua` | Totales; el número principal coincide con el diario de Blizzard (visibles para el personaje) |
 | `Modules/Eligibility.lua` | Estado por (fuente, dificultad): `ready`, `lockedOut`, `verificationRequired`, `unavailable`, `collected`, `outOfScope` |
 | `Modules/FarmList.lua` | Agrupa por instancia, ordena (zona actual → continente → número de monturas → expansión) y oculta hasta el reset |
+| `Modules/Planner.lua` | Ruta **estática** del planner (orden fijo por facción, nunca por posición), pasos de viaje (portales de capital, portales de zona de Cata, teletransportes de mago, mago en el grupo), marcas manuales por personaje hasta el reset |
 | `Integrations/Navigation.lua` | Waypoint nativo (`C_Map.SetUserWaypoint` + `C_SuperTrack`) o TomTom; aviso si el destino está en otro continente; `Debug()` |
 | `Integrations/MinimapButton.lua` | Botón del minimapa vía LibDBIcon + LibDataBroker **si otro addon ya los carga** (dependencia blanda, no se incluyen; ver §10) |
 | `Modules/Probe.lua` | `/aplan probe`: firmas de API, EJ, mapa, lockouts y TomTom → `AnimalitosPlannerDB.diagnostics` |
@@ -51,6 +53,8 @@ El orden de carga está en el `.toc` y **importa**:
 | `UI/HomePanel.lua` | *Home*: saludo con banner, anillo de colección, casillas de estado, "Start here", reinicios |
 | `UI/MountPreview.lua` | Panel lateral con el modelo 3D (ModelScene, como el diario) y "Open in Mount Journal" |
 | `UI/SettingsPanel.lua` | *Settings*: navegación, expansión máxima, minimapa, tamaño y posición de la ventana |
+| `UI/CollectionPanel.lua` | *Collection*: lista virtualizada de todo el diario, buscador, filtros, vista por expansión (solo drops del dataset) |
+| `UI/PlannerPanel.lua` | *Planner*: tabla de pasos (pools), reinicios, Reset all/dungeons/raids, Hide completed, Next step |
 | `UI/MainFrame.lua` | Ventana 720×500: cabecera de una línea (título › sección, personaje, ↻, ✕), barra lateral, sin pie. Escala en `db.ui.scale` |
 | `Bootstrap.lua` | Se carga al final: eventos, comandos `/aplan` y `/animalitos`, AddonCompartment |
 
@@ -117,14 +121,16 @@ Personajes de prueba: **Pennyus** (druida 90, con lockouts en FL H, ICC 25H, Uld
 1. **Flecha del waypoint nativo:** no se vio en Eastern Kingdoms. Pedir `/aplan navdebug` y revisar la opción `showInGameNavigation`, si `IsSuperTrackingUserWaypoint` está activo y la distancia de `C_Navigation`. Alternativa: `/aplan nav tomtom`.
 2. Terminar la v0.4: reordenar la lista a mano (AC-09) y probar Ocultar y "Mostrar ocultas" entre reinicios del juego.
 3. Curar los huecos del reporte (entradas) y validar la lista en esES/esMX.
-4. v0.5: Colección virtualizada (la sección *Collection* hoy dice "próximamente") y Detalle de montura (fuentes y explicación por dificultad, como `/aplan why`). Ajustes y botón del minimapa ya existen sin Ace3.
-5. Preguntas abiertas: reparto de roles en el equipo, nombre público, publicar en CurseForge, en Wago o en ambos.
+4. v0.5: falta el Detalle de montura (fuentes y explicación por dificultad, como `/aplan why`); la Colección ya está en la rama `josemaria`.
+5. Planner: más portales escritos a mano (Horda, Kul Tiras/Zandalar, Shadowlands, druidas, Dalaran Hearthstone, juguetes de teletransporte). Los casos no cubiertos dicen "Travel to …".
+6. Preguntas abiertas: reparto de roles en el equipo, nombre público, publicar en CurseForge, en Wago o en ambos.
 
 ## 10. Rediseño de la UI (rama `josemaria`)
 Hecho por Josemaria Vives con Claude, guiado por el vision board del producto (`01_Mount_Planner_Product_Vision_Board.png`, fuera del repo) y con **ideas** de EllesmereUI. EllesmereUI es "all rights reserved": no se copió código ni arte, solo técnicas (bordes de 1 px, jerarquía de texto por transparencia, línea de brillo, botones planos, títulos en mayúsculas).
 
 **Decisiones:**
-- Ventana 720×500; siempre abre en *Farmable now*; orden de la barra lateral Home → Farmable now → Collection → Settings.
+- Ventana 720×500; siempre abre en *Farmable now*; orden de la barra lateral Home → Farmable now → Planner → Collection → Settings.
+- **Planner:** el orden de la ruta es fijo a propósito (pedido del jugador: si vas a Stormwind por los portales, la lista no puede reordenarse). Se calcula una vez por facción con todo el dataset: continentes en orden fijo (`ORDER`), y dentro de cada uno, vecino más cercano desde un hub fijo (`HUBS`). Lo hecho se marca o se oculta, sin mover el resto. Los textos de viaje vienen de tablas escritas a mano (`ZONE_PORTALS`, `CONTINENT_PORTALS`, `MAGE`); lo que no está cubierto cae en "Travel to …". Reglas de mago validadas: un teletransporte que deja en la zona de la instancia gana siempre (Theramore para Onyxia); un teletransporte lejano no gana a un portal de capital (Stormwind → Caverns of Time, no Theramore + vuelo); el mago usa el viaje gratis a la capital para tomar portales de zona (Uldum). Un portal que deja en el mapa padre (Tanaris) cuenta como llegada a la subzona (Caverns of Time).
 - Fuentes del cliente: Friz Quadrata para títulos y números, Arial Narrow para el texto.
 - Horas con el mismo reloj que el minimapa (`Lockouts:FormatClock`: hora del reino o local y 12/24 h según la opción del jugador). `date()` solo usa la zona horaria de Windows y salía desfasado.
 - Botón del minimapa: **LibDataBroker no tiene licencia**, así que no se incluye; LibDBIcon (BSD) tampoco, para no depender de LDB. El botón aparece solo si otro addon ya cargó ambas.
