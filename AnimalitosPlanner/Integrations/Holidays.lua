@@ -27,6 +27,7 @@ end
 
 --- True when this character already got today's reward from the queue.
 function H:DoneToday(lfgID)
+    if self.test then return false end -- test mode: show them as farmable
     if not GetLFGDungeonRewards then return nil end
     local done = GetLFGDungeonRewards(lfgID)
     return done and true or false
