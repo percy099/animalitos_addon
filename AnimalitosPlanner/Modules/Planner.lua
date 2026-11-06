@@ -335,16 +335,27 @@ function Planner:Kinds()
     return ui.plannerKinds
 end
 
---- Turns one kind on or off; at least one stays on.
+--- Turns one kind on or off; at least one of raid / dungeon / worldBoss
+--- stays on. "favorites" (only instances with a favorite mount) is a
+--- separate flag on top.
 function Planner:SetKind(kind, on)
     local k = self:Kinds()
-    if not on then
+    if not on and kind ~= "favorites" then
         local others = 0
-        for key, v in pairs(k) do if v and key ~= kind then others = others + 1 end end
+        for _, key in ipairs({ "raid", "dungeon", "worldBoss" }) do
+            if k[key] and key ~= kind then others = others + 1 end
+        end
         if others == 0 then return false end
     end
     k[kind] = on and true or false
     return true
+end
+
+local function hasFavorite(e)
+    for mountID in pairs(e.mounts) do
+        if ns.Collection:IsFavorite(mountID) then return true end
+    end
+    return false
 end
 
 function Planner:Build(entries, hideCompleted, kinds)
@@ -352,7 +363,7 @@ function Planner:Build(entries, hideCompleted, kinds)
     local byJid = {}
     for _, e in ipairs(entries or {}) do
         -- Only the kinds the player picked (the route order stays the same).
-        if kinds[kindOf(e.inst)] then byJid[e.jid] = e end
+        if kinds[kindOf(e.inst)] and (not kinds.favorites or hasFavorite(e)) then byJid[e.jid] = e end
     end
 
     local runs = {}

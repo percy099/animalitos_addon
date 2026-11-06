@@ -318,6 +318,26 @@ function Collection:ByExpansion()
     return out
 end
 
+-- Favorites -------------------------------------------------------------------
+-- The addon's own star (account-wide, db.favorites[mountID] = true). Blizzard's
+-- journal favorites only work for mounts already collected.
+function Collection:IsFavorite(mountID)
+    local f = ns.Storage.db.favorites
+    return f ~= nil and mountID ~= nil and f[mountID] == true
+end
+
+function Collection:ToggleFavorite(mountID)
+    if not mountID then return end
+    local db = ns.Storage.db
+    db.favorites = db.favorites or {}
+    db.favorites[mountID] = (not db.favorites[mountID]) or nil
+    if ns.UI and ns.UI.Refresh then ns.UI:Refresh() end
+end
+
+function Collection:HasFavorites()
+    return next(ns.Storage.db.favorites or {}) ~= nil
+end
+
 --- Mounts the journal shows for this character (same set as its counter),
 --- sorted by name. Each item is a MountJournal:GetMount record. nil if the
 --- journal is not ready yet.

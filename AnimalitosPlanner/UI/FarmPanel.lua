@@ -312,7 +312,7 @@ function FarmPanel:Refresh(p, entries, sum)
 
         local mj = ns.MountJournal:GetMount(id)
         r.icon:SetTexture(mj and mj.icon or 134400) -- 134400 = question-mark icon
-        local name = mj and mj.name or ("#" .. id)
+        local name = (ns.Collection:IsFavorite(id) and (ns.UI.STAR .. " ") or "") .. (mj and mj.name or ("#" .. id))
         local color
         if mode == "ready" then
             r.text:SetText(("%s  %s(%s)|r"):format(name, MUTED_HEX, diffList(m.ready)))

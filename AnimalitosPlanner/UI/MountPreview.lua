@@ -26,9 +26,12 @@ local function create()
     local close = ns.UI.CloseButton(f)
     close:SetPoint("TOPRIGHT", -6, -6)
 
+    f.star = ns.UI.FavStar(f, 18)
+    f.star:SetPoint("RIGHT", close, "LEFT", -4, 0)
+
     f.title = ns.UI.fs(f, "GameFontNormalLarge")
     f.title:SetPoint("TOPLEFT", 12, -12)
-    f.title:SetPoint("RIGHT", close, "LEFT", -4, 0)
+    f.title:SetPoint("RIGHT", f.star, "LEFT", -4, 0)
     f.title:SetWordWrap(false)
 
     local holder = CreateFrame("Frame", nil, f, "BackdropTemplate")
@@ -374,6 +377,7 @@ function Preview:Show(mountID)
     local m = ns.MountJournal:GetMount(mountID)
     local extra = ns.MountJournal:GetMountExtra(mountID) or {}
     f.mountID = mountID
+    f.star:SetMount(mountID)
     f.title:SetText(m and m.name or ("#" .. mountID))
     f.scrollChild:SetHeight(math.max(1, build(f, mountID, m, extra)))
     f.scroll:SetVerticalScroll(0)

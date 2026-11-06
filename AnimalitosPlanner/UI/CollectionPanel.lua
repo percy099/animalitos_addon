@@ -20,6 +20,7 @@ local FILTERS = {
     { key = "all",       text = "COL_FILTER_ALL" },
     { key = "missing",   text = "COL_FILTER_MISSING" },
     { key = "collected", text = "COL_FILTER_COLLECTED" },
+    { key = "favorites", text = "COL_FILTER_FAV" },
 }
 
 local function fmt(n)
@@ -103,9 +104,12 @@ local function newRow(p)
     r.source:SetWidth(110)
     r.source:SetWordWrap(false)
 
+    r.fav = ns.UI.FavStar(r, 14)
+    r.fav:SetPoint("RIGHT", r.source, "LEFT", -8, 0)
+
     r.name = ns.UI.fs(r, "GameFontHighlight")
     r.name:SetPoint("LEFT", r.icon, "RIGHT", 8, 0)
-    r.name:SetPoint("RIGHT", r.source, "LEFT", -8, 0)
+    r.name:SetPoint("RIGHT", r.fav, "LEFT", -6, 0)
     r.name:SetWordWrap(false)
 
     -- Achievement view only: thin progress bar under the name.
@@ -153,6 +157,7 @@ local function fillAchRow(r, a, index)
     local C = ns.UI.COLORS
     local m = a.mount
     r.mount, r.farm, r.ach = nil, nil, a
+    r.fav:SetMount(m.mountID)
     r.zebra:SetShown(index % 2 == 1)
     r.icon:SetTexture(m.icon or a.icon or 134400)
     r.icon:SetDesaturated(not m.isCollected)
@@ -181,6 +186,7 @@ end
 local function fillRow(r, m, index, farm, sourceText)
     local C = ns.UI.COLORS
     r.mount, r.farm, r.ach = m, farm, nil
+    r.fav:SetMount(m.mountID)
     r.ptrack:Hide()
     r.pfill:Hide()
     -- "Other drops" shows who and where instead of the source type.
@@ -267,7 +273,9 @@ function CollectionPanel:Create(parent)
     p.search:SetPoint("RIGHT", p.view, "LEFT", -8, 0)
 
     local items = {}
-    for _, f in ipairs(FILTERS) do items[#items + 1] = { key = f.key, text = L[f.text] } end
+    for _, f in ipairs(FILTERS) do
+        items[#items + 1] = { key = f.key, text = f.key == "favorites" and ns.UI.STAR or L[f.text] }
+    end
     p.filter = ns.UI.Segmented(lv, items, function(key)
         ns.Storage.db.ui.collectionFilter = key
         if p.bar then p.bar:SetValue(0) end
@@ -504,6 +512,7 @@ local function refreshAchievements(p, key)
         if a.mount.isCollected then collected = collected + 1 end
         local owned = a.mount.isCollected
         local keep = (key == "all") or (key == "missing" and not owned) or (key == "collected" and owned)
+            or (key == "favorites" and ns.Collection:IsFavorite(a.mount.mountID))
         if keep and cat then keep = a.top == cat end
         if keep and q ~= "" then
             keep = a.name:lower():find(q, 1, true) ~= nil or a.mount.name:lower():find(q, 1, true) ~= nil
@@ -577,6 +586,7 @@ local function refreshDrops(p, key)
         local owned = e.mount.isCollected
         if owned then collected = collected + 1 end
         local keep = (key == "all") or (key == "missing" and not owned) or (key == "collected" and owned)
+            or (key == "favorites" and ns.Collection:IsFavorite(e.mount.mountID))
         if keep and cont then keep = e.continent == cont end
         if keep and q ~= "" then
             keep = e.mount.name:lower():find(q, 1, true) ~= nil or e.label:lower():find(q, 1, true) ~= nil
@@ -686,6 +696,7 @@ function CollectionPanel:Refresh(p, entries)
     for _, m in ipairs(list or {}) do
         local keep = (key == "all") or (key == "missing" and not m.isCollected)
             or (key == "collected" and m.isCollected)
+            or (key == "favorites" and ns.Collection:IsFavorite(m.mountID))
         if keep and src then keep = (m.sourceType or 0) == src end
         if keep and tierSet then keep = tierSet[m.mountID] == true end
         if keep and q ~= "" then keep = m.name:lower():find(q, 1, true) ~= nil end

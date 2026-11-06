@@ -582,8 +582,17 @@ function UI.Dropdown(parent, width, onSelect)
                 r.label:SetPoint("LEFT", 10, 0)
                 r.label:SetPoint("RIGHT", -10, 0)
                 r.label:SetWordWrap(false)
+                -- Check box for multi-select menus (items with checked ~= nil).
+                r.box = r:CreateTexture(nil, "ARTWORK")
+                r.box:SetSize(10, 10)
+                r.box:SetPoint("LEFT", 10, 0)
+                r.box:SetColorTexture(1, 1, 1, 0.35)
+                r.boxIn = r:CreateTexture(nil, "ARTWORK", nil, 1)
+                r.boxIn:SetPoint("TOPLEFT", r.box, 1, -1)
+                r.boxIn:SetPoint("BOTTOMRIGHT", r.box, -1, 1)
                 r:SetScript("OnClick", function(self)
-                    menu:Hide()
+                    -- Multi-select rows keep the menu open.
+                    if self.checked == nil then menu:Hide() end
                     if onSelect then onSelect(self.value) end
                 end)
                 menu.rows[i] = r
@@ -592,6 +601,15 @@ function UI.Dropdown(parent, width, onSelect)
             r:SetPoint("TOPLEFT", 2, -2 - (i - 1) * MENU_ROW_H)
             r:SetPoint("RIGHT", -2, 0)
             r.value = it.value
+            r.checked = it.checked
+            local multi = it.checked ~= nil
+            r.box:SetShown(multi)
+            r.boxIn:SetShown(multi)
+            if multi then
+                if it.checked then r.boxIn:SetColorTexture(a[1], a[2], a[3], 1)
+                else r.boxIn:SetColorTexture(COLORS.background[1], COLORS.background[2], COLORS.background[3], 1) end
+            end
+            r.label:SetPoint("LEFT", multi and 28 or 10, 0)
             r.label:SetText(it.text)
             r:Show()
         end
@@ -601,6 +619,47 @@ function UI.Dropdown(parent, width, onSelect)
     dd:SetScript("OnClick", function() menu:SetShown(not menu:IsShown()) end)
     dd.menu = menu
     return dd
+end
+
+--- Inline favorite star for texts ("|A...|a"), client atlas.
+UI.STAR = "|A:PetJournal-FavoritesIcon:14:14|a"
+
+--- Favorite star button: gold when the mount is a favorite, a faint grey
+--- star otherwise. star:SetMount(mountID); click toggles the favorite.
+function UI.FavStar(parent, size)
+    local b = CreateFrame("Button", nil, parent)
+    b:SetSize(size or 16, size or 16)
+    b.tex = b:CreateTexture(nil, "OVERLAY")
+    b.tex:SetAllPoints()
+    if not b.tex:SetAtlas("PetJournal-FavoritesIcon") then
+        b.tex:SetTexture("Interface\\Common\\FavoritesIcon")
+    end
+    local function paint(self)
+        local on = ns.Collection:IsFavorite(self.mountID)
+        self.tex:SetDesaturated(not on)
+        self.tex:SetAlpha(on and 1 or (self.hover and 0.8 or 0.25))
+    end
+    function b:SetMount(mountID)
+        self.mountID = mountID
+        paint(self)
+    end
+    b:SetScript("OnClick", function(self)
+        ns.Collection:ToggleFavorite(self.mountID)
+        paint(self)
+    end)
+    b:SetScript("OnEnter", function(self)
+        self.hover = true
+        paint(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(ns.L[ns.Collection:IsFavorite(self.mountID) and "FAV_REMOVE" or "FAV_ADD"], 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", function(self)
+        self.hover = false
+        paint(self)
+        GameTooltip:Hide()
+    end)
+    return b
 end
 
 --- Client icon file shown as a monochrome glyph tinted with `color`.

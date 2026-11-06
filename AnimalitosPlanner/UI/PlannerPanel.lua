@@ -303,41 +303,24 @@ function PlannerPanel:Create(parent)
     hideLabel:SetPoint("RIGHT", p.hide, "LEFT", -8, 0)
     hideLabel:SetText(L["PLAN_HIDE_DONE"])
 
-    -- What the route includes: three toggle chips, any combination (at
-    -- least one). World bosses are many: off by default.
-    p.kinds = {}
-    local prev
-    for i = 3, 1, -1 do -- laid out right to left
-        local key = ({ "raid", "dungeon", "worldBoss" })[i]
-        local label = ({ "PLAN_KIND_RAID", "PLAN_KIND_DUNGEON", "PLAN_KIND_WB" })[i]
-        local b = CreateFrame("Button", nil, p, "BackdropTemplate")
-        b:SetHeight(20)
-        b.text = ns.UI.fs(b, "small")
-        b.text:SetPoint("CENTER")
-        b.text:SetText(L[label])
-        b:SetWidth(b.text:GetStringWidth() + 18)
-        if prev then b:SetPoint("RIGHT", prev, "LEFT", -4, 0)
-        else b:SetPoint("RIGHT", p, "TOPRIGHT", -SCROLL_W - 2, -9) end
-        b.key = key
-        b:SetScript("OnClick", function(self)
-            local on = not ns.Planner:Kinds()[self.key]
-            if ns.Planner:SetKind(self.key, on) then
-                if p.bar then p.bar:SetValue(0) end
-                PlannerPanel:Refresh(p)
-            end
-        end)
-        b:SetScript("OnEnter", function(self)
-            GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
-            GameTooltip:AddLine(L["PLAN_KINDS_TIP"], 1, 1, 1, true)
-            GameTooltip:Show()
-        end)
-        b:SetScript("OnLeave", function() GameTooltip:Hide() end)
-        p.kinds[key] = b
-        prev = b
-    end
-    local kindsLabel = ns.UI.fs(p, "small", C.dim)
-    kindsLabel:SetPoint("RIGHT", prev, "LEFT", -8, 0)
-    kindsLabel:SetText(L["PLAN_KINDS"])
+    -- What the route includes: a multi-select dropdown (favorites only,
+    -- raids, dungeons, world bosses; at least one kind stays on). The menu
+    -- stays open while ticking.
+    p.kinds = ns.UI.Dropdown(p, 190, function(key)
+        local on = not ns.Planner:Kinds()[key]
+        if ns.Planner:SetKind(key, on) then
+            if p.bar then p.bar:SetValue(0) end
+            PlannerPanel:Refresh(p)
+        end
+    end)
+    p.kinds:SetHeight(22)
+    p.kinds:SetPoint("RIGHT", p, "TOPRIGHT", -SCROLL_W - 2, -9)
+    p.kinds:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(L["PLAN_KINDS_TIP"], 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    p.kinds:HookScript("OnLeave", function() GameTooltip:Hide() end)
 
     p.next = ns.UI.Button(p, "primary")
     ns.UI.SetButtonText(p.next, L["PLAN_NEXT"], 96)
@@ -425,13 +408,18 @@ function PlannerPanel:Refresh(p, entries)
     local hideDone = ns.Storage.db.ui.plannerHideDone and true or false
     p.hide:SetChecked(hideDone)
     local kinds = ns.Planner:Kinds()
-    local a = C.accent
-    for key, b in pairs(p.kinds) do
-        local on = kinds[key]
-        ns.UI.StylePanel(b, on and { a[1], a[2], a[3], 0.35 } or { 0, 0, 0, 0.25 },
-            { border = on and { a[1], a[2], a[3], 0.9 } or { 1, 1, 1, 0.15 }, noSheen = true })
-        b.text:SetTextColor(1, 1, 1, on and 1 or 0.55)
+    local KIND_KEYS = { { "favorites", "PLAN_KIND_FAV" }, { "raid", "PLAN_KIND_RAID" },
+        { "dungeon", "PLAN_KIND_DUNGEON" }, { "worldBoss", "PLAN_KIND_WB" } }
+    local menu, picked = {}, {}
+    for _, kk in ipairs(KIND_KEYS) do
+        local text = L[kk[2]]
+        if kk[1] == "favorites" then text = ns.UI.STAR .. " " .. text end
+        menu[#menu + 1] = { value = kk[1], text = text, checked = kinds[kk[1]] and true or false }
+        if kinds[kk[1]] and kk[1] ~= "favorites" then picked[#picked + 1] = L[kk[2]] end
     end
+    p.kinds:SetItems(menu)
+    local summary = (#picked == 3) and L["PLAN_KIND_ALL"] or table.concat(picked, ", ")
+    p.kinds:SetText(L["PLAN_KINDS"]:format((kinds.favorites and (ns.UI.STAR .. " ") or "") .. summary))
 
     local steps, sum = ns.Planner:Build(entries, hideDone, kinds)
     p.nextJid = sum.nextJid
@@ -493,7 +481,7 @@ function PlannerPanel:Refresh(p, entries)
                 local m = mountLineAt(f, i, COL.mount, mountWidth())
                 m.mountID = row.id
                 m.text:SetText(row.id == lastMount and ""
-                    or ("|T%s:14:14:0:0|t %s%s|r"):format(row.icon, STATE_HEX[row.state], row.mount))
+                    or ("|T%s:14:14:0:0|t %s%s%s|r"):format(row.icon, ns.Collection:IsFavorite(row.id) and (ns.UI.STAR .. " ") or "", STATE_HEX[row.state], row.mount))
                 m:SetShown(row.id ~= lastMount)
                 lastMount = row.id
             end
@@ -532,7 +520,8 @@ function PlannerPanel:Refresh(p, entries)
 
     p.empty:SetShown(sum.total == 0)
     if sum.total == 0 then
-        p.empty:SetText(ns.Lockouts.loaded and L["PLAN_EMPTY"] or L["NOW_LOCKOUTS_LOADING"])
+        p.empty:SetText(not ns.Lockouts.loaded and L["NOW_LOCKOUTS_LOADING"]
+            or (kinds.favorites and L["PLAN_EMPTY_FAV"]) or L["PLAN_EMPTY"])
     end
     p.child:SetHeight(math.max(y, 1))
     ns.PlannerMini:Refresh() -- marks / switches changed here too
