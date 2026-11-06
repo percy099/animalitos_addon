@@ -542,9 +542,12 @@ function UI.Dropdown(parent, width, onSelect)
         end
     end
 
-    local menu = CreateFrame("Frame", nil, dd, "BackdropTemplate")
-    menu:SetFrameStrata("DIALOG")
-    menu:SetFrameLevel(20)
+    -- The menu is parented to UIParent with a fixed strata: as a child of the
+    -- window it was re-levelled every time the (toplevel) window was raised
+    -- and ended up under its click catcher, so items could not be clicked.
+    local menu = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+    menu:SetFrameStrata("FULLSCREEN_DIALOG")
+    if menu.SetFixedFrameStrata then menu:SetFixedFrameStrata(true) end
     menu:SetPoint("TOPLEFT", dd, "BOTTOMLEFT", 0, -2)
     menu:SetWidth(width)
     local a = COLORS.accent
@@ -553,15 +556,17 @@ function UI.Dropdown(parent, width, onSelect)
     menu:EnableMouse(true)
     menu:Hide()
 
-    -- Invisible full-screen catcher under the menu: outside clicks close it.
-    local catcher = CreateFrame("Button", nil, UIParent)
-    catcher:SetAllPoints(UIParent)
-    catcher:SetFrameStrata("DIALOG")
-    catcher:SetFrameLevel(1)
-    catcher:Hide()
-    catcher:SetScript("OnClick", function() menu:Hide() end)
-    menu:SetScript("OnShow", function() catcher:Show() end)
-    menu:SetScript("OnHide", function() catcher:Hide() end)
+    -- Close on any click outside the menu and the button (event, no OnUpdate).
+    menu:SetScript("OnShow", function(self)
+        -- Match the window scale (Settings > Window size).
+        self:SetScale(dd:GetEffectiveScale() / UIParent:GetEffectiveScale())
+        pcall(self.RegisterEvent, self, "GLOBAL_MOUSE_DOWN")
+    end)
+    menu:SetScript("OnHide", function(self) pcall(self.UnregisterEvent, self, "GLOBAL_MOUSE_DOWN") end)
+    menu:SetScript("OnEvent", function(self)
+        if not self:IsMouseOver() and not dd:IsMouseOver() then self:Hide() end
+    end)
+    dd:HookScript("OnHide", function() menu:Hide() end)
 
     menu.rows = {}
     function dd:SetItems(items)
