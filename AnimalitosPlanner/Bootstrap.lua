@@ -21,6 +21,7 @@ ns:On("PLAYER_ENTERING_WORLD", function(_, isInitialLogin, isReloadingUi)
     if isInitialLogin or isReloadingUi then
         ns:Debounce("scan", 2, function()
             ns.Collection:Scan()
+            ns.PlannerMini:Restore() -- reopen if it was open last session
             ns.UI:Refresh()
         end)
         -- Mount achievements are built in the background a little later, so
@@ -185,6 +186,8 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
     local cmd = strtrim(msg or ""):lower()
     if cmd == "" or cmd == "show" then
         ns.UI:Toggle()
+    elseif cmd == "mini" then
+        ns.PlannerMini:Toggle()
     elseif cmd == "probe" then
         ns.Probe:Run()
     elseif cmd:match("^why%s+.+") then

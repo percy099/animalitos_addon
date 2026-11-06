@@ -380,6 +380,27 @@ function Planner:Build(entries, hideCompleted, withWorldBosses)
     return steps, summary
 end
 
+--- The next two pending runs with the travel in front of each, for the
+--- mini window. Travel starts where the previous step ends (done or not:
+--- you are where you just finished). Returns current, after, summary:
+---   { run = step, travel = { text... } } or nil.
+function Planner:Upcoming(entries, withWorldBosses)
+    local steps, summary = self:Build(entries, false, withWorldBosses)
+    local found, travel = {}, {}
+    for _, s in ipairs(steps) do
+        if s.kind == "travel" then
+            travel[#travel + 1] = s.text
+        elseif s.kind == "run" then
+            if not s.done then
+                found[#found + 1] = { run = s, travel = travel }
+                if #found == 2 then break end
+            end
+            travel = {}
+        end
+    end
+    return found[1], found[2], summary
+end
+
 local function mapName(uiMapID)
     local info = uiMapID and C_Map.GetMapInfo(uiMapID)
     return info and info.name or "?"

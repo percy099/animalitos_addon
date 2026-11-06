@@ -257,6 +257,7 @@ function UI:ResetPosition()
 end
 
 function UI:Refresh()
+    ns.PlannerMini:Refresh() -- may be open while the main window is closed
     local f = self.frame
     if not f or not f:IsShown() then return end
     local _, classFile = UnitClass("player")

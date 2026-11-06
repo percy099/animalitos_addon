@@ -68,6 +68,7 @@ local function describe(r)
     local detail = #names > 0 and ("%s · %s"):format(kind, table.concat(names, ", ")) or kind
     return rows, detail, table.concat(notes, " · ")
 end
+PlannerPanel.Describe = describe -- also used by the mini window
 
 -- Pools ---------------------------------------------------------------------------
 local function newStart(p)
@@ -236,6 +237,19 @@ function PlannerPanel:Create(parent)
         GameTooltip:Show()
     end)
     clear:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
+    -- Small floating window with the next step (stays open on its own).
+    local mini = ns.UI.Button(p, "secondary")
+    ns.UI.SetButtonText(mini, L["PLAN_MINI"], 60)
+    mini:SetPoint("LEFT", clear, "RIGHT", 6, 0)
+    mini:SetScript("OnClick", function() ns.PlannerMini:Toggle() end)
+    mini:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(L["PLAN_MINI"], 1, 1, 1)
+        GameTooltip:AddLine(L["PLAN_MINI_TIP"], nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    mini:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
     p.hide = ns.UI.Switch(p, function(_, checked)
         ns.Storage.db.ui.plannerHideDone = checked or nil
@@ -439,4 +453,5 @@ function PlannerPanel:Refresh(p, entries)
         p.empty:SetText(ns.Lockouts.loaded and L["PLAN_EMPTY"] or L["NOW_LOCKOUTS_LOADING"])
     end
     p.child:SetHeight(math.max(y, 1))
+    ns.PlannerMini:Refresh() -- marks / switches changed here too
 end
