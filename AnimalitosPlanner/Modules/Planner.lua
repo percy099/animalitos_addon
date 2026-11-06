@@ -329,6 +329,14 @@ local function mapName(uiMapID)
     return info and info.name or "?"
 end
 
+-- True if landing on `a` puts you in `b`: same map, or one is a sub-map of
+-- the other (Caverns of Time inside Tanaris).
+local function sameArea(a, b)
+    if a == b then return true end
+    local ia, ib = C_Map.GetMapInfo(a), C_Map.GetMapInfo(b)
+    return (ib and ib.parentMapID == a) or (ia and ia.parentMapID == b) or false
+end
+
 --- Who can open mage teleports/portals right now: { self = bool, group = name|nil }.
 function Planner:MageContext()
     local _, class = UnitClass("player")
@@ -365,7 +373,7 @@ function Planner:TravelTexts(fac, here, ent, mage)
     local zoneDest = MAGE[fac].zone[ent.uiMapID]
     if not zoneDest then
         for key, d in pairs(MAGE[fac]) do
-            if key ~= "zone" and d[1] == ent.uiMapID then zoneDest = d break end
+            if key ~= "zone" and sameArea(d[1], ent.uiMapID) then zoneDest = d break end
         end
     end
     local hop = mageHop(mage, zoneDest)
@@ -374,8 +382,13 @@ function Planner:TravelTexts(fac, here, ent, mage)
         return out
     end
 
-    -- Same continent and no capital portal that helps: just fly.
-    if ent.continent == here.continent and not (inCapital and zonePortal) then
+    -- Back to the capital: mage teleport / portal, else the hearthstone.
+    local mageHome = mageHop(mage, MAGE[fac].capital)
+    local home = mageHome or L["PLAN_HEARTH"]:format(capital)
+
+    -- Same continent: fly, unless a capital zone portal is at hand (in the
+    -- capital, or a free mage trip there: Dustwallow -> Stormwind -> Uldum).
+    if ent.continent == here.continent and not ((inCapital or mageHome) and zonePortal) then
         out[1] = fly
         return out
     end
@@ -385,18 +398,15 @@ function Planner:TravelTexts(fac, here, ent, mage)
     -- destination, or there is no capital portal: Theramore + flying to
     -- Tanaris is worse than Stormwind + the Caverns of Time portal.
     local dest = MAGE[fac][ent.continent]
-    local useful = dest and (dest[1] == ent.uiMapID or not contPortal or dest[1] == contPortal)
+    local useful = dest and (sameArea(dest[1], ent.uiMapID) or not contPortal or dest[1] == contPortal)
     if ent.continent ~= here.continent and not zonePortal and useful then
         hop = mageHop(mage, dest)
         if hop then
             out[1] = hop
-            if dest[1] ~= ent.uiMapID then out[2] = fly end
+            if not sameArea(dest[1], ent.uiMapID) then out[2] = fly end
             return out
         end
     end
-
-    -- Back to the capital: mage teleport / portal, else the hearthstone.
-    local home = mageHop(mage, MAGE[fac].capital) or L["PLAN_HEARTH"]:format(capital)
 
     local landing
     if zonePortal then
@@ -412,13 +422,16 @@ function Planner:TravelTexts(fac, here, ent, mage)
         return out
     end
 
+    -- Name the portal after the sub-zone it really opens to (Caverns of Time).
+    local arrives = sameArea(landing, ent.uiMapID)
+    local portal = L["PLAN_PORTAL"]:format(mapName(arrives and ent.uiMapID or landing))
     if landing == CAPITAL[fac] then
         if not inCapital then out[#out + 1] = home end
     elseif inCapital then
-        out[#out + 1] = L["PLAN_PORTAL"]:format(mapName(landing))
+        out[#out + 1] = portal
     else
-        out[#out + 1] = L["PLAN_THEN"]:format(home, L["PLAN_PORTAL"]:format(mapName(landing)))
+        out[#out + 1] = L["PLAN_THEN"]:format(home, portal)
     end
-    if landing ~= ent.uiMapID then out[#out + 1] = fly end
+    if not arrives then out[#out + 1] = fly end
     return out
 end
