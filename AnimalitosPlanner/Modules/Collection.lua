@@ -250,6 +250,7 @@ function Collection:OtherDrops()
     if self.otherDrops then return self.otherDrops end
     local list = self:GetList()
     if not list then return nil end
+    ns.FarmList:ResolveCurated() -- curated mount IDs checked against their items
     local covered = {}
     for _, src in ipairs(ns.Data.sources) do covered[src.mountID] = true end
     local out = {}

@@ -141,6 +141,37 @@ def build(raw: dict, curated: dict):
     wb_lockouts = {k: v for k, v in curated.get("worldBossLockouts", {}).items() if not k.startswith("_")}
 
     instances, sources, report = {}, [], defaultdict(list)
+
+    def make_instance(jid):
+        inst = raw["instances"][str(jid)]
+        entrance, ambiguous = pick_entrance(
+            raw["entrances"].get(str(jid), []), raw["maps"], entrance_overrides.get(str(jid))
+        )
+        if entrance is None:
+            report["missingEntrance"].append(f"{jid} {inst['name']} ({inst['tierName']})")
+        elif ambiguous:
+            report["ambiguousEntrance"].append(
+                f"{jid} {inst['name']}: picked uiMap {entrance['uiMapID']} — confirm or add an override"
+            )
+        lockout = lockouts.get(str(jid), "unknown")
+        if lockout == "unknown":
+            report["unknownLockout"].append(f"{jid} {inst['name']}")
+        return {
+            "tier": inst["tier"],
+            "isRaid": inst["isRaid"],
+            "mapID": inst["mapID"],
+            "legacy": inst["tier"] < current_tier,
+            "worldBoss": False,
+            "lockoutModel": lockout,
+            "entrance": entrance and {
+                "uiMapID": entrance["uiMapID"],
+                "x": round(entrance["x"], 4),
+                "y": round(entrance["y"], 4),
+                "continent": entrance.get("continent"),
+            },
+            "_name": inst["name"],
+        }
+
     for (jid, encounter_id, mount_id), g in sorted(grouped.items()):
         inst = raw["instances"][str(jid)]
         enc = raw["encounters"].get(str(encounter_id), {})
@@ -176,35 +207,7 @@ def build(raw: dict, curated: dict):
             })
             continue
         if jid not in instances:
-            entrance, ambiguous = (None, False)
-            if not is_world_boss:
-                entrance, ambiguous = pick_entrance(
-                    raw["entrances"].get(str(jid), []), raw["maps"], entrance_overrides.get(str(jid))
-                )
-                if entrance is None:
-                    report["missingEntrance"].append(f"{jid} {inst['name']} ({inst['tierName']})")
-                elif ambiguous:
-                    report["ambiguousEntrance"].append(
-                        f"{jid} {inst['name']}: picked uiMap {entrance['uiMapID']} — confirm or add an override"
-                    )
-            lockout = lockouts.get(str(jid), "unknown")
-            if lockout == "unknown" and not is_world_boss:
-                report["unknownLockout"].append(f"{jid} {inst['name']}")
-            instances[jid] = {
-                "tier": inst["tier"],
-                "isRaid": inst["isRaid"],
-                "mapID": inst["mapID"],
-                "legacy": inst["tier"] < current_tier,
-                "worldBoss": is_world_boss,
-                "lockoutModel": lockout,
-                "entrance": entrance and {
-                    "uiMapID": entrance["uiMapID"],
-                    "x": round(entrance["x"], 4),
-                    "y": round(entrance["y"], 4),
-                    "continent": entrance.get("continent"),
-                },
-                "_name": inst["name"],
-            }
+            instances[jid] = make_instance(jid)
         sources.append({
             "mountID": mount_id,
             "itemID": g["itemID"],
@@ -214,6 +217,32 @@ def build(raw: dict, curated: dict):
             "difficulties": sorted(g["difficulties"]),
             "_comment": f"{enc.get('name')} - {inst['name']}",
         })
+
+    # Hand-curated drops the Encounter Journal does not list (hidden bosses,
+    # the other bosses of a shared drop). Each one was verified by hand on
+    # Wowhead / warcraft.wiki.gg (see its "reason"). journalEncounterID is
+    # resolved in game from dungeonEncounterID; hiddenBoss = locale key of a
+    # boss that is not in the journal (its kill cannot be read: To verify).
+    for x in curated.get("extraSources", {}).get("list", []):
+        jid = x["journalInstanceID"]
+        if str(jid) not in raw["instances"]:
+            report["extraSourceUnknownInstance"].append(f"{jid} (mount {x['mountID']})")
+            continue
+        if jid not in instances:
+            instances[jid] = make_instance(jid)
+        name = raw["instances"][str(jid)]["name"]
+        sources.append({
+            "mountID": x["mountID"],
+            "itemID": x["itemID"],
+            "journalInstanceID": jid,
+            "journalEncounterID": x.get("journalEncounterID"),
+            "dungeonEncounterID": x.get("dungeonEncounterID"),
+            "difficulties": sorted(x["difficulties"]),
+            "hiddenBoss": x.get("hiddenBoss"),
+            "curated": True,
+            "_comment": f"{x.get('name', '?')} - {name} (curated)",
+        })
+        report["curatedSources"].append(f"{x.get('name')} - {name}")
     return instances, sources, report
 
 

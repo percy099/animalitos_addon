@@ -73,6 +73,12 @@ function Eligibility:Evaluate(src, difficultyID)
         return self:EvaluateWorldBoss(src, inst)
     end
 
+    -- Boss not in the Encounter Journal (Nightbane, Infinite Corruptor):
+    -- its kill cannot be read, so it is never Ready.
+    if src.hiddenBoss then
+        return S.VERIFY, L["REASON_HIDDEN_BOSS_" .. src.hiddenBoss:gsub("^BOSS_", "")]
+    end
+
     local boss = encounterName(src.journalEncounterID)
     local record = inst.mapID and ns.Lockouts:Get(inst.mapID, difficultyID)
     if record then

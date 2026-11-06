@@ -80,7 +80,38 @@ function FarmList:ResolveFactionEntrances()
     end
 end
 
+--- Hand-curated sources (overrides.json extraSources): check the mount ID
+--- against the item and find the journal encounter from its dungeon
+--- encounter ID (EJ data, so localized). Retried until both resolve.
+function FarmList:ResolveCurated()
+    if self.curatedDone then return end
+    local pending = false
+    for _, src in ipairs(ns.Data.sources) do
+        if src.curated then
+            if not src.mountChecked then
+                local id = ns.MountJournal:GetMountFromItem(src.itemID)
+                if id then
+                    src.mountID, src.mountChecked = id, true
+                else
+                    pending = true -- item not cached yet
+                end
+            end
+            if src.dungeonEncounterID and not src.journalEncounterID and EJ_GetEncounterInfoByIndex then
+                for i = 1, 30 do
+                    local name, _, jeid, _, _, _, deid = EJ_GetEncounterInfoByIndex(i, src.journalInstanceID)
+                    if not name then break end
+                    if deid == src.dungeonEncounterID then src.journalEncounterID = jeid break end
+                end
+                if not src.journalEncounterID then pending = true end
+            end
+        end
+    end
+    self.curatedTries = (self.curatedTries or 0) + 1
+    self.curatedDone = not pending or self.curatedTries >= 5
+end
+
 function FarmList:Build()
+    self:ResolveCurated()
     self:ResolveFactionEntrances()
     self:ResolveWorldBosses()
     local S = ns.Eligibility.STATES
@@ -263,6 +294,7 @@ function FarmList:TierName(tier)
 end
 
 function FarmList:BossName(src)
+    if src and src.hiddenBoss then return ns.L[src.hiddenBoss] end -- not in the journal
     return (src and src.journalEncounterID and EJ_GetEncounterInfo(src.journalEncounterID)) or "?"
 end
 

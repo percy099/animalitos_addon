@@ -12,6 +12,23 @@
     "_reason1028": "Battle for Azeroth world bosses (Kraulok) rotate weekly and are marked by an epic world quest named after the boss: worldQuest = the addon finds that quest on the boss's map, remembers its ID and reads active / completed (icy-veins.com, Blizzard forums).",
     "1028": "worldQuest"
   },
+  "extraSources": {
+    "_reason": "Boss mount drops the Encounter Journal does not list, each verified by hand on Wowhead (item page) and warcraft.wiki.gg (item / JournalEncounterID pages). mountID = Mount Journal ID (warcraftmounts blizzardid, re-checked in game from the item with C_MountJournal.GetMountFromItem). dungeonEncounterID -> journalEncounterID is resolved in game. hiddenBoss = boss not in the journal: its kill cannot be read, so it stays To verify.",
+    "list": [
+      { "name": "Reins of the Bronze Drake", "mountID": 248, "itemID": 43951, "journalInstanceID": 279, "difficulties": [2], "hiddenBoss": "BOSS_INFINITE_CORRUPTOR",
+        "reason": "Infinite Corruptor, Culling of Stratholme Heroic, guaranteed if killed within 25 min of the first Scourge wave; not in the journal (warcraft.wiki.gg Reins_of_the_Bronze_Drake, wowhead item=43951)" },
+      { "name": "Smoldering Ember Wyrm", "mountID": 883, "itemID": 142552, "journalInstanceID": 860, "difficulties": [23], "hiddenBoss": "BOSS_NIGHTBANE",
+        "reason": "Nightbane, secret boss of Return to Karazhan; not in the journal (warcraft.wiki.gg Smoldering_Ember_Wyrm, wowhead item=142552)" },
+      { "name": "Aerial Unit R-21/X", "mountID": 1227, "itemID": 168830, "journalInstanceID": 1178, "dungeonEncounterID": 2260, "difficulties": [23],
+        "reason": "King Mechagon hard mode, Operation: Mechagon Mythic (warcraft.wiki.gg Aerial_Unit_R-21/X, wowhead item=168830, JournalEncounterID page: King Mechagon 2260)" },
+      { "name": "Grand Black War Mammoth (Emalon)", "mountID": 286, "itemID": 43959, "journalInstanceID": 753, "dungeonEncounterID": 1127, "difficulties": [3, 4],
+        "reason": "Drops from all Vault of Archavon bosses (warcraft.wiki.gg Grand_Black_War_Mammoth); the journal lists it only under Archavon" },
+      { "name": "Grand Black War Mammoth (Koralon)", "mountID": 286, "itemID": 43959, "journalInstanceID": 753, "dungeonEncounterID": 1128, "difficulties": [3, 4],
+        "reason": "Same as Emalon" },
+      { "name": "Grand Black War Mammoth (Toravon)", "mountID": 286, "itemID": 43959, "journalInstanceID": 753, "dungeonEncounterID": 1129, "difficulties": [3, 4],
+        "reason": "Same as Emalon" }
+    ]
+  },
   "excludeInstances": {
     "_reason": "Not real instances (Mythic+ keystone aggregate).",
     "ids": [1319]

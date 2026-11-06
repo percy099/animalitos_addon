@@ -2,7 +2,7 @@
 -- Source: in-game /aplan scan, client 12.1.5.70783, scanned 2026-11-05 13:38:04.
 local _, ns = ...
 ns.Data = {
-    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "11f192eb1623" },
+    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "9a36badeb64f" },
     instances = {
         [-2210] = { tier = 8, isRaid = true, legacy = true, worldBoss = true, ejInstance = 1028, encounter = 2210, lockoutModel = "worldQuest" }, -- Dunegorger Kraulok (Azeroth)
         [-1262] = { tier = 6, isRaid = true, legacy = true, worldBoss = true, ejInstance = 557, encounter = 1262, lockoutModel = "savedWorldBoss" }, -- Rukhmar (Draenor)
@@ -18,6 +18,7 @@ ns.Data = {
         [187] = { tier = 4, isRaid = true, mapID = 967, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 75, x = 0.6088, y = 0.2116, continent = 12 } }, -- Dragon Soul
         [249] = { tier = 2, isRaid = false, mapID = 585, legacy = true, worldBoss = false, lockoutModel = "unknown" }, -- Magisters' Terrace
         [252] = { tier = 2, isRaid = false, mapID = 556, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 108, x = 0.446, y = 0.6561, continent = 101 } }, -- Sethekk Halls
+        [279] = { tier = 3, isRaid = false, mapID = 595, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 75, x = 0.6011, y = 0.8272, continent = 12 } }, -- The Culling of Stratholme
         [286] = { tier = 3, isRaid = false, mapID = 575, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 117, x = 0.5722, y = 0.4649, continent = 113 } }, -- Utgarde Pinnacle
         [317] = { tier = 5, isRaid = true, mapID = 1008, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 379, x = 0.5961, y = 0.3917, continent = 424 } }, -- Mogu'shan Vaults
         [362] = { tier = 5, isRaid = true, mapID = 1098, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 504, x = 0.6383, y = 0.3204, continent = 424 } }, -- Throne of Thunder
@@ -126,5 +127,11 @@ ns.Data = {
         { mountID = 2607, itemID = 246590, journalInstanceID = 1308, journalEncounterID = 2740, dungeonEncounterID = 3183, difficulties = { 16 } }, -- Midnight Falls - March on Quel'Danas
         { mountID = 3030, itemID = 275658, journalInstanceID = 1320, journalEncounterID = 2895, dungeonEncounterID = 3492, difficulties = { 16 } }, -- Ula'tek - The Venomous Abyss
         { mountID = 3058, itemID = 276804, journalInstanceID = 1322, journalEncounterID = 2880, dungeonEncounterID = 3458, difficulties = { 23 } }, -- Zul'jan - Altar of Fangs
+        { mountID = 248, itemID = 43951, journalInstanceID = 279, difficulties = { 2 }, hiddenBoss = "BOSS_INFINITE_CORRUPTOR", curated = true }, -- Reins of the Bronze Drake - The Culling of Stratholme (curated)
+        { mountID = 883, itemID = 142552, journalInstanceID = 860, difficulties = { 23 }, hiddenBoss = "BOSS_NIGHTBANE", curated = true }, -- Smoldering Ember Wyrm - Return to Karazhan (curated)
+        { mountID = 1227, itemID = 168830, journalInstanceID = 1178, dungeonEncounterID = 2260, difficulties = { 23 }, curated = true }, -- Aerial Unit R-21/X - Operation: Mechagon (curated)
+        { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1127, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Emalon) - Vault of Archavon (curated)
+        { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1128, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Koralon) - Vault of Archavon (curated)
+        { mountID = 286, itemID = 43959, journalInstanceID = 753, dungeonEncounterID = 1129, difficulties = { 3, 4 }, curated = true }, -- Grand Black War Mammoth (Toravon) - Vault of Archavon (curated)
     },
 }

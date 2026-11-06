@@ -4,10 +4,10 @@ Generated from client `12.1.5.70783` (scan 2026-11-05 13:38:04).
 
 | Metric | Value |
 |---|---|
-| Sources (mount × boss × instance) | 67 |
-| Unique mounts | 66 |
-| Instances with mounts | 53 |
-| Legacy instances (MVP scope) | 42 |
+| Sources (mount × boss × instance) | 73 |
+| Unique mounts | 69 |
+| Instances with mounts | 54 |
+| Legacy instances (MVP scope) | 43 |
 | World bosses with mounts | 6 |
 
 ## Instances without an entrance (add `entranceOverrides` with uiMapID/x/y) — 5
@@ -23,7 +23,7 @@ Generated from client `12.1.5.70783` (scan 2026-11-05 13:38:04).
 - 68 The Vortex Pinnacle: picked uiMap 249 — confirm or add an override
 - 1273 Nerub-ar Palace: picked uiMap 2213 — confirm or add an override
 
-## Instances without a validated lockout model (v0.3) — 47
+## Instances without a validated lockout model (v0.3) — 48
 
 - 67 The Stonecore
 - 68 The Vortex Pinnacle
@@ -72,3 +72,4 @@ Generated from client `12.1.5.70783` (scan 2026-11-05 13:38:04).
 - 1308 March on Quel'Danas
 - 1320 The Venomous Abyss
 - 1322 Altar of Fangs
+- 279 The Culling of Stratholme
