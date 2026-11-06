@@ -299,6 +299,30 @@ local function build(f, mountID, m, extra)
     end
     text(lay, "● " .. label, "body", status)
 
+    -- Price from the journal text against what this character owns.
+    local buy = not (m and m.isCollected) and ns.Collection:BuyInfo(mountID) or nil
+    if buy then
+        header(lay, "DETAIL_BUY")
+        local summary, sc
+        if buy.canBuy == true then summary, sc = L["BUY_YES"], C.success
+        elseif buy.canBuy == false then summary, sc = L["BUY_NO"], C.warning
+        else summary, sc = L["BUY_UNKNOWN"], C.dim end
+        text(lay, summary, "body", sc, 0, 2)
+        for _, p in ipairs(buy.parts) do
+            local line
+            if p.have == nil then
+                line = L["BUY_PART_UNKNOWN"]:format(ns.Wallet:Format(p, p.need))
+            elseif p.have >= p.need then
+                line = L["BUY_PART_OK"]:format(ns.Wallet:Format(p, p.need), ns.Wallet:Format(p, p.have))
+            else
+                line = L["BUY_PART_MISSING"]:format(ns.Wallet:Format(p, p.need), ns.Wallet:Format(p, p.need - p.have))
+            end
+            if p.name then line = line .. "  |cff999999" .. p.name .. "|r" end
+            text(lay, line, "small", C.text, 8, 3)
+        end
+        text(lay, L["BUY_NOTE"], "tiny", C.muted, 0, 4)
+    end
+
     -- Where to get it (dataset): instance, boss, state per difficulty.
     if #blocks > 0 then
         header(lay, "DETAIL_WHERE")

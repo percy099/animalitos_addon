@@ -317,6 +317,62 @@ function Collection:ByExpansion()
     return out
 end
 
+-- Buying ----------------------------------------------------------------------
+-- Price from the journal text compared with this character's gold and
+-- currencies. Only the price is checked: a vendor can also ask for
+-- reputation or renown, which the text does not say in a readable way.
+local costCache = {} -- [mountID] = parts | false
+
+--- nil when the mount has no price in its text; otherwise
+--- { parts = { {kind, need, have, name, icon...} }, canBuy = true/false/nil }
+--- (nil canBuy = a part could not be identified).
+function Collection:BuyInfo(mountID)
+    local parts = costCache[mountID]
+    if parts == nil then
+        local extra = ns.MountJournal:GetMountExtra(mountID)
+        local text = extra and extra.sourceText
+        if not text or text == "" then return nil end -- not loaded: try again later
+        parts = ns.Wallet:ParseCost(text) or false
+        costCache[mountID] = parts
+    end
+    if not parts then return nil end
+    local out, canBuy = { parts = {} }, true
+    for _, p in ipairs(parts) do
+        local have = ns.Wallet:Have(p)
+        out.parts[#out.parts + 1] = { kind = p.kind, id = p.id, name = p.name, icon = p.icon, need = p.need, have = have }
+        if have == nil then canBuy = canBuy and nil
+        elseif have < p.need then canBuy = false end
+    end
+    out.canBuy = canBuy
+    return out
+end
+
+--- /aplan costs: uncollected mounts with a price, raw and parsed.
+function Collection:DebugCosts()
+    local n = 0
+    for _, m in ipairs(self:GetList() or {}) do
+        if not m.isCollected then
+            local extra = ns.MountJournal:GetMountExtra(m.mountID)
+            local text = extra and extra.sourceText or ""
+            if text:find("|T", 1, true) then
+                n = n + 1
+                if n <= 12 then
+                    local raw = text:match("[^|]*%d[%d,%.]*%s*|T[^|]*|t[^|]*") or text
+                    local info = self:BuyInfo(m.mountID)
+                    local parsed = {}
+                    for _, p in ipairs(info and info.parts or {}) do
+                        parsed[#parsed + 1] = ("%s %s need %d have %s"):format(p.kind, tostring(p.name or p.id or ""),
+                            p.need, tostring(p.have))
+                    end
+                    print(("  %s: %s -> %s"):format(m.name, (raw:gsub("|", "||")),
+                        #parsed > 0 and table.concat(parsed, "; ") or "(no price)"))
+                end
+            end
+        end
+    end
+    print(("  %d missing mounts with an icon in their text"):format(n))
+end
+
 -- Favorites -------------------------------------------------------------------
 -- The addon's own star (account-wide, db.favorites[mountID] = true). Blizzard's
 -- journal favorites only work for mounts already collected.
