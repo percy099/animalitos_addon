@@ -470,9 +470,19 @@ end
 
 --- Where the player is, as the route's travel steps see it: { continent,
 --- zone } with zone = the zone-level map (a city or subzone map counts as
---- its zone). nil inside instances or without a map.
+--- its zone). Inside a dataset instance: its entrance (where you come out);
+--- nil inside other instances or without a map.
 function Planner:PlayerHere()
-    if IsInInstance() then return nil end
+    if IsInInstance() then
+        local instanceMapID = select(8, GetInstanceInfo())
+        for _, inst in pairs(ns.Data.instances) do
+            local ent = inst.entrance
+            if inst.mapID == instanceMapID and ent and ent.continent then
+                return { continent = ent.continent, zone = ent.uiMapID }
+            end
+        end
+        return nil
+    end
     local id = C_Map.GetBestMapForUnit("player")
     local zone, continent, guard = nil, nil, 0
     while id and id > 0 and guard < 10 do
