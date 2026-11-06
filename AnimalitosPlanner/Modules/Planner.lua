@@ -725,6 +725,76 @@ local function homeTexts(fac, here, mage)
     return { L["PLAN_TRAVEL_ZONE"]:format(capital) }
 end
 
+-- Distances on the world map (yards), to compare a direct flight with a
+-- mage hop. Points are a map's center unless x/y are given.
+local posCache = {}
+local function worldPos(uiMapID, x, y)
+    if not (uiMapID and C_Map.GetWorldPosFromMapPos and CreateVector2D) then return nil end
+    local key = uiMapID .. ":" .. (x or 0.5) .. ":" .. (y or 0.5)
+    local p = posCache[key]
+    if p == nil then
+        local cont, pos = C_Map.GetWorldPosFromMapPos(uiMapID, CreateVector2D(x or 0.5, y or 0.5))
+        p = (cont and pos) and { cont, pos.x, pos.y } or false
+        posCache[key] = p
+    end
+    return p or nil
+end
+local function distance(a, b)
+    if not (a and b) or a[1] ~= b[1] then return nil end
+    return math.sqrt((a[2] - b[2]) ^ 2 + (a[3] - b[3]) ^ 2)
+end
+-- What one teleport / portal costs, as flying distance (loading screen,
+-- walking to the next portal).
+local HOP_COST = 600
+
+--- With a mage at hand, on the same continent: a teleport (or teleport home
+--- plus a capital portal) that lands much closer to the entrance than a
+--- direct flight. Returns the travel texts, or nil to fly.
+local function mageShortcut(fac, here, ent, mage)
+    local target = worldPos(ent.uiMapID, ent.x, ent.y)
+    local direct = distance(worldPos(here.zone), target)
+    if not direct then return nil end
+    local L = ns.L
+    local best, bestCost = nil, direct
+    local function try(landing, hops, texts)
+        local d = distance(worldPos(landing), target)
+        if not d then return end
+        local cost = d + hops * HOP_COST
+        if cost < bestCost then
+            best, bestCost = texts, cost
+            if not sameArea(landing, ent.uiMapID) then texts[#texts + 1] = L["PLAN_FLY"]:format(mapName(ent.uiMapID)) end
+        end
+    end
+    -- One teleport (Dalaran, Stonard, Theramore, ...).
+    for key, d in pairs(MAGE[fac]) do
+        local list = key == "zone" and d or { d }
+        for _, dest in pairs(list) do
+            local hop = mageHop(mage, dest)
+            if hop then try(dest[1], 1, { hop }) end
+        end
+    end
+    -- Teleport home, then one of the capital's portals (Orgrimmar ->
+    -- Caverns of Time for Onyxia).
+    local home = mageHop(mage, MAGE[fac].capital)
+    if home then
+        local seen = {}
+        local function portals(t)
+            for _, landing in pairs(t or {}) do
+                if not seen[landing] then
+                    seen[landing] = true
+                    try(landing, 2, { L["PLAN_THEN"]:format(home, L["PLAN_PORTAL"]:format(mapName(landing))) })
+                end
+            end
+        end
+        portals(ZONE_PORTALS)
+        portals(FACTION_ZONE_PORTALS[fac])
+        portals(CONTINENT_PORTALS[fac])
+    end
+    -- Only when clearly better than flying (half the way or less).
+    if best and bestCost < direct * 0.5 then return best end
+    return nil
+end
+
 --- Travel step texts from `here` ({continent, zone}) to an entrance.
 --- Mage teleports / group portals first, then hand-written capital portals;
 --- anything unknown falls back to "Travel to ...".
@@ -809,8 +879,11 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
     local home = homeTexts(fac, here, mage)
 
     -- Same continent: fly, unless a capital zone portal is at hand (in the
-    -- capital, or a free mage trip there: Dustwallow -> Stormwind -> Uldum).
+    -- capital, or a free mage trip there: Dustwallow -> Stormwind -> Uldum),
+    -- or a mage hop lands much closer (ICC -> Dalaran -> Howling Fjord).
     if ent.continent == here.continent and not ((inCapital or mageHome) and zonePortal) then
+        local shortcut = (mage and (mage.self or mage.group)) and mageShortcut(fac, here, ent, mage)
+        if shortcut then return shortcut end
         out[1] = fly
         return out
     end
