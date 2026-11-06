@@ -140,9 +140,14 @@ ns.Data = {
         { lfgDungeonID = 288, event = "EVENT_LOVE", mounts = { { mountID = 352, itemID = 50250 } } }, -- The Crown Chemical Co.
     },
     skips = {
+        [457] = { { boss = "Blackhand", encounter = 959, quests = { { 14, 37029 }, { 15, 37030 }, { 16, 37031 } } } },
+        [669] = { { boss = "Gorefiend", encounter = 1372, quests = { { 14, 39499 }, { 15, 39500 }, { 16, 39501 } } }, { boss = "Mannoroth", encounter = 1395, quests = { { 14, 39502 }, { 15, 39504 }, { 16, 39505 } } } },
         [786] = { { boss = "Grand Magistrix Elisande", encounter = 1743, quests = { { 14, 45381 }, { 15, 45382 }, { 16, 45383 } } } },
         [946] = { { boss = "Imonar the Soulhunter", encounter = 2009, quests = { { 14, 49032 }, { 15, 49075 }, { 16, 49076 } } }, { boss = "Argus the Unmaker", encounter = 2031, quests = { { 14, 49133 }, { 15, 49134 }, { 16, 49135 } } } },
         [1180] = { { boss = "Carapace of N'Zoth", encounter = 2366, quests = { { 14, 58373 }, { 15, 58374 }, { 16, 58375 } } } },
+        [1193] = { { boss = "Kel'Thuzad", encounter = 2440, quests = { { 14, 64597 }, { 15, 64598 }, { 16, 64599 } } } },
+        [1195] = { { boss = "Anduin Wrynn", encounter = 2469, quests = { { 14, 65764 }, { 15, 65763 }, { 16, 65762 } } } },
+        [1207] = { { boss = "Smolderon", encounter = 2563, quests = { { 14, 78600 }, { 15, 78601 }, { 16, 78602 } } } },
     },
     vendorReqs = {
         [198809] = { reputation = { Alliance = 2524, Horde = 2523 }, standing = 8, exceptRace = "Dracthyr" },

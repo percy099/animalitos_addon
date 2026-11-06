@@ -37,6 +37,42 @@
     "_reason": "Raid skips: a quest per difficulty (Normal 14 / Heroic 15 / Mythic 16); a higher one unlocks the lower ones (warcraft.wiki.gg). IDs from each quest's warcraft.wiki.gg page (external links, in Normal, Heroic, Mythic order); /aplan skips shows their titles in game to confirm. boss = English fallback when the journal name is not available.",
     "list": [
       {
+        "name": "Blackrock Foundry", "journalInstanceID": 457,
+        "skips": [
+          { "boss": "Blackhand", "journalEncounterID": 959, "quests": { "14": 37029, "15": 37030, "16": 37031 },
+            "reason": "Sigil of the Black Hand (the three wing bosses x4; warband-wide progress), warcraft.wiki.gg quest page" }
+        ]
+      },
+      {
+        "name": "Hellfire Citadel", "journalInstanceID": 669,
+        "skips": [
+          { "boss": "Gorefiend", "journalEncounterID": 1372, "quests": { "14": 39499, "15": 39500, "16": 39501 },
+            "reason": "Well of Souls (Gorefiend x4), warcraft.wiki.gg quest page" },
+          { "boss": "Mannoroth", "journalEncounterID": 1395, "quests": { "14": 39502, "15": 39504, "16": 39505 },
+            "reason": "The Fel Spire (Mannoroth x4, after Well of Souls), warcraft.wiki.gg quest page" }
+        ]
+      },
+      {
+        "name": "Sanctum of Domination", "journalInstanceID": 1193,
+        "skips": [
+          { "boss": "Kel'Thuzad", "journalEncounterID": 2440, "quests": { "14": 64597, "15": 64598, "16": 64599 },
+            "reason": "Sanctum of Domination - Damned If You Don't (Kel'Thuzad x4), warcraft.wiki.gg quest page" }
+        ]
+      },
+      {
+        "name": "Sepulcher of the First Ones", "journalInstanceID": 1195,
+        "skips": [
+          { "boss": "Anduin Wrynn", "journalEncounterID": 2469, "quests": { "14": 65764, "15": 65763, "16": 65762 },
+            "reason": "Sepulcher of the First Ones - Heavy is the Crown (Anduin x4), warcraft.wiki.gg quest page; IDs listed in descending order under Normal, Heroic, Mythic (not labeled one by one)" }
+        ]
+      },
+      {
+        "name": "Amirdrassil, the Dream's Hope", "journalInstanceID": 1207,
+        "skips": [
+          { "boss": "Smolderon", "journalEncounterID": 2563, "quests": { "14": 78600, "15": 78601, "16": 78602 },
+            "reason": "Amirdrassil, the Dream's Hope: Up in Smoke (Smolderon x3), warcraft.wiki.gg quest page" }
+        ]
+      },      {
         "name": "The Nighthold", "journalInstanceID": 786,
         "skips": [
           { "boss": "Grand Magistrix Elisande", "journalEncounterID": 1743, "quests": { "14": 45381, "15": 45382, "16": 45383 },
