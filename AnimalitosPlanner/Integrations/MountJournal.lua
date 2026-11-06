@@ -18,7 +18,9 @@ function MJ:GetMount(mountID)
           isFactionSpecific, faction, shouldHideOnChar, isCollected, id =
         C_MountJournal.GetMountInfoByID(mountID)
     if not name then return nil end
-    if not sourceType or sourceType == 0 then sourceType = MJ:InferSourceType(id or mountID) or sourceType end
+    -- 0 or a type number the client has no name for (newer types): read it
+    -- from the journal text instead.
+    if not MJ:HasSourceLabel(sourceType) then sourceType = MJ:InferSourceType(id or mountID) or sourceType end
     return {
         mountID = id or mountID,
         name = name,
@@ -90,6 +92,11 @@ function MJ:GetMountFromItem(itemID)
     return C_MountJournal.GetMountFromItem(itemID)
 end
 
+--- True when the client has a localized name for this source type.
+function MJ:HasSourceLabel(sourceType)
+    return sourceType ~= nil and sourceType ~= 0 and _G["BATTLE_PET_SOURCE_" .. sourceType] ~= nil
+end
+
 --- Journal source text without escape codes: old (|cAARRGGBB) and named
 --- (|cnNAME:) colors, |r, textures, atlases, links; |n becomes a new line.
 function MJ:PlainSourceText(text)
@@ -104,12 +111,13 @@ end
 function MJ:DebugUnknownSources()
     local n = 0
     self:ForEach(function(m)
-        if (not m.sourceType or m.sourceType == 0) and not m.shouldHideOnChar then
+        if not self:HasSourceLabel(m.sourceType) and not m.shouldHideOnChar then
             n = n + 1
             if n <= 15 then
                 local extra = self:GetMountExtra(m.mountID)
-                local raw = extra and extra.sourceText or "(nil)"
-                print(("  %s (%d): %s"):format(m.name, m.mountID, raw:gsub("|", "||")))
+                local raw = (extra and extra.sourceText) or "(nil)"
+                raw = raw:gsub("|", "||")
+                print(("  %s (id %d, type %s): %s"):format(m.name, m.mountID, tostring(m.sourceType), raw))
             end
         end
     end)
