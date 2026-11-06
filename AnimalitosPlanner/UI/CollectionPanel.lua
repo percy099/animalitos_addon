@@ -234,17 +234,7 @@ local function render(p)
             elseif p.mode == "drops" then
                 fillRow(r, m.mount, index, nil, m.label)
             else
-                -- "Can pay now": the price instead of the source type.
-                local price
-                if p.buyable then
-                    local info = ns.Collection:BuyInfo(m.mountID)
-                    local parts = {}
-                    for _, part in ipairs(info and info.parts or {}) do
-                        parts[#parts + 1] = ns.Wallet:Format(part, part.need)
-                    end
-                    price = #parts > 0 and table.concat(parts, " + ") or nil
-                end
-                fillRow(r, m, index, p.farm and p.farm[m.mountID], price)
+                fillRow(r, m, index, p.farm and p.farm[m.mountID])
             end
             r:Show()
         else
@@ -657,9 +647,7 @@ function CollectionPanel:Refresh(p, entries)
 
     -- Source menu: "All sources" + every source with how many are missing.
     local src = sourceKey()
-    -- "Can pay now": missing mounts whose price this character can pay.
-    local menu = { { value = "all", text = L["COL_SOURCE_ALL"] },
-        { value = "buyable", text = L["COL_SOURCE_ITEM"]:format(L["COL_BUYABLE"], fmt(ns.Collection:BuyableCount())) } }
+    local menu = { { value = "all", text = L["COL_SOURCE_ALL"] } }
     local missingBy = {}
     local present = {}
     for _, m in ipairs(list or {}) do
@@ -679,12 +667,8 @@ function CollectionPanel:Refresh(p, entries)
             ns.MountJournal:GetSourceTypeLabel(st), fmt(missingBy[st] or 0)) }
     end
     p.source:SetItems(menu)
-    local buyable = src == "buyable"
-    p.buyable = buyable
-    local buySet = buyable and ns.Collection:BuyableSet() or nil
-    if src and not buyable and not present[src] then src = nil end
-    p.source:SetText(L["COL_SOURCE_LABEL"]:format((buyable and L["COL_BUYABLE"])
-        or (src and ns.MountJournal:GetSourceTypeLabel(src)) or L["COL_SOURCE_ANY"]))
+    if src and not present[src] then src = nil end -- also clears an old "buyable" choice
+    p.source:SetText(L["COL_SOURCE_LABEL"]:format(src and ns.MountJournal:GetSourceTypeLabel(src) or L["COL_SOURCE_ANY"]))
 
     local s = ns.Collection.summary
     if s and s.visibleTotal > 0 then
@@ -718,11 +702,7 @@ function CollectionPanel:Refresh(p, entries)
         local keep = (key == "all") or (key == "missing" and not m.isCollected)
             or (key == "collected" and m.isCollected)
             or (key == "favorites" and ns.Collection:IsFavorite(m.mountID))
-        if keep and buyable then
-            keep = buySet[m.mountID] == true
-        elseif keep and src then
-            keep = (m.sourceType or 0) == src
-        end
+        if keep and src then keep = (m.sourceType or 0) == src end
         if keep and tierSet then keep = tierSet[m.mountID] == true end
         if keep and q ~= "" then keep = m.name:lower():find(q, 1, true) ~= nil end
         if keep then items[#items + 1] = m end

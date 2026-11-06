@@ -83,17 +83,6 @@ ns:On("UPDATE_INSTANCE_INFO", function()
     end)
 end)
 
--- Money, currencies and bag items change what can be paid ("Can pay now").
-local function walletChanged()
-    ns.Collection:InvalidateBuyable()
-    if ns.UI.frame and ns.UI.frame:IsShown() then
-        ns:Debounce("wallet", 2, function() ns.UI:Refresh() end)
-    end
-end
-ns:On("PLAYER_MONEY", walletChanged)
-ns:On("CURRENCY_DISPLAY_UPDATE", walletChanged)
-ns:On("BAG_UPDATE_DELAYED", walletChanged)
-
 local function afterBossKill()
     ns:Debounce("raidinfo", 3, function() ns.Lockouts:Request() end)
 end
@@ -230,9 +219,6 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
         ns.Holidays.test = not ns.Holidays.test or nil
         ns:Print("events test mode: " .. (ns.Holidays.test and "on" or "off"))
         ns.UI:Refresh()
-    elseif cmd == "costs" then
-        ns:Print("missing mounts with a price:")
-        ns.Collection:DebugCosts()
     elseif cmd == "unknown" then
         ns:Print("mounts without a source type:")
         ns.MountJournal:DebugUnknownSources()

@@ -50,7 +50,6 @@ function Collection:Scan()
     self.summary, self.list = s, list
     self:InvalidateAchievements() -- collected flags changed; rebuild on demand
     self.otherDrops = nil
-    self:InvalidateBuyable()
     return s
 end
 
@@ -316,92 +315,6 @@ function Collection:ByExpansion()
     for _, t in ipairs(out) do table.sort(t.mounts, function(a, b) return name(a) < name(b) end) end
     table.sort(out, function(a, b) return a.tier < b.tier end)
     return out
-end
-
--- Buying ----------------------------------------------------------------------
--- Price from the journal text compared with this character's gold and
--- currencies. Only the price is checked: a vendor can also ask for
--- reputation or renown, which the text does not say in a readable way.
-local costCache = {} -- [mountID] = parts | false
-
---- nil when the mount has no price in its text; otherwise
---- { parts = { {kind, need, have, name, icon...} }, canBuy = true/false/nil }
---- (nil canBuy = a part could not be identified).
-function Collection:BuyInfo(mountID)
-    local parts = costCache[mountID]
-    if parts == nil then
-        local extra = ns.MountJournal:GetMountExtra(mountID)
-        local text = extra and extra.sourceText
-        if not text or text == "" then return nil end -- not loaded: try again later
-        parts = ns.Wallet:ParseCost(text) or false
-        costCache[mountID] = parts
-    end
-    if not parts then return nil end
-    local out, canBuy = { parts = {} }, true
-    for _, p in ipairs(parts) do
-        local have = ns.Wallet:Have(p)
-        out.parts[#out.parts + 1] = { kind = p.kind, id = p.id, name = p.name, icon = p.icon, need = p.need, have = have }
-        if have == nil then canBuy = canBuy and nil
-        elseif have < p.need then canBuy = false end
-    end
-    out.canBuy = canBuy
-    return out
-end
-
---- Set of missing mounts (visible for this character) whose price can be
---- paid now, and its size. Cached: rebuilt only after money, currencies,
---- bags or the collection change (InvalidateBuyable).
-function Collection:BuyableSet()
-    if self.buyable then return self.buyable, self.buyableCount end
-    local list = self:GetList()
-    if not list then return {}, 0 end
-    local set, n = {}, 0
-    for _, m in ipairs(list) do
-        if not m.isCollected then
-            local info = self:BuyInfo(m.mountID)
-            if info and info.canBuy == true then
-                set[m.mountID] = true
-                n = n + 1
-            end
-        end
-    end
-    self.buyable, self.buyableCount = set, n
-    return set, n
-end
-
-function Collection:BuyableCount()
-    local _, n = self:BuyableSet()
-    return n
-end
-
-function Collection:InvalidateBuyable()
-    self.buyable, self.buyableCount = nil, nil
-end
-
---- /aplan costs: uncollected mounts with a price, raw and parsed.
-function Collection:DebugCosts()
-    -- Priced mounts with what was read; then how many could not be read.
-    local priced, buyable, unreadable = 0, 0, 0
-    for _, m in ipairs(self:GetList() or {}) do
-        if not m.isCollected then
-            local info = self:BuyInfo(m.mountID)
-            if info then
-                priced = priced + 1
-                if info.canBuy == true then buyable = buyable + 1 end
-                if info.canBuy == nil then unreadable = unreadable + 1 end
-                if priced <= 12 then
-                    local parsed = {}
-                    for _, p in ipairs(info.parts) do
-                        parsed[#parsed + 1] = ("%s %s need %s have %s"):format(p.kind, tostring(p.name or p.id or ""),
-                            tostring(p.need), tostring(p.have))
-                    end
-                    print(("  %s: %s -> %s"):format(m.name, table.concat(parsed, "; "), tostring(info.canBuy)))
-                end
-            end
-        end
-    end
-    print(("  %d missing mounts with a price, %d payable now, %d with a part not identified"):format(
-        priced, buyable, unreadable))
 end
 
 -- Favorites -------------------------------------------------------------------
