@@ -93,17 +93,25 @@ local function newStart(p)
 end
 
 local function newTravel(p)
+    -- A "leg of the road": darker band, thin accent bar, icon of the kind
+    -- of travel (flight, portal / teleport spell, hearthstone, boat).
+    local a = ns.UI.COLORS.accent
     local f = CreateFrame("Frame", nil, p.child)
-    f:SetHeight(24)
-    local line = f:CreateTexture(nil, "ARTWORK")
-    line:SetPoint("BOTTOMLEFT")
-    line:SetPoint("BOTTOMRIGHT")
-    line:SetHeight(1)
-    line:SetColorTexture(1, 1, 1, 0.06)
-    f.dash = ns.UI.fs(f, "small", ns.UI.COLORS.muted)
-    f.dash:SetPoint("LEFT", COL.done + 4, 0)
-    f.dash:SetText("—")
-    f.text = ns.UI.fs(f, "body", ns.UI.COLORS.dim)
+    f:SetHeight(26)
+    local bg = f:CreateTexture(nil, "BACKGROUND")
+    bg:SetPoint("TOPLEFT", 0, -1)
+    bg:SetPoint("BOTTOMRIGHT", 0, 1)
+    bg:SetColorTexture(0, 0, 0, 0.22)
+    local bar = f:CreateTexture(nil, "ARTWORK")
+    bar:SetPoint("TOPLEFT", 0, -1)
+    bar:SetPoint("BOTTOMLEFT", 0, 1)
+    bar:SetWidth(2)
+    bar:SetColorTexture(a[1], a[2], a[3], 0.7)
+    f.icon = f:CreateTexture(nil, "ARTWORK")
+    f.icon:SetSize(18, 18)
+    f.icon:SetPoint("LEFT", COL.num - 6, 0)
+    f.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+    f.text = ns.UI.fs(f, "body", { 0.86, 0.80, 0.98, 1 })
     f.text:SetPoint("LEFT", COL.step, 0)
     f.text:SetPoint("RIGHT", -6, 0)
     f.text:SetWordWrap(false)
@@ -420,6 +428,10 @@ function PlannerPanel:Refresh(p, entries)
         elseif s.kind == "travel" then
             f = take(p, "travel")
             f.text:SetText(s.text)
+            f.icon:SetTexture(s.icon)
+            -- Minimap tracking icons have no border to trim; spell icons do.
+            local trim = type(s.icon) ~= "string" or s.icon:find("\\Icons\\", 1, true)
+            if trim then f.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92) else f.icon:SetTexCoord(0, 1, 0, 1) end
         else
             f = take(p, "run")
             local rows, detail, note = describe(s)

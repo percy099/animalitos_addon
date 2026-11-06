@@ -362,7 +362,7 @@ function Planner:Build(entries, hideCompleted, withWorldBosses)
             if ent then
                 local texts = self:TravelTexts(fac, here, ent, mage, r.jid)
                 for _, text in ipairs(texts) do
-                    steps[#steps + 1] = { kind = "travel", text = text }
+                    steps[#steps + 1] = { kind = "travel", text = text, icon = self:TravelIcon(text) }
                 end
                 if not r.done then travelMinutes = travelMinutes + #texts * MINUTES.travel end
                 here.continent, here.zone = ent.continent, ent.uiMapID
@@ -422,6 +422,67 @@ function Planner:MageContext()
 end
 
 -- Text for a mage hop to dest = { uiMapID, spellID }, or nil if nobody can do it.
+-- Travel icons -------------------------------------------------------------------
+-- Travel steps are plain localized texts; the icon is picked from which
+-- locale format the text matches (client textures only).
+local ICON = {
+    fly    = "Interface\\Minimap\\Tracking\\FlightMaster",
+    portal = "Interface\\Icons\\Spell_Arcane_PortalDalaran",
+    hearth = "Interface\\Icons\\INV_Misc_Rune_01",
+    ride   = "Interface\\Icons\\Ability_Hunter_Pathfinding",
+}
+
+-- "Fly to %s" -> "^Fly to (.-)$" (placeholders first, then magic characters).
+local patternCache = {}
+local function formatPattern(fmt)
+    local cached = patternCache[fmt]
+    if cached then return cached end
+    local p = fmt:gsub("%%[%.%d]*[sdf]", "\1")
+    p = p:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1")
+    p = "^" .. p:gsub("\1", "(.-)") .. "$"
+    patternCache[fmt] = p
+    return p
+end
+
+local function spellIcon(nameOrID)
+    return nameOrID and C_Spell and C_Spell.GetSpellTexture and C_Spell.GetSpellTexture(nameOrID) or nil
+end
+
+-- Locale key -> icon kind ("spell" = the named spell's own icon), in match order.
+local ICON_RULES = {
+    { "PLAN_CAST", "spell" }, { "PLAN_USE_ITEM", "item" }, { "PLAN_FLY", "fly" },
+    { "PLAN_HEARTH", "hearth" }, { "PLAN_PORTAL_AT", "portal" }, { "PLAN_PORTAL_IN", "portal" },
+    { "PLAN_PORTAL", "portal" }, { "PLAN_ASK_PORTAL", "portal" }, { "PLAN_TELEPORT", "portal" },
+    { "PLAN_DARK_PORTAL", "portal" }, { "PLAN_BOAT_ZULDAZAR", "ride" }, { "PLAN_BOAT_KULTIRAS", "ride" },
+    { "PLAN_KROOZ", "ride" }, { "PLAN_TRAVEL_CONTINENT", "ride" }, { "PLAN_TRAVEL_ZONE", "ride" },
+}
+
+--- Icon texture for a travel step text.
+function Planner:TravelIcon(text)
+    local L = ns.L
+    if not text then return ICON.ride end
+    -- "A » B": the icon of the second hop (the portal you end up taking).
+    local _, second = text:match(formatPattern(L["PLAN_THEN"]))
+    if second then return self:TravelIcon(second) end
+    for _, rule in ipairs(ICON_RULES) do
+        local arg = text:match(formatPattern(L[rule[1]]))
+        if arg then
+            if rule[2] == "spell" then return spellIcon(arg:match("^(.-) %(") or arg) or ICON.portal end
+            if rule[2] == "item" then
+                for _, ti in pairs(TRAVEL_ITEMS) do
+                    if ns.Navigation:ItemName(ti.item) == arg and C_Item and C_Item.GetItemIconByID then
+                        return C_Item.GetItemIconByID(ti.item)
+                    end
+                end
+                return ICON.hearth
+            end
+            return ICON[rule[2]]
+        end
+    end
+    -- A bare spell name: a mage teleport ("Teleport: Theramore").
+    return spellIcon(text) or ICON.portal
+end
+
 local function mageHop(mage, dest)
     if not (mage and dest) then return nil end
     if mage.self and ns.Navigation:KnowsSpell(dest[2]) then

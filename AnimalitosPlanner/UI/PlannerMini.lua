@@ -164,7 +164,7 @@ local function travelLines(f, travel, color)
             place(f, line(f, "tiny", color), ("   +%d"):format(#travel - MAX_TRAVEL), 1)
             break
         end
-        place(f, line(f, "small", color), "— " .. text, 2)
+        place(f, line(f, "small", color), ("|T%s:14:14:0:0:64:64:5:59:5:59|t  %s"):format(ns.Planner:TravelIcon(text), text), 2)
     end
 end
 
