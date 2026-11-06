@@ -344,6 +344,10 @@ end
 
 -- World bosses use negative keys: -journalEncounterID (see build_dataset.py).
 function FarmList:InstanceName(jid)
+    if type(jid) == "string" then -- "ev<lfgID>": world event boss (Planner marks)
+        local id = tonumber(jid:match("^ev(%d+)$"))
+        return (id and ns.Holidays:Name(id)) or jid
+    end
     if jid < 0 then return (EJ_GetEncounterInfo(-jid)) or ("#" .. jid) end
     return (EJ_GetInstanceInfo(jid)) or ("#" .. jid)
 end

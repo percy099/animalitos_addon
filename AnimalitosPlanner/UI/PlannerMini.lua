@@ -169,7 +169,7 @@ local function travelLines(f, travel, color)
 end
 
 local function runTitle(s)
-    return L[s.inst.worldBoss and "PLAN_KILL" or "PLAN_RUN"]:format(ns.FarmList:InstanceName(s.jid))
+    return ns.PlannerPanel.StepTitle(s)
 end
 
 function Mini:Refresh()
@@ -233,8 +233,19 @@ function Mini:Refresh()
     local jid, isRaid = s.jid, s.inst.isRaid
     f.go:ClearAllPoints()
     f.go:SetPoint("TOPLEFT", PAD, -f.y)
-    f.go:SetEnabled(s.inst.entrance ~= nil)
-    f.go:SetScript("OnClick", function() ns.Navigation:GoToInstance(jid) end)
+    if s.event then
+        -- World event boss: no travel, Queue opens the Dungeon Finder.
+        local lfgID = s.event.h.lfgDungeonID
+        ns.UI.SetButtonText(f.go, L["BTN_QUEUE"], 48)
+        f.go:SetEnabled(true)
+        f.go:SetScript("OnClick", function()
+            if not ns.Holidays:OpenQueue(lfgID) then ns:Print(L["JOURNAL_COMBAT"]) end
+        end)
+    else
+        ns.UI.SetButtonText(f.go, L["BTN_GO"], 48)
+        f.go:SetEnabled(s.inst.entrance ~= nil)
+        f.go:SetScript("OnClick", function() ns.Navigation:GoToInstance(jid) end)
+    end
     f.go:Show()
     f.done:ClearAllPoints()
     f.done:SetPoint("LEFT", f.go, "RIGHT", 6, 0)

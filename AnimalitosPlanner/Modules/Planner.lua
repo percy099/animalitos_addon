@@ -166,7 +166,7 @@ local CONTINENT_ROUTES = {
 }
 
 -- Rough minutes for the "time left" estimate (shown with "≈").
-local MINUTES = { raid = 15, dungeon = 10, travel = 4 }
+local MINUTES = { raid = 15, dungeon = 10, travel = 4, event = 10 }
 
 local function faction()
     local f = UnitFactionGroup("player")
@@ -367,6 +367,19 @@ function Planner:Build(entries, hideCompleted, kinds)
     end
 
     local runs = {}
+    -- World event bosses first: no travel (Dungeon Finder queue), once a
+    -- day. Key "ev<lfgID>" for the manual marks (daily reset).
+    local S = ns.Eligibility.STATES
+    for _, ev in ipairs(ns.FarmList:Holidays()) do
+        local fav = not kinds.favorites
+        for _, id in ipairs(ev.mounts) do fav = fav or ns.Collection:IsFavorite(id) end
+        if fav then
+            local key = "ev" .. ev.h.lfgDungeonID
+            local auto = ev.state == S.LOCKED_OUT
+            runs[#runs + 1] = { kind = "run", event = ev, jid = key, inst = { isRaid = false },
+                done = auto or self:IsManuallyDone(key), auto = auto }
+        end
+    end
     for _, jid in ipairs(self:Route()) do
         local e = byJid[jid]
         if e then
@@ -416,7 +429,9 @@ function Planner:Build(entries, hideCompleted, kinds)
     -- Rough time left: pending runs plus the travel in front of them.
     local m = travelMinutes
     for _, r in ipairs(runs) do
-        if not r.done then m = m + (r.inst.isRaid and MINUTES.raid or MINUTES.dungeon) end
+        if not r.done then
+            m = m + ((r.event and MINUTES.event) or (r.inst.isRaid and MINUTES.raid) or MINUTES.dungeon)
+        end
     end
     summary.minutes = m
     return steps, summary

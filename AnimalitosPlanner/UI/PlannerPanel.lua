@@ -27,7 +27,25 @@ end
 
 -- Step details --------------------------------------------------------------------
 -- Rows of { boss, mount, icon, state } and the step's difficulty / note text.
+-- World event boss step (Planner:Build `event` = FarmList:Holidays() item).
+local function describeEvent(r)
+    local ev = r.event
+    local S = ns.Eligibility.STATES
+    local state = (ev.state == S.READY and "ready") or (ev.state == S.LOCKED_OUT and "locked") or "verify"
+    local rows = {}
+    for _, id in ipairs(ev.mounts) do
+        local mj = ns.MountJournal:GetMount(id)
+        rows[#rows + 1] = { id = id, boss = ev.name, mount = mj and mj.name or ("#" .. id),
+            icon = mj and mj.icon or 134400, state = state }
+    end
+    table.sort(rows, function(a, b) return a.mount < b.mount end)
+    local note = (state == "locked" and L["PLAN_NOTE_LOCKED"]:format(timeLeft(ev.resetAt)))
+        or (state == "verify" and L["EVENT_VERIFY"]) or ""
+    return rows, ("%s · %s"):format(ev.event or "", L["EVENT_DAILY_SHORT"]), note
+end
+
 local function describe(r)
+    if r.event then return describeEvent(r) end
     local e, isRaid = r.e, r.inst.isRaid
     local rows, ready, locked, resetAt, verifyReason = {}, {}, {}, nil, nil
     for id, m in pairs(e.mounts) do
@@ -73,6 +91,12 @@ local function describe(r)
     return rows, detail, table.concat(notes, " · ")
 end
 PlannerPanel.Describe = describe -- also used by the mini window
+
+--- "Run Zul'Gurub", "Kill Galleon", "Queue: Coren Direbrew".
+function PlannerPanel.StepTitle(s)
+    if s.event then return L["PLAN_QUEUE"]:format(s.event.name) end
+    return L[s.inst.worldBoss and "PLAN_KILL" or "PLAN_RUN"]:format(ns.FarmList:InstanceName(s.jid))
+end
 
 -- Pools ---------------------------------------------------------------------------
 local function newStart(p)
@@ -455,7 +479,7 @@ function PlannerPanel:Refresh(p, entries)
             f = take(p, "run")
             local rows, detail, note = describe(s)
             f.num:SetText(s.number)
-            f.title:SetText(L[s.inst.worldBoss and "PLAN_KILL" or "PLAN_RUN"]:format(ns.FarmList:InstanceName(s.jid)))
+            f.title:SetText(ns.PlannerPanel.StepTitle(s))
             f.detail:SetText(detail)
             f.note:SetText(note)
             local links = achByInstance[s.jid]
@@ -501,8 +525,19 @@ function PlannerPanel:Refresh(p, entries)
                 GameTooltip:Show()
             end)
             f.check:SetScript("OnLeave", function() GameTooltip:Hide() end)
-            f.go:SetEnabled(s.inst.entrance ~= nil)
-            f.go:SetScript("OnClick", function() ns.Navigation:GoToInstance(jid) end)
+            if s.event then
+                -- World event boss: Queue opens the Dungeon Finder on it.
+                local lfgID = s.event.h.lfgDungeonID
+                ns.UI.SetButtonText(f.go, L["BTN_QUEUE"], GO_W)
+                f.go:SetEnabled(true)
+                f.go:SetScript("OnClick", function()
+                    if not ns.Holidays:OpenQueue(lfgID) then ns:Print(L["JOURNAL_COMBAT"]) end
+                end)
+            else
+                ns.UI.SetButtonText(f.go, L["BTN_GO"], GO_W) -- pooled rows may have been events
+                f.go:SetEnabled(s.inst.entrance ~= nil)
+                f.go:SetScript("OnClick", function() ns.Navigation:GoToInstance(jid) end)
+            end
             f:SetAlpha(s.done and 0.5 or 1)
 
             local left = 8 + f.title:GetStringHeight() + 2 + f.detail:GetStringHeight()
