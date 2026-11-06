@@ -126,6 +126,9 @@ def build(raw: dict, curated: dict):
     current_tier = curated["currentExpansionTier"]
     entrance_overrides = curated.get("entranceOverrides", {})
     lockouts = {k: v for k, v in curated.get("lockoutModels", {}).items() if not k.startswith("_")}
+    # Difficulties an instance really has (the journal answers for a missing
+    # one with the loot of another: Zul'Gurub "Normal").
+    only = {int(k): set(v["difficulties"]) for k, v in curated.get("instanceDifficulties", {}).items() if not k.startswith("_")}
 
     # Group mount drops into sources: (instance, encounter, mount) -> difficulties
     grouped = defaultdict(lambda: {"difficulties": set(), "itemID": None})
@@ -133,6 +136,8 @@ def build(raw: dict, curated: dict):
         if int(jid) in excluded:
             continue
         for d, diff in inst["difficulties"].items():
+            if int(jid) in only and int(d) not in only[int(jid)]:
+                continue
             for m in diff["mounts"]:
                 key = (int(jid), m["encounterID"], m["mountID"])
                 grouped[key]["difficulties"].add(int(d))

@@ -29,7 +29,11 @@
         "reason": "Same as Emalon" }
     ]
   },
-  "raidSkips": {
+  "instanceDifficulties": {
+    "_reason": "Difficulties an instance really has. The Encounter Journal answers for a difficulty the instance lacks with another one's loot, so the scan saw drops there too.",
+    "76": { "name": "Zul'Gurub", "difficulties": [2], "reason": "Heroic only (Cataclysm 4.1). In game: 'Zul'Gurub is only available as a Heroic dungeon.' when set to Normal (reported by the player)." },
+    "77": { "name": "Zul'Aman", "difficulties": [2], "reason": "Heroic only (Cataclysm 4.1), same as Zul'Gurub; no mount today, kept for consistency." }
+  },  "raidSkips": {
     "_reason": "Raid skips: a quest per difficulty (Normal 14 / Heroic 15 / Mythic 16); a higher one unlocks the lower ones (warcraft.wiki.gg). IDs from each quest's warcraft.wiki.gg page (external links, in Normal, Heroic, Mythic order); /aplan skips shows their titles in game to confirm. boss = English fallback when the journal name is not available.",
     "list": [
       {

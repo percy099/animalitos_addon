@@ -2,7 +2,7 @@
 -- Source: in-game /aplan scan, client 12.1.5.70783, scanned 2026-11-05 13:38:04.
 local _, ns = ...
 ns.Data = {
-    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "9a36badeb64f" },
+    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "e328f763bdc8" },
     instances = {
         [-2210] = { tier = 8, isRaid = true, legacy = true, worldBoss = true, ejInstance = 1028, encounter = 2210, lockoutModel = "worldQuest" }, -- Dunegorger Kraulok (Azeroth)
         [-1262] = { tier = 6, isRaid = true, legacy = true, worldBoss = true, ejInstance = 557, encounter = 1262, lockoutModel = "savedWorldBoss" }, -- Rukhmar (Draenor)
@@ -63,8 +63,8 @@ ns.Data = {
         { mountID = 397, itemID = 63043, journalInstanceID = 67, journalEncounterID = 111, dungeonEncounterID = 1059, difficulties = { 1, 2 } }, -- Slabhide - The Stonecore
         { mountID = 395, itemID = 63040, journalInstanceID = 68, journalEncounterID = 115, dungeonEncounterID = 1041, difficulties = { 1, 2 } }, -- Altairus - The Vortex Pinnacle
         { mountID = 396, itemID = 63041, journalInstanceID = 74, journalEncounterID = 155, dungeonEncounterID = 1034, difficulties = { 3, 4, 5, 6 } }, -- Al'Akir - Throne of the Four Winds
-        { mountID = 410, itemID = 68823, journalInstanceID = 76, journalEncounterID = 176, dungeonEncounterID = 1179, difficulties = { 1, 2 } }, -- Bloodlord Mandokir - Zul'Gurub
-        { mountID = 411, itemID = 68824, journalInstanceID = 76, journalEncounterID = 181, dungeonEncounterID = 1180, difficulties = { 1, 2 } }, -- High Priestess Kilnara - Zul'Gurub
+        { mountID = 410, itemID = 68823, journalInstanceID = 76, journalEncounterID = 176, dungeonEncounterID = 1179, difficulties = { 2 } }, -- Bloodlord Mandokir - Zul'Gurub
+        { mountID = 411, itemID = 68824, journalInstanceID = 76, journalEncounterID = 181, dungeonEncounterID = 1180, difficulties = { 2 } }, -- High Priestess Kilnara - Zul'Gurub
         { mountID = 425, itemID = 71665, journalInstanceID = 78, journalEncounterID = 194, dungeonEncounterID = 1206, difficulties = { 14, 15 } }, -- Alysrazor - Firelands
         { mountID = 415, itemID = 69224, journalInstanceID = 78, journalEncounterID = 198, dungeonEncounterID = 1203, difficulties = { 14, 15 } }, -- Ragnaros - Firelands
         { mountID = 445, itemID = 78919, journalInstanceID = 187, journalEncounterID = 331, dungeonEncounterID = 1297, difficulties = { 3, 4, 5, 6 } }, -- Ultraxion - Dragon Soul
