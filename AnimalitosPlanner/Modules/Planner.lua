@@ -457,9 +457,34 @@ function Planner:Upcoming(entries)
             travel = {}
         end
     end
+    -- The current step's travel starts where the player really is (the
+    -- route order stays fixed; only the way to its next stop changes).
+    -- Inside an instance or with no map: the planned travel stays.
+    local cur = found[1]
+    local here = self:PlayerHere()
+    if cur and here and not cur.run.event and cur.run.inst.entrance then
+        cur.travel = self:TravelTexts(faction(), here, cur.run.inst.entrance, self:MageContext(), cur.run.jid)
+    end
     return found[1], found[2], summary
 end
 
+--- Where the player is, as the route's travel steps see it: { continent,
+--- zone } with zone = the zone-level map (a city or subzone map counts as
+--- its zone). nil inside instances or without a map.
+function Planner:PlayerHere()
+    if IsInInstance() then return nil end
+    local id = C_Map.GetBestMapForUnit("player")
+    local zone, continent, guard = nil, nil, 0
+    while id and id > 0 and guard < 10 do
+        local info = C_Map.GetMapInfo(id)
+        if not info then break end
+        if not zone and info.mapType == Enum.UIMapType.Zone then zone = id end
+        if info.mapType == Enum.UIMapType.Continent then continent = id break end
+        id, guard = info.parentMapID, guard + 1
+    end
+    if not (zone and continent) then return nil end
+    return { continent = continent, zone = zone }
+end
 local function mapName(uiMapID)
     local info = uiMapID and C_Map.GetMapInfo(uiMapID)
     return info and info.name or "?"
