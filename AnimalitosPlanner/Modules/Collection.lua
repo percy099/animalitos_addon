@@ -84,6 +84,7 @@ local function runInBackground(fn, onDone)
     end
     step()
 end
+Collection.RunInBackground = runInBackground -- also used by Requirements
 
 -- Needles to find an instance in criteria text: its name and its bosses'
 -- names (Encounter Journal, so localized). A needle that belongs to two

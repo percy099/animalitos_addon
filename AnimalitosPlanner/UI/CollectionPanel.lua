@@ -234,7 +234,10 @@ local function render(p)
             elseif p.mode == "drops" then
                 fillRow(r, m.mount, index, nil, m.label)
             else
-                fillRow(r, m, index, p.farm and p.farm[m.mountID])
+                -- "Vendor: nothing missing": requirements met or none.
+                local st = p.vendorOk and p.vendorOk[m.mountID]
+                local label = st and ((st == "met") and L["REQ_MET_SHORT"] or L["REQ_NONE_SHORT"]) or nil
+                fillRow(r, m, index, p.farm and p.farm[m.mountID], label)
             end
             r:Show()
         else
@@ -647,7 +650,15 @@ function CollectionPanel:Refresh(p, entries)
 
     -- Source menu: "All sources" + every source with how many are missing.
     local src = sourceKey()
-    local menu = { { value = "all", text = L["COL_SOURCE_ALL"] } }
+    -- "Vendor: nothing missing": missing vendor mounts whose requirements
+    -- (reputation, renown, faction, class) this character meets or that
+    -- ask for nothing. Built in the background; "..." until ready.
+    local vendorOk = src == "vendorok"
+    local vendorSet, vendorCount = ns.Requirements:VendorSet()
+    local menu = { { value = "all", text = L["COL_SOURCE_ALL"] },
+        { value = "vendorok", text = L["COL_SOURCE_ITEM"]:format(L["COL_VENDOR_OK"],
+            vendorCount and fmt(vendorCount) or "...") } }
+    p.vendorOk = vendorOk and vendorSet or nil
     local missingBy = {}
     local present = {}
     for _, m in ipairs(list or {}) do
@@ -667,8 +678,9 @@ function CollectionPanel:Refresh(p, entries)
             ns.MountJournal:GetSourceTypeLabel(st), fmt(missingBy[st] or 0)) }
     end
     p.source:SetItems(menu)
-    if src and not present[src] then src = nil end -- also clears an old "buyable" choice
-    p.source:SetText(L["COL_SOURCE_LABEL"]:format(src and ns.MountJournal:GetSourceTypeLabel(src) or L["COL_SOURCE_ANY"]))
+    if src and not vendorOk and not present[src] then src = nil end -- also clears an old "buyable" choice
+    p.source:SetText(L["COL_SOURCE_LABEL"]:format((vendorOk and L["COL_VENDOR_OK"])
+        or (src and ns.MountJournal:GetSourceTypeLabel(src)) or L["COL_SOURCE_ANY"]))
 
     local s = ns.Collection.summary
     if s and s.visibleTotal > 0 then
@@ -702,7 +714,11 @@ function CollectionPanel:Refresh(p, entries)
         local keep = (key == "all") or (key == "missing" and not m.isCollected)
             or (key == "collected" and m.isCollected)
             or (key == "favorites" and ns.Collection:IsFavorite(m.mountID))
-        if keep and src then keep = (m.sourceType or 0) == src end
+        if keep and vendorOk then
+            keep = vendorSet ~= nil and vendorSet[m.mountID] ~= nil
+        elseif keep and src then
+            keep = (m.sourceType or 0) == src
+        end
         if keep and tierSet then keep = tierSet[m.mountID] == true end
         if keep and q ~= "" then keep = m.name:lower():find(q, 1, true) ~= nil end
         if keep then items[#items + 1] = m end

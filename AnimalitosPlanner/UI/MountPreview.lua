@@ -346,6 +346,27 @@ local function build(f, mountID, m, extra)
         end
     end
 
+    -- Vendor mounts: what the vendor asks for and whether this character has
+    -- it (tooltip of the item + journal text; the price is not checked).
+    local req = not (m and m.isCollected) and ns.Requirements:Get(mountID) or nil
+    if req then
+        header(lay, "DETAIL_REQS")
+        local summary = {
+            met = { L["REQ_ALL_MET"], C.success }, none = { L["REQ_NONE"], C.dim },
+            missing = { L["REQ_MISSING"], C.warning }, unknown = { L["REQ_UNKNOWN"], C.dim },
+            loading = { L["REQ_LOADING"], C.muted }, remix = { L["REQ_REMIX"], C.muted },
+        }
+        local s = summary[req.status] or summary.unknown
+        text(lay, s[1], "body", s[2], 0, 2)
+        if req.status ~= "remix" then
+            for _, r in ipairs(req.reqs) do
+                local icon = ns.Requirements.ICON[r.met] or ns.Requirements.ICON_UNKNOWN
+                text(lay, icon .. "  " .. r.text, "small", C.text, 8, 3)
+            end
+            text(lay, L["REQ_NOTE"], "tiny", C.muted, 0, 4)
+        end
+    end
+
     -- Achievements that reward this mount (built in the background).
     local achs = ns.Collection:Achievements()
     local mine = {}
@@ -365,7 +386,7 @@ local function build(f, mountID, m, extra)
     if extra.description and extra.description ~= "" then
         text(lay, extra.description, "small", C.muted, 0, 8)
     end
-    if #blocks == 0 and #mine == 0 and not (drops and #drops > 0) and not (m and m.isCollected) then
+    if #blocks == 0 and #mine == 0 and not req and not (drops and #drops > 0) and not (m and m.isCollected) then
         text(lay, L["DETAIL_NO_DATA"], "tiny", C.muted, 0, 10)
     end
     return lay.y
