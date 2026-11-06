@@ -400,6 +400,8 @@ function FarmPanel:Refresh(p, entries, sum)
                 if not ns.Holidays:OpenQueue(lfgID) then ns:Print(L["JOURNAL_COMBAT"]) end
             end)
             c.hide:Hide()
+            c.go:ClearAllPoints()
+            c.go:SetPoint("TOPRIGHT", -8, -8)
             local rowY = CARD_HEAD_H
             for k, id in ipairs(ev.mounts) do
                 mountRow(c, ROW_INDENT, rowY, 8, id, ev, nil, "event", k % 2 == 1)
@@ -407,11 +409,15 @@ function FarmPanel:Refresh(p, entries, sum)
             end
             local ch = math.max(rowY + 6, CARD_MIN_H)
             c:SetHeight(ch)
-            -- Artwork: the first mount's icon, trimmed (events have no journal tile).
+            -- Artwork: the first mount's icon, square and centered (events
+            -- have no journal tile; cropping the icon like art blew it up).
             local mj = ns.MountJournal:GetMount(ev.mounts[1])
+            c.thumb:ClearAllPoints()
+            c.thumb:SetPoint("CENTER", c.thumbBg)
+            c.thumb:SetSize(44, 44)
             c.thumb:SetTexture(mj and mj.icon or nil)
+            c.thumb:SetTexCoord(0.08, 0.92, 0.08, 0.92)
             c.thumb:SetShown(mj ~= nil)
-            ns.UI.SetArtCrop(c.thumb, THUMB_W, ch - THUMB_INSET * 2)
             c:Show()
             y = y + ch + CARD_GAP
         end
@@ -470,8 +476,13 @@ function FarmPanel:Refresh(p, entries, sum)
             c.detail:SetText(table.concat(parts, " · "))
 
             local jid, isRaid = e.jid, e.inst.isRaid
-            ns.UI.SetButtonText(c.go, L["BTN_GO"], 50) -- pooled cards may have been event cards
+            -- Pooled cards may have been event cards: restore Go, Hide and the art.
+            ns.UI.SetButtonText(c.go, L["BTN_GO"], 50)
             c.hide:Show()
+            c.go:ClearAllPoints()
+            c.go:SetPoint("RIGHT", c.hide, "LEFT", -6, 0)
+            c.thumb:ClearAllPoints()
+            c.thumb:SetAllPoints(c.thumbBg)
             c.go:SetEnabled(e.inst.entrance ~= nil)
             c.go:SetScript("OnClick", function() ns.Navigation:GoToInstance(jid) end)
             c.hide:SetScript("OnClick", function()
