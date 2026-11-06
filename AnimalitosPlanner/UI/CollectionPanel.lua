@@ -229,11 +229,10 @@ function CollectionPanel:Create(parent)
     p.chip:Hide()
 
     -- Note shown instead of the toolbar in the expansion view.
-    p.expNote = ns.UI.fs(p, "GameFontHighlightSmall", C.muted)
-    p.expNote:SetPoint("TOPLEFT", 2, -(SEARCH_H + 8 + 5))
+    p.expNote = ns.UI.fs(p, "tiny", C.dim) -- two short lines fit above the progress line
+    p.expNote:SetPoint("TOPLEFT", 2, -(SEARCH_H + 6))
     p.expNote:SetPoint("RIGHT", -SCROLL_W, 0)
     p.expNote:SetWordWrap(true)
-    p.expNote:SetText(L["COL_EXP_NOTE"])
 
     -- Progress: "86 / 1,183 collected · 7.3 %" and a thin bar
     local top = -(SEARCH_H + 8 + TOOLBAR_H + 8)
@@ -355,6 +354,11 @@ end
 local function renderTiles(p)
     local data = ns.Collection:ByExpansion()
     p.expData = data
+    -- "66 of 1,183 mounts": say up front how much of the collection this covers.
+    local covered = 0
+    for _, t in ipairs(data) do covered = covered + #t.mounts end
+    local s = ns.Collection.summary
+    p.expNote:SetFormattedText(L["COL_EXP_NOTE"], fmt(covered), fmt(s and s.visibleTotal or 0))
     local n = #data
     local rows = math.max(1, math.ceil(n / TILE_COLS))
     local areaW = ns.UI.CONTENT_WIDTH - SCROLL_W
