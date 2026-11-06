@@ -268,7 +268,7 @@ function UI:Refresh()
     if f.farm:IsShown() then ns.FarmPanel:Refresh(f.farm, entries, sum) end
     if f.summary:IsShown() then ns.HomePanel:Refresh(f.summary, entries, sum) end
     if f.panels.settings:IsShown() then ns.SettingsPanel:Refresh(f.panels.settings) end
-    if f.panels.collection:IsShown() then ns.CollectionPanel:Refresh(f.panels.collection) end
+    if f.panels.collection:IsShown() then ns.CollectionPanel:Refresh(f.panels.collection, entries) end
 end
 
 --- Shows the window on a given section (used by the minimap button).

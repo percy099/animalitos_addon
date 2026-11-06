@@ -518,6 +518,86 @@ function UI.Segmented(parent, items, onSelect)
     return seg
 end
 
+--- Dropdown: a secondary button with a chevron that opens a menu below it.
+--- dd:SetItems({ {value=, text=}, ... }), dd:SetText(text). onSelect(value)
+--- runs when an item is clicked. A click anywhere else closes the menu.
+local MENU_ROW_H = 22
+function UI.Dropdown(parent, width, onSelect)
+    local dd = UI.Button(parent, "secondary")
+    dd:SetWidth(width)
+    dd:GetFontString():ClearAllPoints()
+    dd:GetFontString():SetPoint("LEFT", 10, 0)
+    dd:GetFontString():SetPoint("RIGHT", -22, 0)
+    dd:GetFontString():SetJustifyH("LEFT")
+    dd:GetFontString():SetWordWrap(false)
+    -- Chevron drawn with two lines (no font glyph needed)
+    for i = 1, 2 do
+        local l = dd:CreateLine(nil, "OVERLAY")
+        l:SetThickness(1.5)
+        l:SetColorTexture(1, 1, 1, 0.7)
+        if i == 1 then
+            l:SetStartPoint("RIGHT", -15, 2); l:SetEndPoint("RIGHT", -11, -2)
+        else
+            l:SetStartPoint("RIGHT", -11, -2); l:SetEndPoint("RIGHT", -7, 2)
+        end
+    end
+
+    local menu = CreateFrame("Frame", nil, dd, "BackdropTemplate")
+    menu:SetFrameStrata("DIALOG")
+    menu:SetFrameLevel(20)
+    menu:SetPoint("TOPLEFT", dd, "BOTTOMLEFT", 0, -2)
+    menu:SetWidth(width)
+    local a = COLORS.accent
+    UI.StylePanel(menu, { COLORS.background[1], COLORS.background[2], COLORS.background[3], 1 },
+        { border = { a[1], a[2], a[3], 0.45 }, noSheen = true })
+    menu:EnableMouse(true)
+    menu:Hide()
+
+    -- Invisible full-screen catcher under the menu: outside clicks close it.
+    local catcher = CreateFrame("Button", nil, UIParent)
+    catcher:SetAllPoints(UIParent)
+    catcher:SetFrameStrata("DIALOG")
+    catcher:SetFrameLevel(1)
+    catcher:Hide()
+    catcher:SetScript("OnClick", function() menu:Hide() end)
+    menu:SetScript("OnShow", function() catcher:Show() end)
+    menu:SetScript("OnHide", function() catcher:Hide() end)
+
+    menu.rows = {}
+    function dd:SetItems(items)
+        for i, it in ipairs(items) do
+            local r = menu.rows[i]
+            if not r then
+                r = CreateFrame("Button", nil, menu)
+                r:SetHeight(MENU_ROW_H)
+                local hl = r:CreateTexture(nil, "HIGHLIGHT")
+                hl:SetAllPoints()
+                hl:SetColorTexture(a[1], a[2], a[3], 0.25)
+                r.label = fs(r, "small")
+                r.label:SetPoint("LEFT", 10, 0)
+                r.label:SetPoint("RIGHT", -10, 0)
+                r.label:SetWordWrap(false)
+                r:SetScript("OnClick", function(self)
+                    menu:Hide()
+                    if onSelect then onSelect(self.value) end
+                end)
+                menu.rows[i] = r
+            end
+            r:ClearAllPoints()
+            r:SetPoint("TOPLEFT", 2, -2 - (i - 1) * MENU_ROW_H)
+            r:SetPoint("RIGHT", -2, 0)
+            r.value = it.value
+            r.label:SetText(it.text)
+            r:Show()
+        end
+        for i = #items + 1, #menu.rows do menu.rows[i]:Hide() end
+        menu:SetHeight(#items * MENU_ROW_H + 4)
+    end
+    dd:SetScript("OnClick", function() menu:SetShown(not menu:IsShown()) end)
+    dd.menu = menu
+    return dd
+end
+
 --- Client icon file shown as a monochrome glyph tinted with `color`.
 function UI.Glyph(tex, file, color)
     tex:SetTexture(file)

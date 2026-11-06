@@ -31,6 +31,31 @@ local function filterKey()
     return ui.collectionFilter or "all"
 end
 
+-- Selected source type (Mount Journal sourceType number), or nil = all.
+local function sourceKey()
+    return ns.Storage.db.ui.collectionSource
+end
+
+local function diffList(list)
+    local names = {}
+    for _, d in ipairs(list) do names[#names + 1] = ns.FarmList:DifficultyName(d) end
+    return table.concat(names, ", ")
+end
+
+-- mountID -> { jid, ready = {difficulty...} } for mounts farmable right now
+-- (visible instances only, same rule as the Farmable now list and Home).
+local function farmableMap(entries)
+    local map = {}
+    for _, e in ipairs(entries or {}) do
+        if e.readyCount > 0 and not e.hidden then
+            for id, m in pairs(e.mounts) do
+                if #m.ready > 0 and not map[id] then map[id] = { jid = e.jid, ready = m.ready } end
+            end
+        end
+    end
+    return map
+end
+
 -- Tooltip ---------------------------------------------------------------------
 local function showTooltip(row)
     local m = row.mount
@@ -38,6 +63,10 @@ local function showTooltip(row)
     local C = ns.UI.COLORS
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
     GameTooltip:AddLine(m.name, 1, 1, 1)
+    if row.farm then
+        GameTooltip:AddLine(L["COL_TIP_FARMABLE"]:format(ns.FarmList:InstanceName(row.farm.jid), diffList(row.farm.ready)),
+            C.success[1], C.success[2], C.success[3], true)
+    end
     local extra = ns.MountJournal:GetMountExtra(m.mountID)
     if extra and extra.sourceText and extra.sourceText ~= "" then
         GameTooltip:AddLine(extra.sourceText, 1, 1, 1, true)
@@ -87,9 +116,9 @@ local function newRow(p)
     return r
 end
 
-local function fillRow(r, m, index)
+local function fillRow(r, m, index, farm)
     local C = ns.UI.COLORS
-    r.mount = m
+    r.mount, r.farm = m, farm
     r.zebra:SetShown(index % 2 == 1)
     r.icon:SetTexture(m.icon or 134400) -- 134400 = question-mark icon
     r.icon:SetDesaturated(not m.isCollected)
@@ -97,8 +126,16 @@ local function fillRow(r, m, index)
     r.name:SetText(m.name)
     r.name:SetTextColor(1, 1, 1, m.isCollected and 1 or 0.78)
     r.source:SetText(ns.MountJournal:GetSourceTypeLabel(m.sourceType))
-    local color = m.isCollected and C.success or C.muted
-    r.status:SetText(m.isCollected and L["STATUS_COLLECTED"] or L["STATUS_MISSING"])
+    -- Green = farmable now (same meaning as in Farmable now), purple = collected.
+    local color, text
+    if m.isCollected then
+        color, text = C.accent, L["STATUS_COLLECTED"]
+    elseif farm then
+        color, text = C.success, L["STATUS_FARMABLE"]
+    else
+        color, text = C.muted, L["STATUS_MISSING"]
+    end
+    r.status:SetText(text)
     r.status:SetTextColor(color[1], color[2], color[3], color[4] or 1)
     r.dot:SetVertexColor(color[1], color[2], color[3], color[4] or 1)
 end
@@ -115,7 +152,7 @@ local function render(p)
             r:ClearAllPoints()
             r:SetPoint("TOPLEFT", 0, -(index - 1) * ROW_H)
             r:SetPoint("RIGHT", p.child, "RIGHT", -4, 0)
-            fillRow(r, m, index)
+            fillRow(r, m, index, p.farm and p.farm[m.mountID])
             r:Show()
         else
             r.mount = nil
@@ -147,6 +184,13 @@ function CollectionPanel:Create(parent)
         CollectionPanel:Refresh(p)
     end)
     p.filter:SetPoint("TOPLEFT", 0, -(SEARCH_H + 8))
+
+    p.source = ns.UI.Dropdown(p, 170, function(value)
+        ns.Storage.db.ui.collectionSource = (value ~= "all") and value or nil
+        if p.bar then p.bar:SetValue(0) end
+        CollectionPanel:Refresh(p)
+    end)
+    p.source:SetPoint("LEFT", p.filter, "RIGHT", 8, 0)
 
     p.count = ns.UI.fs(p, "small", C.muted)
     p.count:SetPoint("RIGHT", p, "TOPRIGHT", -SCROLL_W - 2, -(SEARCH_H + 8 + TOOLBAR_H / 2))
@@ -190,10 +234,38 @@ function CollectionPanel:Create(parent)
 end
 
 -- Refresh ---------------------------------------------------------------------
-function CollectionPanel:Refresh(p)
+--- entries (optional) = FarmList:Build() result, for the "Farmable" mark;
+--- internal refreshes (search, filters) reuse the last one.
+function CollectionPanel:Refresh(p, entries)
+    if entries then p.farm = farmableMap(entries) end
     local list = ns.Collection:GetList()
     local key = filterKey()
     p.filter:SetSelected(key)
+
+    -- Source menu: "All sources" + every source with how many are missing.
+    local src = sourceKey()
+    local menu = { { value = "all", text = L["COL_SOURCE_ALL"] } }
+    local missingBy = {}
+    local present = {}
+    for _, m in ipairs(list or {}) do
+        local st = m.sourceType or 0
+        present[st] = true
+        if not m.isCollected then missingBy[st] = (missingBy[st] or 0) + 1 end
+    end
+    local sources = {}
+    for st in pairs(present) do sources[#sources + 1] = st end
+    table.sort(sources, function(a, b)
+        local ma, mb = missingBy[a] or 0, missingBy[b] or 0
+        if ma ~= mb then return ma > mb end
+        return a < b
+    end)
+    for _, st in ipairs(sources) do
+        menu[#menu + 1] = { value = st, text = L["COL_SOURCE_ITEM"]:format(
+            ns.MountJournal:GetSourceTypeLabel(st), fmt(missingBy[st] or 0)) }
+    end
+    p.source:SetItems(menu)
+    if src and not present[src] then src = nil end
+    p.source:SetText(L["COL_SOURCE_LABEL"]:format(src and ns.MountJournal:GetSourceTypeLabel(src) or L["COL_SOURCE_ANY"]))
 
     local s = ns.Collection.summary
     if s and s.visibleTotal > 0 then
@@ -212,6 +284,7 @@ function CollectionPanel:Refresh(p)
     for _, m in ipairs(list or {}) do
         local keep = (key == "all") or (key == "missing" and not m.isCollected)
             or (key == "collected" and m.isCollected)
+        if keep and src then keep = (m.sourceType or 0) == src end
         if keep and q ~= "" then keep = m.name:lower():find(q, 1, true) ~= nil end
         if keep then items[#items + 1] = m end
     end
