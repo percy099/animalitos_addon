@@ -168,6 +168,21 @@ function Navigation:SpellName(spellID)
     return GetSpellInfo and (GetSpellInfo(spellID)) or nil
 end
 
+--- True if the player has a travel item: in the toy box or in the bags.
+function Navigation:HasTravelItem(itemID)
+    if PlayerHasToy and PlayerHasToy(itemID) then return true end
+    local count = (C_Item and C_Item.GetItemCount and C_Item.GetItemCount(itemID))
+        or (GetItemCount and GetItemCount(itemID)) or 0
+    return count > 0
+end
+
+--- Localized item name, or nil while the item is not cached.
+function Navigation:ItemName(itemID)
+    local name = C_Item and C_Item.GetItemNameByID and C_Item.GetItemNameByID(itemID)
+    if not name and C_Item and C_Item.RequestLoadItemDataByID then C_Item.RequestLoadItemDataByID(itemID) end
+    return name
+end
+
 --- Name of another mage in the player's group (party or raid), or nil.
 function Navigation:GroupMage()
     local n = GetNumGroupMembers and GetNumGroupMembers() or 0

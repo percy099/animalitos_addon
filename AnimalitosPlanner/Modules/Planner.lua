@@ -118,6 +118,14 @@ local MAGE = {
     },
 }
 
+-- Travel items any class can own (toy box or bags): one hop to a fixed
+-- place, like a mage teleport but with a cooldown, so a mage teleport to
+-- the same continent wins. { itemID, landing uiMapID per faction }.
+local TRAVEL_ITEMS = {
+    [619] = { item = 140192, Alliance = 627, Horde = 627 }, -- Dalaran Hearthstone -> Dalaran (Broken Isles)
+    [572] = { item = 110560, Alliance = 582, Horde = 590 }, -- Garrison Hearthstone -> Lunarfall / Frostwall
+}
+
 -- Rough minutes for the "time left" estimate (shown with "≈").
 local MINUTES = { raid = 15, dungeon = 10, travel = 4 }
 
@@ -415,6 +423,19 @@ function Planner:TravelTexts(fac, here, ent, mage)
             if not sameArea(dest[1], ent.uiMapID) then out[2] = fly end
             return out
         end
+    end
+
+    -- A travel item for that continent (Dalaran / Garrison Hearthstone),
+    -- same rule as a mage teleport: skipped if the capital portal arrives.
+    local ti = TRAVEL_ITEMS[ent.continent]
+    local tiLanding = ti and ti[fac]
+    if tiLanding and ent.continent ~= here.continent and not zonePortal
+        and (sameArea(tiLanding, ent.uiMapID) or not contPortal or not sameArea(contPortal, ent.uiMapID))
+        and ns.Navigation:HasTravelItem(ti.item) then
+        local itemName = ns.Navigation:ItemName(ti.item)
+        out[1] = itemName and L["PLAN_USE_ITEM"]:format(itemName) or L["PLAN_TELEPORT"]:format(mapName(tiLanding))
+        if not sameArea(tiLanding, ent.uiMapID) then out[2] = fly end
+        return out
     end
 
     local landing
