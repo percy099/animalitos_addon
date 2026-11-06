@@ -23,6 +23,9 @@ ns:On("PLAYER_ENTERING_WORLD", function(_, isInitialLogin, isReloadingUi)
             ns.Collection:Scan()
             ns.UI:Refresh()
         end)
+        -- Mount achievements are built in the background a little later, so
+        -- they are usually ready before the window is first opened.
+        C_Timer.After(8, function() ns.Collection:BuildAchievements() end)
     end
 end)
 

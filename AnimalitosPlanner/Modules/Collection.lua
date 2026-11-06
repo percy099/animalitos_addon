@@ -48,53 +48,40 @@ function Collection:Scan()
     s.visibleTotal = s.collectedVisible + s.missingVisible
     table.sort(list, function(a, b) return a.name < b.name end)
     self.summary, self.list = s, list
-    self.achievements, self.achByInstance = nil, nil -- collected flags changed; rebuild on demand
+    self:InvalidateAchievements() -- collected flags changed; rebuild on demand
     return s
 end
 
---- Mount-reward achievements for mounts this character can see, joined with
---- the Mount Journal. Built on first use and cached until a mount or an
---- achievement is earned. Each entry: Achievements:ScanMounts fields plus
---- mount (journal record). Sorted: not collected first, then by progress.
-function Collection:Achievements()
-    if self.achievements then return self.achievements end
-    local list = self:GetList()
-    if not list then return nil end
-    local byName, byID = {}, {}
-    for _, m in ipairs(list) do
-        byName[m.name:lower()] = m.mountID
-        byID[m.mountID] = m
+-- Background work -----------------------------------------------------------
+-- Walking every achievement in the game takes far too long for one frame
+-- (the screen froze on first open). It runs as a coroutine, resumed with
+-- C_Timer.After(0) and given a few milliseconds per frame (no OnUpdate).
+local SLICE_MS = 6
+local sliceStart = 0
+
+--- Called inside long loops: gives the frame back when the slice is used up.
+local function tick()
+    if coroutine.running() and debugprofilestop() - sliceStart > SLICE_MS then
+        coroutine.yield()
     end
-    local found, uncached = ns.Achievements:ScanMounts(byName)
-    local out = {}
-    for _, a in ipairs(found) do
-        local m = byID[a.mountID]
-        if m then -- visible for this character
-            a.mount = m
-            out[#out + 1] = a
+end
+Collection.Tick = tick
+
+local function runInBackground(fn, onDone)
+    local co = coroutine.create(fn)
+    local function step()
+        sliceStart = debugprofilestop()
+        local ok, err = coroutine.resume(co)
+        if not ok then
+            geterrorhandler()(err)
+            onDone(false)
+        elseif coroutine.status(co) == "dead" then
+            onDone(true)
+        else
+            C_Timer.After(0, step)
         end
     end
-    table.sort(out, function(a, b)
-        if a.mount.isCollected ~= b.mount.isCollected then return not a.mount.isCollected end
-        local pa, pb = a.done / a.total, b.done / b.total
-        if pa ~= pb then return pa > pb end
-        return a.name < b.name
-    end)
-    self.achievements = out
-    -- Reward items not cached yet: ask for them and rebuild once a bit later.
-    if #uncached > 0 and not self.achRetried then
-        self.achRetried = true
-        ns.Achievements:RequestItems(uncached)
-        C_Timer.After(2, function()
-            self.achievements, self.achByInstance = nil, nil
-            if ns.UI and ns.UI.Refresh then ns.UI:Refresh() end
-        end)
-    end
-    return out
-end
-
-function Collection:InvalidateAchievements()
-    self.achievements, self.achByInstance = nil, nil
+    step()
 end
 
 -- Needles to find an instance in criteria text: its name and its bosses'
@@ -113,6 +100,7 @@ local function instanceNeedles()
                     elseif owner[key] ~= jid then owner[key] = false end
                 end
             end
+            tick()
         end
     end
     local list = {}
@@ -123,14 +111,9 @@ local function instanceNeedles()
     return list
 end
 
---- [journalInstanceID] = { { ach = entry, missing = { criterion text... } } }
---- for mount achievements not collected yet: each missing criterion that
---- names one of the instance's bosses (or the instance) is linked to it.
---- Matching is automatic and only a hint; it never changes eligibility.
-function Collection:AchievementsByInstance()
-    if self.achByInstance then return self.achByInstance end
-    local achs = self:Achievements()
-    if not achs then return {} end
+-- Each missing criterion that names an instance (or one of its bosses) is
+-- linked to it. A hint only; it never changes eligibility.
+local function linkToInstances(achs)
     local needles = instanceNeedles()
     local out = {}
     for _, a in ipairs(achs) do
@@ -144,6 +127,7 @@ function Collection:AchievementsByInstance()
                         break
                     end
                 end
+                tick()
             end
             for jid, missing in pairs(perJid) do
                 out[jid] = out[jid] or {}
@@ -151,8 +135,81 @@ function Collection:AchievementsByInstance()
             end
         end
     end
-    self.achByInstance = out
     return out
+end
+
+-- Builds both caches in the background, then refreshes the open window.
+function Collection:BuildAchievements()
+    if self.achBuilding or self.achievements then return end
+    local list = self:GetList()
+    if not list then return end -- journal not ready; the next call retries
+    self.achBuilding = true
+    local gen = self.achGen or 0
+    local result, byInstance, uncached
+    runInBackground(function()
+        local byName, byID = {}, {}
+        for _, m in ipairs(list) do
+            byName[m.name:lower()] = m.mountID
+            byID[m.mountID] = m
+        end
+        local found
+        found, uncached = ns.Achievements:ScanMounts(byName, tick)
+        result = {}
+        for _, a in ipairs(found) do
+            local m = byID[a.mountID]
+            if m then -- visible for this character
+                a.mount = m
+                result[#result + 1] = a
+            end
+        end
+        table.sort(result, function(a, b)
+            if a.mount.isCollected ~= b.mount.isCollected then return not a.mount.isCollected end
+            local pa, pb = a.done / a.total, b.done / b.total
+            if pa ~= pb then return pa > pb end
+            return a.name < b.name
+        end)
+        byInstance = linkToInstances(result)
+    end, function(ok)
+        self.achBuilding = false
+        if not ok then return end
+        if gen ~= (self.achGen or 0) then
+            -- Something was earned while building: start over with fresh data.
+            self:BuildAchievements()
+            return
+        end
+        self.achievements, self.achByInstance = result, byInstance
+        -- Reward items not cached yet: ask for them and rebuild once later.
+        if #uncached > 0 and not self.achRetried then
+            self.achRetried = true
+            ns.Achievements:RequestItems(uncached)
+            C_Timer.After(3, function()
+                self.achievements, self.achByInstance = nil, nil
+                self:BuildAchievements()
+            end)
+        end
+        if ns.UI and ns.UI.Refresh then ns.UI:Refresh() end
+    end)
+end
+
+--- Mount-reward achievements for mounts this character can see, joined with
+--- the Mount Journal (Achievements:ScanMounts fields plus mount). Sorted:
+--- not collected first, then by progress. nil while it is still being
+--- built in the background (the window refreshes when it is ready).
+function Collection:Achievements()
+    if not self.achievements then self:BuildAchievements() end
+    return self.achievements
+end
+
+function Collection:InvalidateAchievements()
+    self.achievements, self.achByInstance = nil, nil
+    self.achGen = (self.achGen or 0) + 1
+end
+
+--- [journalInstanceID] = { { ach = entry, missing = { criterion text... } } }
+--- for mount achievements not collected yet. Empty while still building.
+function Collection:AchievementsByInstance()
+    if not self.achByInstance then self:BuildAchievements() end
+    return self.achByInstance or {}
 end
 
 --- Raid/dungeon mounts of our dataset grouped by expansion (Encounter

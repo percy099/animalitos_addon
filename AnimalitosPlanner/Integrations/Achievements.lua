@@ -52,12 +52,15 @@ end
 --- reward item is not cached or the mount is granted without an item.
 --- Returns list, uncachedItemIDs.
 ---   entry = { id, name, icon, completed, mountID, done, total, top, topName, category }
-function Achievements:ScanMounts(mountsByName)
+--- tick (optional) is called once per achievement so a caller running in
+--- the background can give the frame back.
+function Achievements:ScanMounts(mountsByName, tick)
     local out, uncached, seen = {}, {}, {}
     if not GetCategoryList then return out, uncached end
     for _, cat in ipairs(GetCategoryList() or {}) do
         local num = GetCategoryNumAchievements(cat, true) or 0
         for i = 1, num do
+            if tick then tick() end
             local id, name, _, completed, _, _, _, _, _, icon, rewardText = GetAchievementInfo(cat, i)
             if id and not seen[id] and rewardText and rewardText ~= "" then
                 seen[id] = true
