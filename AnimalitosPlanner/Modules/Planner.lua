@@ -126,6 +126,24 @@ local TRAVEL_ITEMS = {
     [572] = { item = 110560, Alliance = 582, Horde = 590 }, -- Garrison Hearthstone -> Lunarfall / Frostwall
 }
 
+-- Zones you cannot fly into: reached through a portal in another zone
+-- (confirmed by the player and warcraft.wiki.gg). via = uiMapID of the
+-- portal's zone; where = portal position per faction (nil = not known).
+local ZONE_ACCESS = {
+    [504] = { -- Isle of Thunder: Kirin Tor / Sunreaver portal in Townlong Steppes (quest chain unlock)
+        via = 388, viaContinent = 424,
+        Alliance = { x = 49.7, y = 68.7 },
+    },
+}
+
+-- Continents a faction reaches by a chain, not a capital portal.
+-- Alliance -> Zandalar: Kalimdor, fly to the Echo Isles (Durotar), boat to Zuldazar.
+local CONTINENT_ROUTES = {
+    Alliance = {
+        [875] = { via = 1, viaContinent = 12, boat = "PLAN_BOAT_ZULDAZAR", lands = 862 },
+    },
+}
+
 -- Rough minutes for the "time left" estimate (shown with "≈").
 local MINUTES = { raid = 15, dungeon = 10, travel = 4 }
 
@@ -320,7 +338,7 @@ function Planner:Build(entries, hideCompleted, withWorldBosses)
         if not (hideCompleted and r.done) then
             local ent = r.inst.entrance
             if ent then
-                local texts = self:TravelTexts(fac, here, ent, mage)
+                local texts = self:TravelTexts(fac, here, ent, mage, r.jid)
                 for _, text in ipairs(texts) do
                     steps[#steps + 1] = { kind = "travel", text = text }
                 end
@@ -372,10 +390,52 @@ end
 --- Travel step texts from `here` ({continent, zone}) to an entrance.
 --- Mage teleports / group portals first, then hand-written capital portals;
 --- anything unknown falls back to "Travel to ...".
-function Planner:TravelTexts(fac, here, ent, mage)
+function Planner:TravelTexts(fac, here, ent, mage, jid)
     local L = ns.L
+    if ent.continent == here.continent and ent.uiMapID == here.zone then return {} end
+
+    -- A known Mythic+ teleport goes straight to the entrance: best of all.
+    if jid and jid > 0 then
+        local spellID, spellName = ns.Navigation:DungeonTeleport(ns.FarmList:InstanceName(jid))
+        if spellID then return { L["PLAN_CAST"]:format(spellName or "?") } end
+    end
+
+    -- Leaving a portal-only zone: take its portal back first (a mage
+    -- teleport or the hearthstone also work, so only when flying out).
+    local from = ZONE_ACCESS[here.zone]
+    if from and ent.uiMapID ~= here.zone then
+        local rest = self:TravelTexts(fac, { continent = from.viaContinent, zone = from.via }, ent, mage)
+        local first = rest[1]
+        if first and first:find(L["PLAN_FLY"]:format(""), 1, true) == 1 then
+            table.insert(rest, 1, L["PLAN_PORTAL"]:format(mapName(from.via)))
+        end
+        return rest
+    end
+
+    -- Entering a portal-only zone: go to the portal's zone, then take it.
+    local access = ZONE_ACCESS[ent.uiMapID]
+    if access then
+        local out = self:TravelTexts(fac, here, { continent = access.viaContinent, uiMapID = access.via }, mage)
+        local where = access[fac]
+        out[#out + 1] = where
+            and L["PLAN_PORTAL_AT"]:format(mapName(ent.uiMapID), mapName(access.via), where.x, where.y)
+            or L["PLAN_PORTAL_IN"]:format(mapName(ent.uiMapID), mapName(access.via))
+        return out
+    end
+
+    -- A continent reached by a chain (Alliance -> Zandalar by boat), unless
+    -- a mage teleport goes there directly.
+    local route = CONTINENT_ROUTES[fac] and CONTINENT_ROUTES[fac][ent.continent]
+    if route and ent.continent ~= here.continent and not mageHop(mage, MAGE[fac][ent.continent]) then
+        local out = self:TravelTexts(fac, here, { continent = route.viaContinent, uiMapID = route.via }, mage)
+        out[#out + 1] = L[route.boat]
+        if not sameArea(route.lands, ent.uiMapID) then
+            out[#out + 1] = L["PLAN_FLY"]:format(mapName(ent.uiMapID))
+        end
+        return out
+    end
+
     local out = {}
-    if ent.continent == here.continent and ent.uiMapID == here.zone then return out end
 
     local inCapital = here.zone == CAPITAL[fac]
     local capital = mapName(CAPITAL[fac])

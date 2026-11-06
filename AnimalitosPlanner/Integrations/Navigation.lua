@@ -168,6 +168,64 @@ function Navigation:SpellName(spellID)
     return GetSpellInfo and (GetSpellInfo(spellID)) or nil
 end
 
+-- Mythic+ dungeon teleports ("Path of ..."): spells inside spellbook flyouts
+-- whose description names the dungeon ("Teleport to the entrance to King's
+-- Rest."). Read from the player's own spellbook, so localized and always
+-- current. Descriptions can load late; the index is rebuilt until complete.
+local dungeonTeleports, teleportsComplete
+
+local function collectFlyoutSpells()
+    local spells = {}
+    if not (C_SpellBook and C_SpellBook.GetNumSpellBookSkillLines and GetFlyoutInfo and GetFlyoutSlotInfo) then
+        return spells
+    end
+    local bank = Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
+    local flyoutType = Enum.SpellBookItemType and Enum.SpellBookItemType.Flyout
+    for line = 1, C_SpellBook.GetNumSpellBookSkillLines() do
+        local info = C_SpellBook.GetSpellBookSkillLineInfo(line)
+        if info then
+            for i = info.itemIndexOffset + 1, info.itemIndexOffset + info.numSpellBookItems do
+                local item = C_SpellBook.GetSpellBookItemInfo(i, bank)
+                if item and item.itemType == flyoutType and item.actionID then
+                    local _, _, numSlots = GetFlyoutInfo(item.actionID)
+                    for s = 1, numSlots or 0 do
+                        local spellID, _, isKnown = GetFlyoutSlotInfo(item.actionID, s)
+                        if spellID and isKnown then spells[#spells + 1] = spellID end
+                    end
+                end
+            end
+        end
+    end
+    return spells
+end
+
+--- Known dungeon-teleport spell whose description mentions the instance
+--- name, as spellID, spellName; or nil.
+function Navigation:DungeonTeleport(instanceName)
+    if not instanceName or instanceName == "" then return nil end
+    -- Rebuild when missing, or (at most every 10 s) while descriptions load.
+    local now = GetTime()
+    if not dungeonTeleports or (not teleportsComplete and now - (self.teleportsAt or 0) > 10) then
+        self.teleportsAt = now
+        dungeonTeleports, teleportsComplete = {}, true
+        local ok, spells = pcall(collectFlyoutSpells)
+        for _, id in ipairs(ok and spells or {}) do
+            local desc = C_Spell.GetSpellDescription and C_Spell.GetSpellDescription(id)
+            if desc and desc ~= "" then
+                dungeonTeleports[#dungeonTeleports + 1] = { id = id, desc = desc:lower() }
+            else
+                teleportsComplete = false -- not loaded yet; ask and retry later
+                if C_Spell.RequestLoadSpellData then C_Spell.RequestLoadSpellData(id) end
+            end
+        end
+    end
+    local key = instanceName:lower()
+    for _, t in ipairs(dungeonTeleports) do
+        if t.desc:find(key, 1, true) then return t.id, self:SpellName(t.id) end
+    end
+    return nil
+end
+
 --- True if the player has a travel item: in the toy box or in the bags.
 function Navigation:HasTravelItem(itemID)
     if PlayerHasToy and PlayerHasToy(itemID) then return true end
