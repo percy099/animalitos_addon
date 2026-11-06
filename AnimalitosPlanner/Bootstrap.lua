@@ -248,6 +248,9 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
         ns.Navigation:Debug()
     elseif cmd == "nav tomtom" or cmd == "nav native" then
         ns.Navigation:SetMode(cmd:match("nav (%a+)"))
+    elseif cmd == "group" then
+        ns:Print("group:")
+        ns.Comm:Debug()
     elseif cmd == "skips" then
         ns:Print("raid skip quests:")
         ns.Difficulty:DebugSkips()

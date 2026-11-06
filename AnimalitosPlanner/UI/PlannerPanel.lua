@@ -463,6 +463,12 @@ function PlannerPanel:Refresh(p, entries)
     elseif sum.mage and sum.mage.group then
         text = text .. "  ·  " .. L["PLAN_MAGE_GROUP"]:format(sum.mage.group)
     end
+    -- Who in the group also runs the addon (group route, part 1).
+    local peers = {}
+    for _, peer in ipairs(ns.Comm:Peers()) do peers[#peers + 1] = peer.name end
+    if #peers > 0 then
+        text = text .. "  ·  |cff8dd3a8" .. L["PLAN_GROUP_ADDON"]:format(table.concat(peers, ", ")) .. "|r"
+    end
     p.progress:SetText(text)
     p.fill:SetWidth(math.max(1, p.trackW * (sum.total > 0 and sum.done / sum.total or 0)))
 
