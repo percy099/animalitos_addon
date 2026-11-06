@@ -134,7 +134,9 @@ local function newRow(p)
     r:SetScript("OnLeave", function() GameTooltip:Hide() end)
     r:SetScript("OnClick", function(self, button)
         if self.ach then
-            if button == "RightButton" then
+            -- Click: mount detail with the 3D model (it lists the achievement
+            -- too); right-click: straight to the Achievements window.
+            if button ~= "RightButton" then
                 ns.MountPreview:Toggle(self.ach.mountID)
             elseif not ns.Achievements:Open(self.ach.id) then
                 ns:Print(L["JOURNAL_COMBAT"])
