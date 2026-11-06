@@ -23,6 +23,7 @@ local MEDIA = "Interface\\AddOns\\AnimalitosPlanner\\Media\\"
 local SECTIONS = {
     { key = "home",       label = "NAV_HOME",       icon = MEDIA .. "nav-home" },
     { key = "farm",       label = "NAV_FARM",       icon = MEDIA .. "nav-farm" },
+    { key = "planner",    label = "NAV_PLANNER",    icon = MEDIA .. "nav-planner" },
     { key = "collection", label = "NAV_COLLECTION", icon = MEDIA .. "nav-collection" },
     { key = "settings",   label = "NAV_SETTINGS",   icon = MEDIA .. "nav-settings" },
 }
@@ -182,6 +183,7 @@ function UI:Create()
     f.panels = {
         farm = ns.FarmPanel:Create(content),
         home = ns.HomePanel:Create(content),
+        planner = ns.PlannerPanel:Create(content),
         collection = ns.CollectionPanel:Create(content),
         settings = ns.SettingsPanel:Create(content),
     }
@@ -269,6 +271,7 @@ function UI:Refresh()
     if f.summary:IsShown() then ns.HomePanel:Refresh(f.summary, entries, sum) end
     if f.panels.settings:IsShown() then ns.SettingsPanel:Refresh(f.panels.settings) end
     if f.panels.collection:IsShown() then ns.CollectionPanel:Refresh(f.panels.collection, entries) end
+    if f.panels.planner:IsShown() then ns.PlannerPanel:Refresh(f.panels.planner, entries) end
 end
 
 --- Shows the window on a given section (used by the minimap button).

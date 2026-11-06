@@ -93,6 +93,16 @@ function Navigation:Debug()
     end
 end
 
+--- World coordinates of a point on a uiMap: continentID, x, y (yards), or nil.
+--- Used by the planner to order stops geographically.
+function Navigation:WorldPos(uiMapID, x, y)
+    if not (C_Map.GetWorldPosFromMapPos and CreateVector2D and uiMapID) then return nil end
+    local ok, continentID, pos = pcall(C_Map.GetWorldPosFromMapPos, uiMapID, CreateVector2D(x or 0.5, y or 0.5))
+    if not ok or not pos then return nil end
+    local wx, wy = pos:GetXY()
+    return continentID, wx, wy
+end
+
 function Navigation:SetMode(mode)
     if mode == "tomtom" and not tomtomAvailable() then
         ns:Print(L["NAV_TOMTOM_MISSING"])

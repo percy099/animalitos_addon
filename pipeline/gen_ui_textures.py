@@ -155,7 +155,22 @@ def refresh(x, y):
     return arc or head
 
 
-NAV_ICONS = {"home": home, "farm": horseshoe, "collection": book, "settings": gear, "refresh": refresh}
+def checklist(x, y):
+    """Three rows: a ticked box and a bar each (the planner's step list)."""
+    for top in (6, 25, 44):
+        box = in_rect(x, y, 4, top, 18, top + 14) and not in_rect(x, y, 7, top + 3, 15, top + 11)
+        bar = in_rect(x, y, 25, top + 4, 60, top + 10)
+        if box or bar:
+            return True
+    # tick inside the first two boxes
+    for top in (6, 25):
+        if in_poly(x, y, [(7, top + 7), (10, top + 7), (11, top + 9), (15, top + 3), (17, top + 4), (11, top + 13)]):
+            return True
+    return False
+
+
+NAV_ICONS = {"home": home, "farm": horseshoe, "collection": book, "settings": gear, "refresh": refresh,
+             "planner": checklist}
 
 
 if __name__ == "__main__":

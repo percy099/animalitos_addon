@@ -4,7 +4,7 @@
 ## Notes-esES: Planificador de colección y farmeo de monturas.
 ## Notes-esMX: Planificador de colección y farmeo de monturas.
 ## Author: AnimalitosPlanner Team
-## Version: 0.5.4
+## Version: 0.6.0
 ## Category: Collections
 ## IconTexture: Interface\AddOns\AnimalitosPlanner\Media\icon
 ## SavedVariables: AnimalitosPlannerDB
@@ -24,6 +24,7 @@ Integrations\Lockouts.lua
 Modules\Collection.lua
 Modules\Eligibility.lua
 Modules\FarmList.lua
+Modules\Planner.lua
 Integrations\Navigation.lua
 Integrations\MinimapButton.lua
 Modules\Probe.lua
@@ -34,6 +35,7 @@ UI\HomePanel.lua
 UI\MountPreview.lua
 UI\SettingsPanel.lua
 UI\CollectionPanel.lua
+UI\PlannerPanel.lua
 UI\MainFrame.lua
 
 Bootstrap.lua
