@@ -129,6 +129,11 @@ end
 -- Static route ----------------------------------------------------------------
 local cachedRoute, cachedFaction
 
+--- Forget the route (a world boss position was found after it was computed).
+function Planner:InvalidateRoute()
+    cachedRoute = nil
+end
+
 local function entrancePos(inst)
     local e = inst.entrance
     local _, x, y = ns.Navigation:WorldPos(e.uiMapID, e.x, e.y)

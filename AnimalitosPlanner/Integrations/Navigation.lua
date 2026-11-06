@@ -103,6 +103,26 @@ function Navigation:WorldPos(uiMapID, x, y)
     return continentID, wx, wy
 end
 
+--- Where the Encounter Journal pins an encounter (world bosses): searches the
+--- zones under each root continent uiMapID. Returns { uiMapID, x, y, continent } or nil.
+function Navigation:FindEncounterOnMaps(encounterID, roots)
+    if not (C_EncounterJournal and C_EncounterJournal.GetEncountersOnMap and C_Map.GetMapChildrenInfo) then
+        return nil
+    end
+    for _, root in ipairs(roots) do
+        local ok, children = pcall(C_Map.GetMapChildrenInfo, root, Enum.UIMapType.Zone, true)
+        for _, child in ipairs(ok and children or {}) do
+            local ok2, pins = pcall(C_EncounterJournal.GetEncountersOnMap, child.mapID)
+            for _, pin in ipairs(ok2 and pins or {}) do
+                if pin.encounterID == encounterID and pin.mapX then
+                    return { uiMapID = child.mapID, x = pin.mapX, y = pin.mapY, continent = root }
+                end
+            end
+        end
+    end
+    return nil
+end
+
 --- True if the player knows the spell (mage teleports for the planner).
 function Navigation:KnowsSpell(spellID)
     local fn = (C_SpellBook and C_SpellBook.IsSpellKnown) or IsSpellKnown or IsPlayerSpell

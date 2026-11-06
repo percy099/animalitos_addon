@@ -58,7 +58,7 @@ function Eligibility:Evaluate(src, difficultyID)
     end
 
     local inst = ns.Data.instances[src.journalInstanceID]
-    if not inst or inst.worldBoss or not inst.legacy then
+    if not inst or not inst.legacy then
         return S.OUT_OF_SCOPE, L["REASON_OUT_OF_SCOPE"]
     end
     if inst.tier > (ns.Storage.db.settings.maxTier or 10) then
@@ -67,6 +67,10 @@ function Eligibility:Evaluate(src, difficultyID)
 
     if not ns.Lockouts.loaded then
         return S.VERIFY, L["REASON_LOCKOUTS_LOADING"]
+    end
+
+    if inst.worldBoss then
+        return self:EvaluateWorldBoss(src, inst)
     end
 
     local boss = encounterName(src.journalEncounterID)
@@ -88,4 +92,40 @@ function Eligibility:Evaluate(src, difficultyID)
     end
 
     return S.READY, record and L["REASON_BOSS_ALIVE"]:format(boss or "?") or L["REASON_NOT_SAVED"]
+end
+
+-- Names a world boss may be saved under: the encounter ("Salyis's Warband")
+-- and each of its creatures ("Galleon").
+local wbNamesCache = {}
+local function worldBossNames(encounterID)
+    local names = wbNamesCache[encounterID]
+    if names then return names end
+    names = {}
+    local n = EJ_GetEncounterInfo(encounterID)
+    if n then names[#names + 1] = n end
+    if EJ_GetCreatureInfo then
+        for i = 1, 9 do
+            local _, creature = EJ_GetCreatureInfo(i, encounterID)
+            if not creature then break end
+            names[#names + 1] = creature
+        end
+    end
+    if #names > 0 then wbNamesCache[encounterID] = names end
+    return names
+end
+
+--- World boss: one weekly kill. Only "savedWorldBoss" models (validated to
+--- show up in GetSavedWorldBossInfo) can be Ready; others need verification.
+function Eligibility:EvaluateWorldBoss(src, inst)
+    local boss = encounterName(src.journalEncounterID) or "?"
+    if inst.lockoutModel ~= "savedWorldBoss" then
+        return S.VERIFY, L["REASON_WB_UNKNOWN"]
+    end
+    local ids = { src.journalEncounterID }
+    if src.dungeonEncounterID then ids[2] = src.dungeonEncounterID end
+    local resetAt = ns.Lockouts:WorldBossKilled(worldBossNames(src.journalEncounterID), ids)
+    if resetAt then
+        return S.LOCKED_OUT, L["REASON_KILLED"]:format(boss), resetAt
+    end
+    return S.READY, L["REASON_WB_ALIVE"]:format(boss)
 end

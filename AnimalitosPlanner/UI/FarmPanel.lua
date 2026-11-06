@@ -386,7 +386,7 @@ function FarmPanel:Refresh(p, entries, sum)
 
             local near = e.near == 2 and ("  |cff8dd3a8" .. L["NEAR_HERE"] .. "|r") or ""
             c.title:SetText(ns.FarmList:InstanceName(e.jid) .. near)
-            local parts = { e.inst.isRaid and L["TYPE_RAID"] or L["TYPE_DUNGEON"] }
+            local parts = { ns.FarmList:TypeName(e.inst) }
             local zone = e.inst.entrance and C_Map.GetMapInfo(e.inst.entrance.uiMapID)
             if zone then parts[#parts + 1] = zone.name end
             parts[#parts + 1] = #ids == 1 and L["MOUNT_ONE"] or L["MOUNTS_N"]:format(#ids)

@@ -30,7 +30,39 @@ end
 ---   entries  = array of { jid, inst, mounts = { [mountID] = { ready = {diff...}, locked = {diff...}, resetAt } },
 ---                         readyCount, near = 0|1|2 }
 ---   counts   = { [state] = number of unique mounts in that state }
+-- Continents to search for each EJ world-boss pseudo-instance's pins.
+local WORLD_BOSS_ROOTS = {
+    [322] = { 424 },               -- Pandaria
+    [557] = { 572 },               -- Draenor
+    [822] = { 619 },               -- Broken Isles
+    [1028] = { 875, 876, 12, 13 }, -- Azeroth (BfA: Zandalar, Kul Tiras, Darkshore, Arathi)
+    [1192] = { 1550 },             -- Shadowlands
+    [1205] = { 1978 },             -- Dragon Isles
+    [1278] = { 2274 },             -- Khaz Algar
+}
+
+--- World bosses have no dungeon entrance: take the boss's map pin from the
+--- Encounter Journal once per session (the dataset cannot know it).
+function FarmList:ResolveWorldBosses()
+    if self.worldBossesResolved then return end
+    local missing = false
+    for _, inst in pairs(ns.Data.instances) do
+        if inst.worldBoss and not inst.entrance then
+            inst.entrance = ns.Navigation:FindEncounterOnMaps(inst.encounter, WORLD_BOSS_ROOTS[inst.ejInstance] or {})
+            if inst.entrance then
+                if ns.Planner then ns.Planner:InvalidateRoute() end -- route now knows where it is
+            else
+                missing = true
+            end
+        end
+    end
+    -- Retry next time if the journal was not ready yet.
+    self.worldBossesResolved = not missing or (self.resolveTries or 0) >= 3
+    self.resolveTries = (self.resolveTries or 0) + 1
+end
+
 function FarmList:Build()
+    self:ResolveWorldBosses()
     local S = ns.Eligibility.STATES
     local byInstance, counts, mountStates = {}, {}, {}
     for _, src in ipairs(ns.Data.sources) do
@@ -163,14 +195,29 @@ function FarmList:UnhideAll()
     wipe(hiddenTable())
 end
 
+-- World bosses use negative keys: -journalEncounterID (see build_dataset.py).
 function FarmList:InstanceName(jid)
+    if jid < 0 then return (EJ_GetEncounterInfo(-jid)) or ("#" .. jid) end
     return (EJ_GetInstanceInfo(jid)) or ("#" .. jid)
 end
 
 --- Encounter Journal tile artwork for an instance (texture fileID), or nil.
+--- World bosses use their continent's journal art.
 function FarmList:InstanceArt(jid)
+    if jid < 0 then
+        local inst = ns.Data.instances[jid]
+        jid = inst and inst.ejInstance
+        if not jid then return nil end
+    end
     local _, _, _, buttonImage = EJ_GetInstanceInfo(jid)
     return buttonImage
+end
+
+--- "Raid" / "Dungeon" / "World boss".
+function FarmList:TypeName(inst)
+    local L = ns.L
+    if inst.worldBoss then return L["TYPE_WORLD_BOSS"] end
+    return inst.isRaid and L["TYPE_RAID"] or L["TYPE_DUNGEON"]
 end
 
 --- Encounter Journal tiers (1 = Classic ... newest expansion).
@@ -194,5 +241,6 @@ local SHORT = {
 }
 
 function FarmList:DifficultyName(d)
+    if d == 0 then return ns.L["DIFF_WEEKLY"] end -- world boss: one weekly kill
     return SHORT[d] or (GetDifficultyInfo(d)) or tostring(d)
 end

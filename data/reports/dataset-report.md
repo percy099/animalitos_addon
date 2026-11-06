@@ -6,9 +6,9 @@ Generated from client `12.1.5.70783` (scan 2026-11-05 13:38:04).
 |---|---|
 | Sources (mount × boss × instance) | 67 |
 | Unique mounts | 66 |
-| Instances with mounts | 50 |
+| Instances with mounts | 53 |
 | Legacy instances (MVP scope) | 42 |
-| World-boss pseudo-instances | 3 |
+| World bosses with mounts | 6 |
 
 ## Instances without an entrance (add `entranceOverrides` with uiMapID/x/y) — 5
 
@@ -23,7 +23,7 @@ Generated from client `12.1.5.70783` (scan 2026-11-05 13:38:04).
 - 68 The Vortex Pinnacle: picked uiMap 249 — confirm or add an override
 - 1273 Nerub-ar Palace: picked uiMap 2213 — confirm or add an override
 
-## Instances without a validated lockout model (v0.3) — 47
+## Instances without a validated lockout model (v0.3) — 48
 
 - 67 The Stonecore
 - 68 The Vortex Pinnacle
@@ -53,6 +53,7 @@ Generated from client `12.1.5.70783` (scan 2026-11-05 13:38:04).
 - 946 Antorus, the Burning Throne
 - 1001 Freehold
 - 1022 The Underrot
+- -2210 Dunegorger Kraulok (world boss, Azeroth)
 - 1041 Kings' Rest
 - 1176 Battle of Dazar'alor
 - 1178 Operation: Mechagon

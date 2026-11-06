@@ -397,7 +397,7 @@ function HomePanel:Refresh(p, entries, sum)
             shown = shown + 1
             local r = p.startRows[shown]
             r.name:SetText(ns.FarmList:InstanceName(e.jid))
-            local parts = { e.inst.isRaid and L["TYPE_RAID"] or L["TYPE_DUNGEON"] }
+            local parts = { ns.FarmList:TypeName(e.inst) }
             local zone = e.inst.entrance and C_Map.GetMapInfo(e.inst.entrance.uiMapID)
             if zone then parts[#parts + 1] = zone.name end
             r.detail:SetText(table.concat(parts, " · "))

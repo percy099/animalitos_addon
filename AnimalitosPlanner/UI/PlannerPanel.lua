@@ -64,7 +64,7 @@ local function describe(r)
     end
     if not next(ready) and not next(locked) and verifyReason then notes[#notes + 1] = verifyReason end
 
-    local kind = isRaid and L["TYPE_RAID"] or L["TYPE_DUNGEON"]
+    local kind = ns.FarmList:TypeName(r.inst)
     local detail = #names > 0 and ("%s · %s"):format(kind, table.concat(names, ", ")) or kind
     return rows, detail, table.concat(notes, " · ")
 end
@@ -338,7 +338,7 @@ function PlannerPanel:Refresh(p, entries)
             f = take(p, "run")
             local rows, detail, note = describe(s)
             f.num:SetText(s.number)
-            f.title:SetText(L["PLAN_RUN"]:format(ns.FarmList:InstanceName(s.jid)))
+            f.title:SetText(L[s.inst.worldBoss and "PLAN_KILL" or "PLAN_RUN"]:format(ns.FarmList:InstanceName(s.jid)))
             f.detail:SetText(detail)
             f.note:SetText(note)
             -- Same boss twice in a row (two mounts) is written once.

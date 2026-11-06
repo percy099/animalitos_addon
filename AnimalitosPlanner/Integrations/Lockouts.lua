@@ -43,6 +43,20 @@ function Lockouts:Refresh()
         end
     end
     self.byMap = byMap
+
+    -- World bosses killed (looted) this week: Raid Info's "World Bosses".
+    -- GetSavedWorldBossInfo(i) -> name, worldBossID, secondsUntilReset.
+    local wb = { names = {}, ids = {} }
+    if GetNumSavedWorldBosses and GetSavedWorldBossInfo then
+        for i = 1, GetNumSavedWorldBosses() do
+            local bossName, worldBossID, reset = GetSavedWorldBossInfo(i)
+            if bossName and reset and reset > 0 then
+                wb.names[bossName:lower()] = now + reset
+                if worldBossID then wb.ids[worldBossID] = now + reset end
+            end
+        end
+    end
+    self.worldBosses = wb
     self.loaded = true
     self.updatedAt = now
 end
@@ -50,6 +64,21 @@ end
 function Lockouts:Get(instanceMapID, difficultyID)
     local m = self.byMap[instanceMapID]
     return m and m[difficultyID]
+end
+
+--- resetAt if any of the names / ids is a world boss killed this week, else nil.
+function Lockouts:WorldBossKilled(names, ids)
+    local wb = self.worldBosses
+    if not wb then return nil end
+    for _, n in ipairs(names) do
+        local at = wb.names[n:lower()]
+        if at then return at end
+    end
+    for _, id in ipairs(ids) do
+        local at = wb.ids[id]
+        if at then return at end
+    end
+    return nil
 end
 
 --- Seconds until the daily and weekly resets (nil when the client cannot tell).

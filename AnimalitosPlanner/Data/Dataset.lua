@@ -2,8 +2,14 @@
 -- Source: in-game /aplan scan, client 12.1.5.70783, scanned 2026-11-05 13:38:04.
 local _, ns = ...
 ns.Data = {
-    version = { client = "12.1.5.70783", generated = "2026-11-05", hash = "b39574e34370" },
+    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "068fe01b2116" },
     instances = {
+        [-2210] = { tier = 8, isRaid = true, legacy = true, worldBoss = true, ejInstance = 1028, encounter = 2210, lockoutModel = "unknown" }, -- Dunegorger Kraulok (Azeroth)
+        [-1262] = { tier = 6, isRaid = true, legacy = true, worldBoss = true, ejInstance = 557, encounter = 1262, lockoutModel = "savedWorldBoss" }, -- Rukhmar (Draenor)
+        [-826] = { tier = 5, isRaid = true, legacy = true, worldBoss = true, ejInstance = 322, encounter = 826, lockoutModel = "savedWorldBoss" }, -- Oondasta (Pandaria)
+        [-814] = { tier = 5, isRaid = true, legacy = true, worldBoss = true, ejInstance = 322, encounter = 814, lockoutModel = "savedWorldBoss" }, -- Nalak, The Storm Lord (Pandaria)
+        [-725] = { tier = 5, isRaid = true, legacy = true, worldBoss = true, ejInstance = 322, encounter = 725, lockoutModel = "savedWorldBoss" }, -- Salyis's Warband (Pandaria)
+        [-691] = { tier = 5, isRaid = true, legacy = true, worldBoss = true, ejInstance = 322, encounter = 691, lockoutModel = "savedWorldBoss" }, -- Sha of Anger (Pandaria)
         [67] = { tier = 4, isRaid = false, mapID = 725, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 207, x = 0.4738, y = 0.5205, continent = 948 } }, -- The Stonecore
         [68] = { tier = 4, isRaid = false, mapID = 657, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 249, x = 0.767, y = 0.8436, continent = 12 } }, -- The Vortex Pinnacle
         [74] = { tier = 4, isRaid = true, mapID = 754, legacy = true, worldBoss = false, lockoutModel = "unknown" }, -- Throne of the Four Winds
@@ -14,11 +20,9 @@ ns.Data = {
         [252] = { tier = 2, isRaid = false, mapID = 556, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 108, x = 0.446, y = 0.6561, continent = 101 } }, -- Sethekk Halls
         [286] = { tier = 3, isRaid = false, mapID = 575, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 117, x = 0.5722, y = 0.4649, continent = 113 } }, -- Utgarde Pinnacle
         [317] = { tier = 5, isRaid = true, mapID = 1008, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 379, x = 0.5961, y = 0.3917, continent = 424 } }, -- Mogu'shan Vaults
-        [322] = { tier = 5, isRaid = true, mapID = 996, legacy = true, worldBoss = true, lockoutModel = "unknown" }, -- Pandaria
         [362] = { tier = 5, isRaid = true, mapID = 1098, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 504, x = 0.6383, y = 0.3204, continent = 424 } }, -- Throne of Thunder
         [369] = { tier = 5, isRaid = true, mapID = 1136, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 390, x = 0.7371, y = 0.4249, continent = 424 } }, -- Siege of Orgrimmar
         [457] = { tier = 6, isRaid = true, mapID = 1205, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 543, x = 0.5157, y = 0.272, continent = 572 } }, -- Blackrock Foundry
-        [557] = { tier = 6, isRaid = true, mapID = 1228, legacy = true, worldBoss = true, lockoutModel = "unknown" }, -- Draenor
         [669] = { tier = 6, isRaid = true, mapID = 1448, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 534, x = 0.4697, y = 0.5264, continent = 572 } }, -- Hellfire Citadel
         [745] = { tier = 2, isRaid = true, mapID = 532, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 42, x = 0.4699, y = 0.7491, continent = 13 } }, -- Karazhan
         [749] = { tier = 2, isRaid = true, mapID = 550, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 109, x = 0.736, y = 0.6372, continent = 101 } }, -- The Eye
@@ -34,7 +38,6 @@ ns.Data = {
         [946] = { tier = 7, isRaid = true, mapID = 1712, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 885, x = 0.5482, y = 0.6253, continent = 905 } }, -- Antorus, the Burning Throne
         [1001] = { tier = 8, isRaid = false, mapID = 1754, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 895, x = 0.8457, y = 0.7878, continent = 876 } }, -- Freehold
         [1022] = { tier = 8, isRaid = false, mapID = 1841, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 863, x = 0.5126, y = 0.6465, continent = 875 } }, -- The Underrot
-        [1028] = { tier = 8, isRaid = true, mapID = 1861, legacy = true, worldBoss = true, lockoutModel = "unknown" }, -- Azeroth
         [1041] = { tier = 8, isRaid = false, mapID = 1762, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 862, x = 0.3759, y = 0.3948, continent = 875 } }, -- Kings' Rest
         [1176] = { tier = 8, isRaid = true, mapID = 2070, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 1161, x = 0.7044, y = 0.3556, continent = 876 } }, -- Battle of Dazar'alor
         [1178] = { tier = 8, isRaid = false, mapID = 2097, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 1462, x = 0.7294, y = 0.3649, continent = 876 } }, -- Operation: Mechagon
@@ -70,15 +73,15 @@ ns.Data = {
         { mountID = 185, itemID = 32768, journalInstanceID = 252, journalEncounterID = 542, dungeonEncounterID = 1904, difficulties = { 2 } }, -- Anzu - Sethekk Halls
         { mountID = 264, itemID = 44151, journalInstanceID = 286, journalEncounterID = 643, dungeonEncounterID = 2029, difficulties = { 2 } }, -- Skadi the Ruthless - Utgarde Pinnacle
         { mountID = 478, itemID = 87777, journalInstanceID = 317, journalEncounterID = 726, dungeonEncounterID = 1500, difficulties = { 3, 4, 5, 6 } }, -- Elegon - Mogu'shan Vaults
-        { mountID = 473, itemID = 87771, journalInstanceID = 322, journalEncounterID = 691, difficulties = { 3, 4, 5, 6, 7 } }, -- Sha of Anger - Pandaria
-        { mountID = 515, itemID = 89783, journalInstanceID = 322, journalEncounterID = 725, difficulties = { 3, 4, 5, 6, 7 } }, -- Salyis's Warband - Pandaria
-        { mountID = 542, itemID = 95057, journalInstanceID = 322, journalEncounterID = 814, difficulties = { 3, 4, 5, 6, 7 } }, -- Nalak, The Storm Lord - Pandaria
-        { mountID = 533, itemID = 94228, journalInstanceID = 322, journalEncounterID = 826, difficulties = { 3, 4, 5, 6, 7 } }, -- Oondasta - Pandaria
+        { mountID = 473, itemID = 87771, journalInstanceID = -691, journalEncounterID = 691, difficulties = { 0 } }, -- Sha of Anger - Pandaria (world boss)
+        { mountID = 515, itemID = 89783, journalInstanceID = -725, journalEncounterID = 725, difficulties = { 0 } }, -- Salyis's Warband - Pandaria (world boss)
+        { mountID = 542, itemID = 95057, journalInstanceID = -814, journalEncounterID = 814, difficulties = { 0 } }, -- Nalak, The Storm Lord - Pandaria (world boss)
+        { mountID = 533, itemID = 94228, journalInstanceID = -826, journalEncounterID = 826, difficulties = { 0 } }, -- Oondasta - Pandaria (world boss)
         { mountID = 531, itemID = 93666, journalInstanceID = 362, journalEncounterID = 819, dungeonEncounterID = 1575, difficulties = { 3, 4, 5, 6 } }, -- Horridon - Throne of Thunder
         { mountID = 543, itemID = 95059, journalInstanceID = 362, journalEncounterID = 828, dungeonEncounterID = 1573, difficulties = { 3, 4, 5, 6 } }, -- Ji-Kun - Throne of Thunder
         { mountID = 559, itemID = 104253, journalInstanceID = 369, journalEncounterID = 869, dungeonEncounterID = 1623, difficulties = { 16 } }, -- Garrosh Hellscream - Siege of Orgrimmar
         { mountID = 613, itemID = 116660, journalInstanceID = 457, journalEncounterID = 959, dungeonEncounterID = 1704, difficulties = { 16 } }, -- Blackhand - Blackrock Foundry
-        { mountID = 634, itemID = 116771, journalInstanceID = 557, journalEncounterID = 1262, difficulties = { 14 } }, -- Rukhmar - Draenor
+        { mountID = 634, itemID = 116771, journalInstanceID = -1262, journalEncounterID = 1262, difficulties = { 0 } }, -- Rukhmar - Draenor (world boss)
         { mountID = 751, itemID = 123890, journalInstanceID = 669, journalEncounterID = 1438, dungeonEncounterID = 1799, difficulties = { 16 } }, -- Archimonde - Hellfire Citadel
         { mountID = 168, itemID = 30480, journalInstanceID = 745, journalEncounterID = 1553, dungeonEncounterID = 652, difficulties = { 3 } }, -- Attumen the Huntsman - Karazhan
         { mountID = 183, itemID = 32458, journalInstanceID = 749, journalEncounterID = 1576, dungeonEncounterID = 733, difficulties = { 4 } }, -- Kael'thas Sunstrider - The Eye
@@ -98,7 +101,7 @@ ns.Data = {
         { mountID = 954, itemID = 152789, journalInstanceID = 946, journalEncounterID = 2031, dungeonEncounterID = 2092, difficulties = { 16 } }, -- Argus the Unmaker - Antorus, the Burning Throne
         { mountID = 995, itemID = 159842, journalInstanceID = 1001, journalEncounterID = 2095, dungeonEncounterID = 2096, difficulties = { 23 } }, -- Harlan Sweete - Freehold
         { mountID = 1053, itemID = 160829, journalInstanceID = 1022, journalEncounterID = 2158, dungeonEncounterID = 2123, difficulties = { 23 } }, -- Unbound Abomination - The Underrot
-        { mountID = 1250, itemID = 174842, journalInstanceID = 1028, journalEncounterID = 2210, difficulties = { 14, 15, 16, 17 } }, -- Dunegorger Kraulok - Azeroth
+        { mountID = 1250, itemID = 174842, journalInstanceID = -2210, journalEncounterID = 2210, difficulties = { 0 } }, -- Dunegorger Kraulok - Azeroth (world boss)
         { mountID = 1040, itemID = 159921, journalInstanceID = 1041, journalEncounterID = 2172, dungeonEncounterID = 2143, difficulties = { 23 } }, -- Dazar, The First King - Kings' Rest
         { mountID = 1217, itemID = 166518, journalInstanceID = 1176, journalEncounterID = 2334, dungeonEncounterID = 2276, difficulties = { 14, 15, 16 } }, -- High Tinker Mekkatorque - Battle of Dazar'alor
         { mountID = 1217, itemID = 166518, journalInstanceID = 1176, journalEncounterID = 2343, dungeonEncounterID = 2281, difficulties = { 17 } }, -- Lady Jaina Proudmoore - Battle of Dazar'alor

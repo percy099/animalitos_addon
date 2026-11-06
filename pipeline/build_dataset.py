@@ -138,11 +138,43 @@ def build(raw: dict, curated: dict):
                 grouped[key]["difficulties"].add(int(d))
                 grouped[key]["itemID"] = m["itemID"]
 
+    wb_lockouts = {k: v for k, v in curated.get("worldBossLockouts", {}).items() if not k.startswith("_")}
+
     instances, sources, report = {}, [], defaultdict(list)
     for (jid, encounter_id, mount_id), g in sorted(grouped.items()):
         inst = raw["instances"][str(jid)]
         enc = raw["encounters"].get(str(encounter_id), {})
         is_world_boss = jid in pseudo
+        if is_world_boss:
+            # The EJ lists every world boss of a continent as one "raid" whose
+            # bosses live in different zones. Each boss becomes its own entry,
+            # keyed by -journalEncounterID; the addon finds its map position
+            # in game (C_EncounterJournal.GetEncountersOnMap) and reads the
+            # weekly kill from GetSavedWorldBossInfo.
+            wb_key = -encounter_id
+            if wb_key not in instances:
+                instances[wb_key] = {
+                    "tier": inst["tier"],
+                    "isRaid": True,
+                    "legacy": inst["tier"] < current_tier,
+                    "worldBoss": True,
+                    "ejInstance": jid,
+                    "encounter": encounter_id,
+                    "lockoutModel": wb_lockouts.get(str(jid), "unknown"),
+                    "_name": f"{enc.get('name')} ({inst['name']})",
+                }
+                if instances[wb_key]["lockoutModel"] == "unknown":
+                    report["unknownLockout"].append(f"{wb_key} {enc.get('name')} (world boss, {inst['name']})")
+            sources.append({
+                "mountID": mount_id,
+                "itemID": g["itemID"],
+                "journalInstanceID": wb_key,
+                "journalEncounterID": encounter_id,
+                "dungeonEncounterID": enc.get("dungeonEncounterID"),
+                "difficulties": [0],  # world bosses: one weekly kill, no difficulty choice
+                "_comment": f"{enc.get('name')} - {inst['name']} (world boss)",
+            })
+            continue
         if jid not in instances:
             entrance, ambiguous = (None, False)
             if not is_world_boss:
@@ -238,7 +270,7 @@ def write_report(instances, sources, report, raw):
         f"| Unique mounts | {len({s['mountID'] for s in sources})} |",
         f"| Instances with mounts | {len(instances)} |",
         f"| Legacy instances (MVP scope) | {len(legacy)} |",
-        f"| World-boss pseudo-instances | {sum(1 for i in instances.values() if i['worldBoss'])} |",
+        f"| World bosses with mounts | {sum(1 for i in instances.values() if i['worldBoss'])} |",
         "",
     ]
     titles = {
