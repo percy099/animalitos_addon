@@ -6,7 +6,7 @@ Addon de World of Warcraft retail (12.1.5) para **farmear monturas**. Te dice:
 - te pone un waypoint en la entrada y la dificultad correcta;
 - y te avisa de los jefes de eventos de temporada y de las monturas de vendedor que ya puedes comprar.
 
-Estado: **v0.25** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
+Estado: **v0.26** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
 
 ## Instalación
 1. Copia (o enlaza) la carpeta `AnimalitosPlanner/` en `World of Warcraft\_retail_\Interface\AddOns\`.
@@ -53,6 +53,7 @@ El botón **↻** de la cabecera vuelve a escanear la colección y los lockouts.
 | `/aplan navdebug` | Diagnóstico para cuando no se ve el waypoint |
 | `/aplan mini` | Abre o cierra la ventana mini del Planner |
 | `/aplan events` · `/aplan events test` | Estado de los jefes de eventos; `test` los simula activos (solo la sesión) |
+| `/aplan group` | Quién del grupo tiene el addon (versión, facción) y el estado del canal |
 | `/aplan skips` | Misiones de skip de raid: título en tu cliente y si están hechas |
 | `/aplan probe` · `/aplan scan` · `/aplan scan items` · `/aplan curated` · `/aplan unknown` | Herramientas de desarrollo (ver CLAUDE.md) |
 
