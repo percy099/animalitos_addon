@@ -902,6 +902,20 @@ local function mageShortcut(fac, here, ent, mage)
     return nil
 end
 
+-- Separate continent maps joined by land: from these zones, fly across
+-- (Silvermoon -> Eastern Plaguelands / Stratholme, and back).
+-- [continent] = { [zone on the other continent] = true }.
+local FLY_ACROSS = {
+    [2537] = { [23] = true, [22] = true }, -- Quel'Thalas <-> Eastern / Western Plaguelands
+}
+
+local function flyAcross(here, ent)
+    local near = FLY_ACROSS[here.continent]
+    if near and near[ent.uiMapID] then return true end
+    near = FLY_ACROSS[ent.continent]
+    return near and near[here.zone] or false
+end
+
 --- Travel step texts from `here` ({continent, zone}) to an entrance.
 --- Mage teleports / group portals first, then hand-written capital portals;
 --- anything unknown falls back to "Travel to ...".
@@ -910,6 +924,7 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
     if ent.continent == here.continent and (ent.uiMapID == here.zone or sameArea(ent.uiMapID, here.zone)) then
         return {} -- already there (Dazar'alor is inside Zuldazar)
     end
+    if flyAcross(here, ent) then return { L["PLAN_FLY"]:format(mapName(ent.uiMapID)) } end
 
     -- A known Mythic+ teleport goes straight to the entrance: best of all.
     if jid and jid > 0 then
