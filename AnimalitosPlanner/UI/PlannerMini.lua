@@ -223,6 +223,8 @@ local function placeSecure(f, t, action)
         return
     end
     local k = t:GetEffectiveScale() / UIParent:GetEffectiveScale()
+    -- Just the text, not the whole line width.
+    local width = math.min(t:GetUnboundedStringWidth and t:GetUnboundedStringWidth() or t:GetStringWidth(), right - left)
     f.secureUsed = f.secureUsed + 1
     local b = secureButton(f.secureUsed)
     b:SetAttribute("type", action.type)
@@ -234,7 +236,7 @@ local function placeSecure(f, t, action)
     b:SetFrameLevel(f:GetFrameLevel() + 20)
     b:ClearAllPoints()
     b:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left * k - 4, top * k + 2)
-    b:SetSize((right - left) * k + 10, (top - bottom) * k + 4)
+    b:SetSize(width * k + 10, (top - bottom) * k + 4)
     b:Show()
 end
 -- clickable: true for the current step (its first hop is where you are).
@@ -248,12 +250,9 @@ local function travelLines(f, travel, color, clickable)
         local t = line(f, "small", action and ns.UI.COLORS.text or color)
         place(f, t, ("|T%s:14:14:0:0:64:64:5:59:5:59|t  %s"):format(ns.Planner:TravelIcon(text), text), 2)
         if action then
-            -- Never let a failure here stop the window from drawing; say why.
-            local ok, err = pcall(placeSecure, f, t, action)
-            if not ok and not f.secureError then
-                f.secureError = true
-                ns:Print("travel button: " .. tostring(err))
-            end
+            -- Placed once the window has its final height (it is anchored
+            -- by its middle, so a later resize moves every line).
+            f.pendingSecure[#f.pendingSecure + 1] = { t, action }
         end
     end
 end
@@ -344,6 +343,7 @@ function Mini:Refresh()
     for _, b in ipairs(f.mountBtns) do b:Hide() end
     f.used = 0
     f.secureUsed = 0
+    f.pendingSecure = {}
     if not InCombatLockdown() then hideSecure() end
     f.y = 30
 
@@ -471,6 +471,14 @@ function Mini:Refresh()
         f.sep:Hide()
     end
     f:SetHeight(f.y + PAD)
+    for _, p in ipairs(f.pendingSecure) do
+        -- Never let a failure here stop the window from drawing; say why.
+        local ok, err = pcall(placeSecure, f, p[1], p[2])
+        if not ok and not f.secureError then
+            f.secureError = true
+            ns:Print("travel button: " .. tostring(err))
+        end
+    end
 end
 
 --- Shows or hides the mini window; remembered across sessions.

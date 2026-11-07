@@ -107,6 +107,7 @@ local MAGE = {
         [1550] = { 1670, 344587 },       -- Oribos
         [1978] = { 2112, 395277 },       -- Valdrakken
         [2274] = { 2339, 446540 },       -- Dornogal
+        [2537] = { 2393, 1259190 },      -- Silvermoon City (Midnight, both factions)
     },
     Horde = {
         capital = { 85, 3567 },          -- Teleport: Orgrimmar
@@ -121,6 +122,7 @@ local MAGE = {
         [1550] = { 1670, 344587 },       -- Oribos
         [1978] = { 2112, 395277 },       -- Valdrakken
         [2274] = { 2339, 446540 },       -- Dornogal
+        [2537] = { 2393, 1259190 },      -- Silvermoon City (Midnight, both factions)
     },
 }
 
@@ -670,7 +672,7 @@ local PORTAL = {
     [49359] = 49360, [49358] = 49361, [33690] = 33691, [35715] = 35717,
     [53140] = 53142, [132621] = 132620, [132627] = 132626, [176248] = 176246,
     [176242] = 176244, [224869] = 224871, [281403] = 281400, [281404] = 281402,
-    [344587] = 344597, [395277] = 395289, [446540] = 446534,
+    [344587] = 344597, [395277] = 395289, [446540] = 446534, [1259190] = 1259200,
 }
 local HEARTHSTONE = 6948
 
@@ -925,6 +927,16 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
         return {} -- already there (Dazar'alor is inside Zuldazar)
     end
     if flyAcross(here, ent) then return { L["PLAN_FLY"]:format(mapName(ent.uiMapID)) } end
+    -- Coming from farther away to a zone next to another continent's city
+    -- (Stratholme from Silvermoon): get to that city, then fly across.
+    for c, near in pairs(FLY_ACROSS) do
+        local city = CONTINENT_PORTALS[fac][c]
+        if near[ent.uiMapID] and city and here.continent ~= c and here.continent ~= ent.continent then
+            local out = self:TravelTexts(fac, here, { continent = c, uiMapID = city }, mage)
+            out[#out + 1] = L["PLAN_FLY"]:format(mapName(ent.uiMapID))
+            return out
+        end
+    end
 
     -- A known Mythic+ teleport goes straight to the entrance: best of all.
     if jid and jid > 0 then
