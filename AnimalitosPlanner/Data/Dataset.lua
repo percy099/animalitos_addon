@@ -2,7 +2,7 @@
 -- Source: in-game /aplan scan, client 12.1.5.70783, scanned 2026-11-05 13:38:04.
 local _, ns = ...
 ns.Data = {
-    version = { client = "12.1.5.70783", generated = "2026-11-06", hash = "0f946928ab0f" },
+    version = { client = "12.1.5.70783", generated = "2026-11-07", hash = "0885b91307ae" },
     instances = {
         [-2210] = { tier = 8, isRaid = true, legacy = true, worldBoss = true, ejInstance = 1028, encounter = 2210, lockoutModel = "worldQuest" }, -- Dunegorger Kraulok (Azeroth)
         [-1262] = { tier = 6, isRaid = true, legacy = true, worldBoss = true, ejInstance = 557, encounter = 1262, lockoutModel = "savedWorldBoss" }, -- Rukhmar (Draenor)
@@ -12,7 +12,7 @@ ns.Data = {
         [-691] = { tier = 5, isRaid = true, legacy = true, worldBoss = true, ejInstance = 322, encounter = 691, lockoutModel = "savedWorldBoss" }, -- Sha of Anger (Pandaria)
         [67] = { tier = 4, isRaid = false, mapID = 725, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 207, x = 0.4738, y = 0.5205, continent = 948 } }, -- The Stonecore
         [68] = { tier = 4, isRaid = false, mapID = 657, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 249, x = 0.767, y = 0.8436, continent = 12 } }, -- The Vortex Pinnacle
-        [74] = { tier = 4, isRaid = true, mapID = 754, legacy = true, worldBoss = false, lockoutModel = "unknown" }, -- Throne of the Four Winds
+        [74] = { tier = 4, isRaid = true, mapID = 754, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 249, x = 0.385, y = 0.805, continent = 12 } }, -- Throne of the Four Winds
         [76] = { tier = 4, isRaid = false, mapID = 859, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 50, x = 0.721, y = 0.3293, continent = 13 } }, -- Zul'Gurub
         [78] = { tier = 4, isRaid = true, mapID = 720, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 198, x = 0.468, y = 0.7839, continent = 12 } }, -- Firelands
         [187] = { tier = 4, isRaid = true, mapID = 967, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 75, x = 0.6088, y = 0.2116, continent = 12 } }, -- Dragon Soul
@@ -42,7 +42,7 @@ ns.Data = {
         [1041] = { tier = 8, isRaid = false, mapID = 1762, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 862, x = 0.3759, y = 0.3948, continent = 875 } }, -- Kings' Rest
         [1176] = { tier = 8, isRaid = true, mapID = 2070, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 1161, x = 0.7044, y = 0.3556, continent = 876 } }, -- Battle of Dazar'alor
         [1178] = { tier = 8, isRaid = false, mapID = 2097, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 1462, x = 0.7294, y = 0.3649, continent = 876 } }, -- Operation: Mechagon
-        [1180] = { tier = 8, isRaid = true, mapID = 2217, legacy = true, worldBoss = false, lockoutModel = "unknown" }, -- Ny'alotha, the Waking City
+        [1180] = { tier = 8, isRaid = true, mapID = 2217, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 249, x = 0.54, y = 0.43, continent = 12 } }, -- Ny'alotha, the Waking City
         [1182] = { tier = 9, isRaid = false, mapID = 2286, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 1533, x = 0.4015, y = 0.5521, continent = 1550 } }, -- The Necrotic Wake
         [1193] = { tier = 9, isRaid = true, mapID = 2450, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 1543, x = 0.6975, y = 0.3202, continent = 1550 } }, -- Sanctum of Domination
         [1194] = { tier = 9, isRaid = false, mapID = 2441, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 2371, x = 0.6358, y = 0.7022, continent = 2274 } }, -- Tazavesh, the Veiled Market
@@ -50,7 +50,7 @@ ns.Data = {
         [1207] = { tier = 10, isRaid = true, mapID = 2549, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 2200, x = 0.2731, y = 0.3104, continent = 1978 } }, -- Amirdrassil, the Dream's Hope
         [1210] = { tier = 11, isRaid = false, mapID = 2651, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 2214, x = 0.5546, y = 0.2163, continent = 2274 } }, -- Darkflame Cleft
         [1273] = { tier = 11, isRaid = true, mapID = 2657, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 2213, x = 0.3505, y = 0.7243, continent = 2274 } }, -- Nerub-ar Palace
-        [1292] = { tier = 1, isRaid = false, mapID = 329, legacy = true, worldBoss = false, lockoutModel = "unknown" }, -- Stratholme - Service Entrance
+        [1292] = { tier = 1, isRaid = false, mapID = 329, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 23, x = 0.43, y = 0.18, continent = 13 } }, -- Stratholme - Service Entrance
         [1296] = { tier = 11, isRaid = true, mapID = 2769, legacy = true, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 2346, x = 0.4155, y = 0.4878, continent = 2274 } }, -- Liberation of Undermine
         [1299] = { tier = 12, isRaid = false, mapID = 2805, legacy = false, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 2395, x = 0.3545, y = 0.7883, continent = 2537 } }, -- Windrunner Spire
         [1300] = { tier = 12, isRaid = false, mapID = 2811, legacy = false, worldBoss = false, lockoutModel = "unknown", entrance = { uiMapID = 2424, x = 0.6346, y = 0.1539, continent = 2537 } }, -- Magisters' Terrace

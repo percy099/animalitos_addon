@@ -421,6 +421,7 @@ function Planner:Build(entries, hideCompleted, kinds)
                 end
                 if not r.done then travelMinutes = travelMinutes + #texts * MINUTES.travel end
                 here.continent, here.zone = ent.continent, ent.uiMapID
+                here.fromInstance = true -- you start inside: walking out takes time
             end
             steps[#steps + 1] = r
         end
@@ -478,7 +479,7 @@ function Planner:PlayerHere()
         for _, inst in pairs(ns.Data.instances) do
             local ent = inst.entrance
             if inst.mapID == instanceMapID and ent and ent.continent then
-                return { continent = ent.continent, zone = ent.uiMapID }
+                return { continent = ent.continent, zone = ent.uiMapID, fromInstance = true }
             end
         end
         return nil
@@ -746,6 +747,9 @@ end
 -- What one teleport / portal costs, as flying distance (loading screen,
 -- walking to the next portal).
 local HOP_COST = 600
+-- Walking out of the instance you just finished (Return to Karazhan's
+-- tower top): a teleport from inside skips it.
+local EXIT_COST = 1500
 
 --- With a mage at hand, on the same continent: a teleport (or teleport home
 --- plus a capital portal) that lands much closer to the entrance than a
@@ -754,6 +758,7 @@ local function mageShortcut(fac, here, ent, mage)
     local target = worldPos(ent.uiMapID, ent.x, ent.y)
     local direct = distance(worldPos(here.zone), target)
     if not direct then return nil end
+    if here.fromInstance then direct = direct + EXIT_COST end
     local L = ns.L
     local best, bestCost = nil, direct
     local function try(landing, hops, texts)
@@ -790,8 +795,9 @@ local function mageShortcut(fac, here, ent, mage)
         portals(FACTION_ZONE_PORTALS[fac])
         portals(CONTINENT_PORTALS[fac])
     end
-    -- Only when clearly better than flying (half the way or less).
-    if best and bestCost < direct * 0.5 then return best end
+    -- Only when clearly better than flying (half the way or less; from
+    -- inside an instance, any clear gain, since the exit is skipped).
+    if best and bestCost < direct * (here.fromInstance and 0.85 or 0.5) then return best end
     return nil
 end
 

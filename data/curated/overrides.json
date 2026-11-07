@@ -128,7 +128,18 @@
     "ids": [1319]
   },
   "entranceOverrides": {
-    "860": {
+    "74": {
+      "uiMapID": 249, "x": 0.385, "y": 0.805, "continent": 12,
+      "_reason": "Throne of the Four Winds: in the sky of south-west Uldum, /way 38.5 80.5 (player, from an Overgear guide). No entrance pin in the client scan."
+    },
+    "1180": {
+      "uiMapID": 249, "x": 0.54, "y": 0.43, "continent": 12,
+      "_reason": "Ny'alotha: the entrance moves weekly with the N'Zoth assault (Uldum or Vale of Eternal Blossoms); the player chose the Uldum one, Vir'naal Dam 54 43. No entrance pin in the client scan."
+    },
+    "1292": {
+      "uiMapID": 23, "x": 0.43, "y": 0.18, "continent": 13,
+      "_reason": "Stratholme Service Entrance: Eastwall Gate, Eastern Plaguelands 43 18 (warcraft.wiki.gg Stratholme_Service_Entrance). No entrance pin in the client scan."
+    },    "860": {
       "uiMapID": 42, "x": 0.4699, "y": 0.7491, "continent": 13,
       "_reason": "Return to Karazhan has no entrance pin in the client scan; it uses the Karazhan door in Deadwind Pass (same point as Karazhan 745). Reported missing from the route by the player."
     },

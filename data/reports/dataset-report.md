@@ -10,12 +10,9 @@ Generated from client `12.1.5.70783` (scan 2026-11-05 13:38:04).
 | Legacy instances (MVP scope) | 43 |
 | World bosses with mounts | 6 |
 
-## Instances without an entrance (add `entranceOverrides` with uiMapID/x/y) — 4
+## Instances without an entrance (add `entranceOverrides` with uiMapID/x/y) — 1
 
-- 74 Throne of the Four Winds (Cataclysm)
 - 249 Magisters' Terrace (Burning Crusade)
-- 1180 Ny'alotha, the Waking City (Battle for Azeroth)
-- 1292 Stratholme - Service Entrance (Classic)
 
 ## Ambiguous entrances (confirm or override) — 2
 
