@@ -255,18 +255,15 @@ function CollectionPanel:Create(parent)
     p:SetAllPoints()
     p.query = ""
 
-    -- View switch (List / By expansion), top right. Everything that belongs
-    -- to the list lives in p.listView so a view change is one Show/Hide.
-    p.view = ns.UI.Segmented(p, {
-        { key = "list", text = L["COL_VIEW_LIST"] },
-        { key = "exp",  text = L["COL_VIEW_EXP"] },
-        { key = "ach",  text = L["COL_VIEW_ACH"] },
-        { key = "drops", text = L["COL_VIEW_DROPS"] },
-    }, function(key)
+    -- View, top right: one dropdown (the player found four tabs plus the
+    -- filter dropdown below confusing). Everything that belongs to the list
+    -- lives in p.listView so a view change is one Show/Hide.
+    p.view = ns.UI.Dropdown(p, 190, function(key)
         if p.bar then p.bar:SetValue(0) end
         ns.Storage.db.ui.collectionView = key
         CollectionPanel:Refresh(p)
     end)
+    p.view:SetHeight(SEARCH_H)
     p.view:SetPoint("TOPRIGHT", -SCROLL_W, 0)
 
     local lv = CreateFrame("Frame", nil, p)
@@ -632,7 +629,15 @@ function CollectionPanel:Refresh(p, entries)
 
     local view = ns.Storage.db.ui.collectionView or "list"
     p.mode = view
-    p.view:SetSelected(view)
+    local VIEWS = { { "list", "COL_VIEW_LIST" }, { "exp", "COL_VIEW_EXP" }, { "ach", "COL_VIEW_ACH" },
+        { "drops", "COL_VIEW_DROPS" } }
+    local viewMenu, viewName = {}, L["COL_VIEW_LIST"]
+    for _, v in ipairs(VIEWS) do
+        viewMenu[#viewMenu + 1] = { value = v[1], text = L[v[2]] } -- single choice: no check box
+        if v[1] == view then viewName = L[v[2]] end
+    end
+    p.view:SetItems(viewMenu)
+    p.view:SetText(L["COL_VIEW_LABEL"]:format(viewName))
     p.listView:SetShown(view == "list" or view == "ach" or view == "drops")
     p.expView:SetShown(view == "exp")
     p.expNote:SetShown(view == "exp")
