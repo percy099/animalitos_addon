@@ -224,7 +224,7 @@ local function placeSecure(f, t, action)
     end
     local k = t:GetEffectiveScale() / UIParent:GetEffectiveScale()
     -- Just the text, not the whole line width.
-    local width = math.min(t:GetUnboundedStringWidth and t:GetUnboundedStringWidth() or t:GetStringWidth(), right - left)
+    local width = math.min(t.GetUnboundedStringWidth and t:GetUnboundedStringWidth() or t:GetStringWidth(), right - left)
     f.secureUsed = f.secureUsed + 1
     local b = secureButton(f.secureUsed)
     b:SetAttribute("type", action.type)
