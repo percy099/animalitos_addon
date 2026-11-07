@@ -400,24 +400,12 @@ function FarmList:EncounterNames(jid)
     return out
 end
 
---- Position of a source's boss in its instance (journal order), for
---- listing mounts boss by boss; hidden or unknown bosses go last.
-local bossOrder = {}
+--- Sort key for a source's boss inside its instance, for listing mounts
+--- boss by boss. Journal encounter IDs go up in boss order (Ultraxion 331,
+--- Madness 333); EJ_GetEncounterInfoByIndex cannot be used, it reads the
+--- instance selected in the journal. Hidden bosses go last.
 function FarmList:BossOrder(src)
-    local jid = src and src.journalInstanceID
-    if not (jid and src.journalEncounterID) or jid < 0 or not EJ_GetEncounterInfoByIndex then return 99 end
-    local order = bossOrder[jid]
-    if not order then
-        order = {}
-        for i = 1, 40 do
-            local name, _, encounterID = EJ_GetEncounterInfoByIndex(i, jid)
-            if not name then break end
-            if encounterID then order[encounterID] = i end
-        end
-        if not next(order) then return 99 end -- journal not ready: try again later
-        bossOrder[jid] = order
-    end
-    return order[src.journalEncounterID] or 99
+    return (src and src.journalEncounterID) or math.huge
 end
 
 --- "Raid" / "Dungeon" / "World boss".

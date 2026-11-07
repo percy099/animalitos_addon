@@ -37,6 +37,12 @@ local HUBS = {
         [2274] = 2339, -- Dornogal
     },
 }
+-- Continents where the player fixed the first stops (journalInstanceIDs,
+-- in order); the walk goes on from the last one. Northrend: Eye of
+-- Eternity, Icecrown Citadel, Ulduar, Utgarde Pinnacle (player's order).
+local FIXED_ORDER = {
+    [113] = { 756, 758, 759, 286 },
+}
 local CAPITAL = { Alliance = 84, Horde = 85 }
 local HOME_CONTINENT = { Alliance = 13, Horde = 12 }
 
@@ -240,6 +246,17 @@ function Planner:Route()
                 if p and (not best or p[2] > pts[best][2]) then best = jid end
             end
             if best then cx, cy = pts[best][1], pts[best][2] end
+        end
+        -- Stops the player put first, in their order.
+        for _, fixed in ipairs(FIXED_ORDER[c] or {}) do
+            for i, jid in ipairs(left) do
+                if jid == fixed then
+                    table.remove(left, i)
+                    route[#route + 1] = jid
+                    if pts[jid] then cx, cy = pts[jid][1], pts[jid][2] end
+                    break
+                end
+            end
         end
         -- Nearest neighbour walk (ties by jid). Points the client cannot
         -- place keep their jid order at the end of the continent.
@@ -754,6 +771,19 @@ local EXIT_COST = 1500
 --- With a mage at hand, on the same continent: a teleport (or teleport home
 --- plus a capital portal) that lands much closer to the entrance than a
 --- direct flight. Returns the travel texts, or nil to fly.
+local function returnPortalHere(fac, here)
+    local z = here.zone
+    if not z then return false end
+    local hub = homeHub(fac, here.continent)
+    if hub and sameArea(hub, z) then return true end
+    for _, t in ipairs({ ZONE_PORTALS, FACTION_ZONE_PORTALS[fac] or {}, CONTINENT_PORTALS[fac] }) do
+        for _, landing in pairs(t) do
+            if sameArea(landing, z) then return true end
+        end
+    end
+    return false
+end
+
 local function mageShortcut(fac, here, ent, mage)
     local target = worldPos(ent.uiMapID, ent.x, ent.y)
     local direct = distance(worldPos(here.zone), target)
@@ -778,10 +808,14 @@ local function mageShortcut(fac, here, ent, mage)
             if hop then try(dest[1], 1, { hop }) end
         end
     end
-    -- Teleport home, then one of the capital's portals (Orgrimmar ->
-    -- Caverns of Time for Onyxia).
+    -- Home to the capital: mage teleport, or for anyone the return portal
+    -- of a portal zone / hub (Mount Hyjal's Nordrassil -> Orgrimmar). Then
+    -- fly from the capital, or take one of its portals (Caverns of Time
+    -- for Onyxia).
     local home = mageHop(mage, MAGE[fac].capital)
+        or (returnPortalHere(fac, here) and L["PLAN_PORTAL"]:format(mapName(CAPITAL[fac])))
     if home then
+        try(CAPITAL[fac], 1, { home })
         local seen = {}
         local function portals(t)
             for _, landing in pairs(t or {}) do
@@ -888,7 +922,7 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
     -- capital, or a free mage trip there: Dustwallow -> Stormwind -> Uldum),
     -- or a mage hop lands much closer (ICC -> Dalaran -> Howling Fjord).
     if ent.continent == here.continent and not ((inCapital or mageHome) and zonePortal) then
-        local shortcut = (mage and (mage.self or mage.group)) and mageShortcut(fac, here, ent, mage)
+        local shortcut = mageShortcut(fac, here, ent, mage)
         if shortcut then return shortcut end
         out[1] = fly
         return out

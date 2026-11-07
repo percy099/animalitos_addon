@@ -199,15 +199,12 @@ local function newRun(p)
     -- The achievement line is a link: icon, accent color, brighter on hover,
     -- click opens the achievement in Blizzard's window.
     f.achBtn = CreateFrame("Button", nil, f)
-    f.achBtn:SetAllPoints(f.ach)
-    local achHl = f.achBtn:CreateTexture(nil, "HIGHLIGHT")
-    achHl:SetAllPoints()
-    achHl:SetColorTexture(C.accent[1], C.accent[2], C.accent[3], 0.18)
+    f.achBtn:SetPoint("TOPLEFT", f.ach, "TOPLEFT", -3, 2)
+    f.achBtn:SetPoint("BOTTOMRIGHT", f.ach, "BOTTOMRIGHT", 3, -2)
+    ns.UI.Clickable(f.achBtn)
     f.achBtn:SetScript("OnClick", function()
         local link = f.achLinks and f.achLinks[1]
-        if link and link.ach.id and OpenAchievementFrameToAchievement then
-            OpenAchievementFrameToAchievement(link.ach.id)
-        end
+        if link and link.ach.id and not ns.Achievements:Open(link.ach.id) then ns:Print(L["JOURNAL_COMBAT"]) end
     end)
     f.achBtn:SetScript("OnEnter", function() f:GetScript("OnEnter")(f, true) end)
     f.achBtn:SetScript("OnLeave", function() GameTooltip:Hide() end)

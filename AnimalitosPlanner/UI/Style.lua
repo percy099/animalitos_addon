@@ -241,6 +241,29 @@ end
 
 -- Uppercase that also handles Spanish accented letters (string.upper is ASCII-only).
 local UPPER = { ["á"] = "Á", ["é"] = "É", ["í"] = "Í", ["ó"] = "Ó", ["ú"] = "Ú", ["ñ"] = "Ñ", ["ü"] = "Ü" }
+--- Makes a button look clickable: a thin accent outline (always visible)
+--- and a soft accent fill on hover. Same look for every clickable line
+--- (travel, achievements) so players learn it once.
+function UI.Clickable(b)
+    if b.clickableEdge then return end
+    local A = UI.COLORS.accent
+    local function edge(p1, p2, w, h)
+        local t = b:CreateTexture(nil, "BORDER")
+        t:SetPoint(p1)
+        t:SetPoint(p2)
+        if w then t:SetWidth(w) else t:SetHeight(h) end
+        t:SetColorTexture(A[1], A[2], A[3], 0.75)
+    end
+    edge("TOPLEFT", "TOPRIGHT", nil, 1)
+    edge("BOTTOMLEFT", "BOTTOMRIGHT", nil, 1)
+    edge("TOPLEFT", "BOTTOMLEFT", 1, nil)
+    edge("TOPRIGHT", "BOTTOMRIGHT", 1, nil)
+    local hl = b:CreateTexture(nil, "HIGHLIGHT")
+    hl:SetAllPoints()
+    hl:SetColorTexture(A[1], A[2], A[3], 0.22)
+    b.clickableEdge = true
+end
+
 function UI.Upper(s)
     return (s:gsub("\195[\128-\191]", UPPER):upper())
 end
