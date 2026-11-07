@@ -262,13 +262,39 @@ local function runTitle(s)
     return ns.PlannerPanel.StepTitle(s)
 end
 
+-- Bosses killed in this run, from ENCOUNTER_END: legacy Normal dungeons
+-- have no lockout, so the lockout alone cannot tell. Kept per instance and
+-- difficulty; cleared when you leave the instance (a reset run starts with
+-- every boss alive).
+local run = { mapID = nil, difficulty = nil, kills = {} }
+ns:On("ENCOUNTER_END", function(_, encounterID, _, _, _, success)
+    if success ~= 1 and success ~= true then return end
+    local _, instanceType, difficultyID, _, _, _, _, mapID = GetInstanceInfo()
+    if instanceType == "none" then return end
+    if run.mapID ~= mapID or run.difficulty ~= difficultyID then
+        run.mapID, run.difficulty, run.kills = mapID, difficultyID, {}
+    end
+    run.kills[encounterID] = true
+    if Mini.frame and Mini.frame:IsShown() then ns:Debounce("mini-kill", 0.5, function() Mini:Refresh() end) end
+end)
+ns:On("PLAYER_ENTERING_WORLD", function()
+    if not IsInInstance() then run.mapID, run.difficulty, run.kills = nil, nil, {} end
+end)
+
+local function killedNow(src, d)
+    local _, _, difficultyID, _, _, _, _, mapID = GetInstanceInfo()
+    return src.dungeonEncounterID and run.mapID == mapID and run.difficulty == d
+        and difficultyID == d and run.kills[src.dungeonEncounterID] or false
+end
+
 -- True when every boss that drops this mount is dead in the current run:
--- the lockout of the difficulty you are in says so (a heroic kill keeps
--- the mount "Ready" overall when Normal has no lockout).
+-- killed this run (ENCOUNTER_END), or the lockout of the difficulty you
+-- are in says so (a heroic kill keeps the mount "Ready" overall when
+-- Normal has no lockout).
 local function killedThisRun(m, d)
     local S = ns.Eligibility.STATES
     for _, src in ipairs(m.sources or { m.source }) do
-        if ns.Eligibility:Evaluate(src, d) ~= S.LOCKED_OUT then return false end
+        if not killedNow(src, d) and ns.Eligibility:Evaluate(src, d) ~= S.LOCKED_OUT then return false end
     end
     return true
 end
