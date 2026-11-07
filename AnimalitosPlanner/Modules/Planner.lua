@@ -195,8 +195,10 @@ end
 
 --- Every dataset instance with an entrance, in route order (journalInstanceIDs),
 --- followed by those without an entrance. Computed once per faction.
-function Planner:Route()
-    local fac = faction()
+--- fac: whose route order (default: this character's faction; the group
+--- route uses the leader's).
+function Planner:Route(fac)
+    fac = fac or faction()
     if cachedRoute and cachedFaction == fac then return cachedRoute end
     ns.FarmList:ResolveFactionEntrances() -- Horde Battle of Dazar'alor
 
@@ -375,6 +377,47 @@ local function hasFavorite(e)
     return false
 end
 
+-- A group route step only someone else needs: a stand-in entry with their
+-- mounts (no difficulties: those are theirs).
+local function peerEntry(jid, peers)
+    local inst = ns.Data.instances[jid]
+    if not inst then return nil end
+    local mounts = {}
+    for _, p in ipairs(peers) do
+        for _, list in ipairs({ p.ready, p.locked }) do
+            for _, id in ipairs(list) do
+                if not mounts[id] then
+                    local source
+                    for _, src in ipairs(ns.Data.sources) do
+                        if src.journalInstanceID == jid and src.mountID == id then source = src break end
+                    end
+                    mounts[id] = { ready = {}, locked = {}, verify = {}, source = source, peer = true }
+                end
+            end
+        end
+    end
+    return { jid = jid, inst = inst, mounts = mounts, readyCount = 0, peerOnly = true }
+end
+
+-- Who in the group needs a step: { { name, state = "ready" | "locked" } },
+-- me first. nil outside the group route.
+local function whoNeeds(e, peers)
+    local who = {}
+    if e and not e.peerOnly then
+        local state
+        for _, m in pairs(e.mounts) do
+            if #m.ready > 0 then state = "ready" break end
+            if #m.locked > 0 then state = "locked" end
+        end
+        if state then who[#who + 1] = { me = true, state = state } end
+    end
+    for _, p in ipairs(peers or {}) do
+        local state = (#p.ready > 0 and "ready") or (#p.locked > 0 and "locked") or nil
+        if state then who[#who + 1] = { name = p.name, state = state } end
+    end
+    return who
+end
+
 function Planner:Build(entries, hideCompleted, kinds)
     kinds = kinds or self:Kinds()
     local byJid = {}
@@ -382,6 +425,10 @@ function Planner:Build(entries, hideCompleted, kinds)
         -- Only the kinds the player picked (the route order stays the same).
         if kinds[kindOf(e.inst)] and (not kinds.favorites or hasFavorite(e)) then byJid[e.jid] = e end
     end
+    -- Group route: the union of everyone's steps, in the leader's order;
+    -- the leader's done marks count for everyone.
+    local group = ns.Comm and ns.Comm:GroupActive()
+    local peerNeeds = group and ns.Comm:NeedsByJid() or nil
 
     local runs = {}
     -- World event bosses first: no travel (Dungeon Finder queue), once a
@@ -393,25 +440,45 @@ function Planner:Build(entries, hideCompleted, kinds)
         if fav then
             local key = "ev" .. ev.h.lfgDungeonID
             local auto = ev.state == S.LOCKED_OUT
+            local leader = ns.Comm and ns.Comm:GroupActive() and ns.Comm:LeaderDone(key)
             runs[#runs + 1] = { kind = "run", event = ev, jid = key, inst = { isRaid = false },
-                done = auto or self:IsManuallyDone(key), auto = auto }
+                done = auto or self:IsManuallyDone(key) or leader, auto = auto }
         end
     end
-    for _, jid in ipairs(self:Route()) do
+    for _, jid in ipairs(self:Route(group and ns.Comm:RouteFaction() or nil)) do
         local e = byJid[jid]
+        local peers = peerNeeds and peerNeeds[jid]
+        if not e and peers and not kinds.favorites then
+            local inst = ns.Data.instances[jid]
+            if inst and kinds[kindOf(inst)] then e = peerEntry(jid, peers) end
+        end
         if e then
             local anyReady, anyLocked = false, false
             for _, m in pairs(e.mounts) do
                 if #m.ready > 0 then anyReady = true end
                 if #m.locked > 0 then anyLocked = true end
             end
+            local who = group and whoNeeds(e, peers) or nil
+            -- Someone else in the group can still loot it: not done for me.
+            for _, w in ipairs(who or {}) do
+                if w.state == "ready" then anyReady = true end
+            end
             -- Auto-done: nothing left to loot this reset and something was killed.
             -- Unknown (verify only) is never treated as done.
-            local auto = ns.Lockouts.loaded and anyLocked and not anyReady
+            local auto = ns.Lockouts.loaded and anyLocked and not anyReady and not e.peerOnly
             local manual = self:IsManuallyDone(jid)
+            local leader = group and ns.Comm:LeaderDone(jid)
             runs[#runs + 1] = { kind = "run", jid = jid, inst = e.inst, e = e,
-                done = auto or manual, auto = auto }
+                done = auto or manual or leader, auto = auto, who = who }
         end
+    end
+    -- The leader shares its done steps, so everyone's route advances with it.
+    if group and UnitIsGroupLeader("player") then
+        local keys = {}
+        for _, r in ipairs(runs) do
+            if r.done then keys[#keys + 1] = tostring(r.jid) end
+        end
+        ns.Comm:ShareDone(keys)
     end
 
     local summary = { total = #runs, done = 0 }

@@ -50,7 +50,8 @@ local function describe(r)
     local rows, ready, locked, resetAt, verifyReason = {}, {}, {}, nil, nil
     for id, m in pairs(e.mounts) do
         local mj = ns.MountJournal:GetMount(id)
-        local state = (#m.ready > 0 and "ready") or (#m.locked > 0 and "locked") or "verify"
+        -- "peer": a mount only someone else in the group route needs.
+        local state = (m.peer and "peer") or (#m.ready > 0 and "ready") or (#m.locked > 0 and "locked") or "verify"
         -- One row per boss that drops it (Vault of Archavon: all four).
         for k, src in ipairs(m.sources or { m.source }) do
             rows[#rows + 1] = { id = id, boss = ns.FarmList:BossName(src), mount = mj and mj.name or ("#" .. id),
@@ -78,6 +79,16 @@ local function describe(r)
     for _, d in ipairs(list) do names[#names + 1] = ns.FarmList:DifficultyName(d) end
 
     local notes = {}
+    -- Group route: who needs this step (check = can loot it now).
+    if r.who and #r.who > 0 then
+        local parts = {}
+        for _, w in ipairs(r.who) do
+            local name = w.me and L["GROUP_YOU"] or w.name
+            parts[#parts + 1] = (w.state == "ready") and ("|cff8dd3a8%s|r |A:common-icon-checkmark:11:11|a"):format(name)
+                or ("|cffe0a040%s (%s)|r"):format(name, L["GROUP_LOCKED"])
+        end
+        notes[#notes + 1] = L["GROUP_WHO"]:format(table.concat(parts, "  "))
+    end
     if not next(ready) and next(locked) then
         -- Locked: when it resets is the only thing that matters today.
         notes[#notes + 1] = L["PLAN_NOTE_LOCKED"]:format(timeLeft(resetAt))
@@ -350,6 +361,25 @@ function PlannerPanel:Create(parent)
     hideLabel:SetPoint("RIGHT", p.hide, "LEFT", -8, 0)
     hideLabel:SetText(L["PLAN_HIDE_DONE"])
 
+    -- Group route: only when someone else in the group runs the addon.
+    p.group = ns.UI.Switch(p, function(_, checked)
+        ns.Storage.db.ui.plannerGroup = checked or nil
+        if p.bar then p.bar:SetValue(0) end
+        PlannerPanel:Refresh(p)
+        ns.PlannerMini:Refresh()
+    end)
+    p.group:SetPoint("RIGHT", hideLabel, "LEFT", -18, 0)
+    p.groupLabel = ns.UI.fs(p, "small", C.dim)
+    p.groupLabel:SetPoint("RIGHT", p.group, "LEFT", -8, 0)
+    p.groupLabel:SetText(L["PLAN_GROUP_ROUTE"])
+    p.group:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(L["PLAN_GROUP_ROUTE"], 1, 1, 1)
+        GameTooltip:AddLine(L["PLAN_GROUP_ROUTE_TIP"], nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    p.group:HookScript("OnLeave", function() GameTooltip:Hide() end)
+
     -- What the route includes: a multi-select dropdown (favorites only,
     -- raids, dungeons, world bosses; at least one kind stays on). The menu
     -- stays open while ticking.
@@ -440,7 +470,7 @@ function PlannerPanel:Create(parent)
 end
 
 -- Refresh -------------------------------------------------------------------------
-local STATE_HEX = { ready = "|cffffffff", locked = "|cffe0a040", verify = "|cff8c8899" }
+local STATE_HEX = { ready = "|cffffffff", locked = "|cffe0a040", verify = "|cff8c8899", peer = "|cffb8b0c8" }
 
 --- entries = FarmList:Build() result; internal refreshes reuse the last one.
 function PlannerPanel:Refresh(p, entries)
@@ -454,6 +484,10 @@ function PlannerPanel:Refresh(p, entries)
 
     local hideDone = ns.Storage.db.ui.plannerHideDone and true or false
     p.hide:SetChecked(hideDone)
+    local anyPeer = #ns.Comm:Peers() > 0
+    p.group:SetShown(anyPeer)
+    p.groupLabel:SetShown(anyPeer)
+    p.group:SetChecked(ns.Storage.db.ui.plannerGroup and true or false)
     local kinds = ns.Planner:Kinds()
     local KIND_KEYS = { { "favorites", "PLAN_KIND_FAV" }, { "raid", "PLAN_KIND_RAID" },
         { "dungeon", "PLAN_KIND_DUNGEON" }, { "worldBoss", "PLAN_KIND_WB" } }

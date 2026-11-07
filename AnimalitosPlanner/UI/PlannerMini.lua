@@ -395,7 +395,7 @@ function Mini:Refresh()
         -- also when that kill locked its last difficulty (Normal after Heroic).
         local km = insideDiff and s.e.mounts[r.id]
         local killed = km and killedThisRun(km, insideDiff)
-        if (r.state == "ready" or killed) and not seen[r.id] then
+        if (r.state == "ready" or r.state == "peer" or killed) and not seen[r.id] then
             seen[r.id] = true
             n = n + 1
             local b = mountButton(f, n)
