@@ -95,7 +95,8 @@ local function encodeNeeds()
     -- group route is the union.
     local jids = {}
     for _, e in ipairs(entries or {}) do
-        if type(e.jid) == "number" and e.jid > 0 then
+        -- World bosses have negative IDs (-814 = Nalak): share them too.
+        if type(e.jid) == "number" and e.jid ~= 0 then
             local own = ns.Planner:OwnStep(e)
             if own then jids[#jids + 1] = own end
         end
@@ -124,7 +125,7 @@ end
 
 local function decodeNeeds(data)
     local needs = {}
-    for jid, ready, locked in data:gmatch("(%d+):([%d%.]*)/([%d%.]*)") do
+    for jid, ready, locked in data:gmatch("(%-?%d+):([%d%.]*)/([%d%.]*)") do
         needs[tonumber(jid)] = { ready = decodeIDs(ready), locked = decodeIDs(locked) }
     end
     return needs
