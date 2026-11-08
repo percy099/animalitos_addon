@@ -85,14 +85,14 @@ function Eligibility:Evaluate(src, difficultyID)
         if not boss then
             return S.VERIFY, L["REASON_BOSS_UNKNOWN"]
         end
-        if record.killed[boss] then
+        if ns.Lockouts:IsKilled(record, boss) then
             return S.LOCKED_OUT, L["REASON_KILLED"]:format(boss), record.resetAt
         end
     end
 
     for _, sibling in ipairs(SIZE_SIBLINGS[difficultyID] or {}) do
         local other = inst.mapID and ns.Lockouts:Get(inst.mapID, sibling)
-        if other and boss and other.killed[boss] then
+        if other and boss and ns.Lockouts:IsKilled(other, boss) then
             return S.LOCKED_OUT, L["REASON_SHARED_SIZE"]:format(boss), other.resetAt
         end
     end

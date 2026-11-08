@@ -75,6 +75,22 @@ function Lockouts:Refresh()
     return changed
 end
 
+--- Is this boss (Encounter Journal name) killed in the lockout record?
+--- The lockout may name it differently: "Lord Harlan Sweete" in the
+--- lockout, "Harlan Sweete" in the journal. So an exact name first, then
+--- one name contained in the other (ignoring case).
+function Lockouts:IsKilled(record, boss)
+    if not (record and boss) then return false end
+    if record.killed[boss] then return true end
+    local b = boss:lower()
+    if #b < 4 then return false end
+    for name in pairs(record.killed) do
+        local n = name:lower()
+        if #n >= 4 and (n:find(b, 1, true) or b:find(n, 1, true)) then return true end
+    end
+    return false
+end
+
 function Lockouts:Get(instanceMapID, difficultyID)
     local m = self.byMap[instanceMapID]
     return m and m[difficultyID]
