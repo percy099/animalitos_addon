@@ -71,6 +71,10 @@ local function describe(r)
         return a.boss < b.boss
     end)
 
+    -- A step only the others need: the difficulties they can loot it on.
+    if not next(ready) and not next(locked) and e.groupDiffs then
+        for d in pairs(e.groupDiffs) do ready[d] = true end
+    end
     local diffs = next(ready) and ready or locked
     local list = {}
     for d in pairs(diffs) do list[#list + 1] = d end
@@ -79,15 +83,32 @@ local function describe(r)
     for _, d in ipairs(list) do names[#names + 1] = ns.FarmList:DifficultyName(d) end
 
     local notes = {}
-    -- Group route: who needs this step (check = can loot it now).
-    if r.who and #r.who > 0 then
-        local parts = {}
-        for _, w in ipairs(r.who) do
-            local name = w.me and L["GROUP_YOU"] or w.name
-            parts[#parts + 1] = (w.state == "ready") and ("|cff8dd3a8%s|r |A:common-icon-checkmark:11:11|a"):format(name)
-                or ("|cffe0a040%s (%s)|r"):format(name, L["GROUP_LOCKED"])
+    -- Group route: one line per player with the addon. Check = can loot
+    -- something here now; then their lockout and what they still miss.
+    local groupBlock
+    if r.group then
+        local lines = {}
+        for _, g in ipairs(r.group) do
+            local name = g.me and L["GROUP_YOU"] or g.name
+            local cd
+            if #g.cd > 0 then
+                local ds = {}
+                for i, d in ipairs(g.cd) do ds[i] = d end
+                table.sort(ds)
+                for i, d in ipairs(ds) do ds[i] = ns.FarmList:DifficultyName(d) end
+                cd = L["GROUP_CD"]:format(table.concat(ds, ", "))
+            elseif g.lockedHere then
+                cd = L["GROUP_CD_KILLED"]
+            else
+                cd = L["GROUP_CD_FREE"]
+            end
+            local need = (g.needs > 0 and L["GROUP_NEEDS"]:format(g.needs, g.total))
+                or L[g.total > 1 and "GROUP_HAS_ALL" or "GROUP_HAS"]
+            local color = (g.canLoot and "8dd3a8") or (g.needs > 0 and "e0a040") or "9a93a8"
+            local icon = g.canLoot and "|A:common-icon-checkmark:11:11|a " or "    "
+            lines[#lines + 1] = ("%s|cff%s%s|r  %s · %s"):format(icon, color, name, cd, need)
         end
-        notes[#notes + 1] = L["GROUP_WHO"]:format(table.concat(parts, "  "))
+        groupBlock = table.concat(lines, "\n")
     end
     if not next(ready) and next(locked) then
         -- Locked: when it resets is the only thing that matters today.
@@ -107,7 +128,9 @@ local function describe(r)
 
     local kind = ns.FarmList:TypeName(r.inst)
     local detail = #names > 0 and ("%s · %s"):format(kind, table.concat(names, ", ")) or kind
-    return rows, detail, table.concat(notes, " · ")
+    local note = table.concat(notes, " · ")
+    if groupBlock then note = (note ~= "") and (groupBlock .. "\n" .. note) or groupBlock end
+    return rows, detail, note
 end
 PlannerPanel.Describe = describe -- also used by the mini window
 

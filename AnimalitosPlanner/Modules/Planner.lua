@@ -441,17 +441,25 @@ local function sourcesOf(jid)
     return srcByJid[jid] or {}
 end
 
--- Difficulties the others can still loot here, as votes { [d] = n }, or
--- nil. The leader's "Set H" button uses them even when the leader does
--- not need the step.
-local function peerDiffs(jid, peers)
+-- Group route -------------------------------------------------------------------
+-- Everyone shares a status per instance (Comm:MyStatus): the mounts in their
+-- route (pick), every mount they still miss there and their lockouts. The
+-- group route is the union of everyone's picks, so every player sees the
+-- same steps; each step lists every player with the addon.
+
+-- Difficulties the others can still loot here (their ready mounts among the
+-- step's), as votes { [d] = n }, or nil. The leader's "Set H" button uses
+-- them even when the leader does not need the step.
+local function peerDiffs(jid, peers, M)
     local votes, any = {}, false
-    for _, p in ipairs(peers or {}) do
+    for _, p in ipairs(peers) do
         for _, id in ipairs(p.ready) do
-            for _, src in ipairs(sourcesOf(jid)) do
-                if src.mountID == id then
-                    for _, d in ipairs(src.difficulties or {}) do
-                        if d ~= 0 then votes[d] = (votes[d] or 0) + 1 any = true end
+            if M[id] then
+                for _, src in ipairs(sourcesOf(jid)) do
+                    if src.mountID == id then
+                        for _, d in ipairs(src.difficulties or {}) do
+                            if d ~= 0 then votes[d] = (votes[d] or 0) + 1 any = true end
+                        end
                     end
                 end
             end
@@ -460,61 +468,83 @@ local function peerDiffs(jid, peers)
     return any and votes or nil
 end
 
--- A group route step only someone else needs: a stand-in entry with their
--- mounts (no difficulties: those are theirs).
-local function peerEntry(jid, peers)
+local function stubMount(jid, id)
+    local source
+    for _, src in ipairs(sourcesOf(jid)) do
+        if src.mountID == id then source = src break end
+    end
+    return { ready = {}, locked = {}, verify = {}, source = source, peer = true }
+end
+
+-- The step with everyone's picked mounts: mine as they are; one only the
+-- others picked comes from my full entry if I miss it too (my real state),
+-- else as a stand-in. nil when nobody picked anything here.
+local function groupEntry(jid, own, full, peers)
+    local picks = {}
+    for _, p in ipairs(peers) do
+        for _, id in ipairs(p.pick) do picks[id] = true end
+    end
+    if not own and not next(picks) then return nil end
     local inst = ns.Data.instances[jid]
     if not inst then return nil end
-    local mounts = {}
-    for _, p in ipairs(peers) do
-        for _, list in ipairs({ p.ready, p.locked }) do
-            for _, id in ipairs(list) do
-                if not mounts[id] then
-                    local source
-                    for _, src in ipairs(sourcesOf(jid)) do
-                        if src.mountID == id then source = src break end
-                    end
-                    mounts[id] = { ready = {}, locked = {}, verify = {}, source = source, peer = true }
-                end
-            end
-        end
+    local e = {}
+    for k, v in pairs(own or full or {}) do e[k] = v end
+    e.jid, e.inst, e.mounts = jid, inst, {}
+    for id, m in pairs(own and own.mounts or {}) do e.mounts[id] = m end
+    for id in pairs(picks) do
+        if not e.mounts[id] then e.mounts[id] = (full and full.mounts[id]) or stubMount(jid, id) end
     end
-    return { jid = jid, inst = inst, mounts = mounts, readyCount = 0, peerOnly = true,
-        near = ns.FarmList:Near(inst) } -- the mini's difficulty line at the entrance
+    e.peerOnly = not own
+    e.readyCount = e.readyCount or 0
+    e.near = e.near or ns.FarmList:Near(inst) -- the mini's difficulty line at the entrance
+    return e
 end
 
--- Who in the group needs a step: { { name, state = "ready" | "locked" } },
--- me first. nil outside the group route.
-local function whoNeeds(e, peers)
-    local who = {}
-    if e and not e.peerOnly then
-        local state
-        for _, m in pairs(e.mounts) do
-            if #m.ready > 0 then state = "ready" break end
-            if #m.locked > 0 then state = "locked" end
-        end
-        if state then who[#who + 1] = { me = true, state = state } end
+local function anyIn(list, M)
+    for _, id in ipairs(list or {}) do
+        if M[id] then return true end
     end
-    for _, p in ipairs(peers or {}) do
-        local state = (#p.ready > 0 and "ready") or (#p.locked > 0 and "locked") or nil
-        if state then who[#who + 1] = { name = p.name, state = state } end
-    end
-    return who
+    return false
 end
 
+local function countIn(s, M)
+    local seen, n = {}, 0
+    for _, list in ipairs({ s.ready, s.locked, s.other }) do
+        for _, id in ipairs(list or {}) do
+            if M[id] and not seen[id] then seen[id] = true n = n + 1 end
+        end
+    end
+    return n
+end
+
+-- One line per player for a step: { name, me, needs, total, canLoot,
+-- lockedHere, cd = {difficultyID...} }, me first.
+local function groupRows(M, total, mine, peers)
+    local rows = {}
+    local function add(name, me, s)
+        rows[#rows + 1] = { name = name, me = me, total = total, needs = countIn(s, M),
+            canLoot = anyIn(s.ready, M), lockedHere = anyIn(s.locked, M), cd = s.cd or {} }
+    end
+    add(nil, true, mine)
+    for _, p in ipairs(peers) do add(p.name, false, p) end
+    return rows
+end
 function Planner:Build(entries, hideCompleted, kinds)
     kinds = kinds or self:Kinds()
     local mine = self:Mode() == "mine"
-    local byJid = {}
+    local byJid, fullByJid = {}, {}
     for _, e in ipairs(entries or {}) do
+        fullByJid[e.jid] = e
         -- Only the kinds the player picked (the route order stays the same).
         e = self:OwnStep(e, kinds)
         if e then byJid[e.jid] = e end
     end
-    -- Group route: the union of everyone's steps, in the leader's order;
+    -- Group route: the union of everyone's routes, in the leader's order;
     -- the leader's done marks count for everyone.
     local group = ns.Comm and ns.Comm:GroupActive()
-    local peerNeeds = group and ns.Comm:NeedsByJid() or nil
+    local peerList = group and ns.Comm:PeerStatuses() or nil
+    local myStatus = group and ns.Comm:MyStatus() or nil
+    local leaderPeer = group and ns.Comm:LeaderPeer() or nil
 
     local runs = {}
     -- World event bosses first: no travel (Dungeon Finder queue), once a
@@ -538,35 +568,47 @@ function Planner:Build(entries, hideCompleted, kinds)
     end
     for _, jid in ipairs(self:Route(group and ns.Comm:RouteFaction() or nil)) do
         local e = byJid[jid]
-        local peers = peerNeeds and peerNeeds[jid]
-        -- The others already filtered what they share (their own Show and
-        -- route choice): their steps come in whatever my filter says.
-        if not e and peers then e = peerEntry(jid, peers) end
-        local gd = e and peers and peerDiffs(jid, peers)
-        if gd then
-            local copy = {}
-            for k, v in pairs(e) do copy[k] = v end
-            copy.groupDiffs = gd
-            e = copy
+        local rows
+        if group then
+            -- Everyone's status here (a peer without an entry has every mount
+            -- and no lockout). Their picks already passed their own filters.
+            local peers = {}
+            for _, p in ipairs(peerList) do
+                local s = p.status[jid] or ns.Comm.EMPTY
+                peers[#peers + 1] = { name = p.name, pick = s.pick, ready = s.ready, locked = s.locked,
+                    other = s.other, cd = s.cd }
+            end
+            e = groupEntry(jid, e, fullByJid[jid], peers)
+            if e then
+                local M, total = {}, 0
+                for id in pairs(e.mounts) do M[id] = true total = total + 1 end
+                rows = groupRows(M, total, myStatus[jid] or ns.Comm.EMPTY, peers)
+                e.groupDiffs = peerDiffs(jid, peers, M)
+            end
         end
         if e then
             local anyReady, anyLocked = false, false
-            for _, m in pairs(e.mounts) do
-                if #m.ready > 0 then anyReady = true end
-                if #m.locked > 0 then anyLocked = true end
+            if rows then
+                for _, g in ipairs(rows) do
+                    if g.canLoot then anyReady = true end
+                    if g.lockedHere then anyLocked = true end
+                end
+            else
+                for _, m in pairs(e.mounts) do
+                    if #m.ready > 0 then anyReady = true end
+                    if #m.locked > 0 then anyLocked = true end
+                end
             end
-            local who = group and whoNeeds(e, peers) or nil
-            -- Someone else in the group can still loot it: not done for me.
-            for _, w in ipairs(who or {}) do
-                if w.state == "ready" then anyReady = true end
-            end
-            -- Auto-done: nothing left to loot this reset and something was killed.
-            -- Unknown (verify only) is never treated as done.
-            local auto = ns.Lockouts.loaded and anyLocked and not anyReady and not e.peerOnly
+            -- Auto-done: nobody can loot anything left this reset and something
+            -- was killed. Unknown (verify only) is never treated as done.
+            local auto = ns.Lockouts.loaded and anyLocked and not anyReady
             local manual = self:IsManuallyDone(jid)
-            local leader = group and ns.Comm:LeaderDone(jid)
+            -- In a group the leader's marks decide, so everyone sees the same.
+            local done
+            if leaderPeer then done = ns.Comm:LeaderDone(jid) or manual
+            else done = auto or manual end
             runs[#runs + 1] = { kind = "run", jid = jid, inst = e.inst, e = e,
-                done = auto or manual or leader, auto = auto, who = who }
+                done = done, auto = auto, group = rows }
         end
     end
     -- The leader shares its done steps, so everyone's route advances with it.

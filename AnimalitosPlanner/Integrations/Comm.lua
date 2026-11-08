@@ -4,9 +4,10 @@
 --
 -- Part 1, presence: HELLO / HI <version> <faction> (HELLO on joining a
 -- group or login, peers answer HI; HI is never answered, so no loops).
--- Part 2, needs: each addon shares, per instance, the mounts it can loot
--- now (ready) or already killed this reset (locked). The group route is
--- the union of everyone's steps.
+-- Part 2, status (STAT): each addon shares, per instance, the mounts in its
+-- own route, every mount it still misses there (lootable now / killed this
+-- reset / other) and its lockouts. The group route is the union of
+-- everyone's routes; each step says, per player, CD and what they miss.
 -- Part 3, progress: the leader shares which steps are done; the others
 -- follow it.
 -- Needs and progress can be longer than one message (255 bytes): they go
@@ -52,13 +53,33 @@ local function myself()
 end
 
 -- One raw message. Errors (restricted channel, throttling) are kept for
--- /aplan group instead of shown.
+-- /aplan group instead of shown. Returns true when the client throttled it.
+local THROTTLED = Enum and Enum.SendAddonMessageResult and Enum.SendAddonMessageResult.AddonMessageThrottle
 local function rawSend(kind, msg)
     local ch = channel()
-    if not ch or not register() then return end
+    if not ch or not register() then return false end
     local ok, result = pcall(C_ChatInfo.SendAddonMessage, PREFIX, msg, ch)
     Comm.lastSend = { kind = kind, channel = ch, ok = ok, result = result, at = time() }
+    return ok and THROTTLED ~= nil and result == THROTTLED
 end
+
+-- Pieces wait in a queue: a few at once, then one per second (the client
+-- drops addon messages past a short burst).
+local outbox, pumping = {}, false
+local BURST = 6
+local function pump()
+    local sent = 0
+    while outbox[1] do
+        if sent >= BURST then break end
+        local m = outbox[1]
+        if rawSend(m[1], m[2]) then break end -- throttled: try again later
+        table.remove(outbox, 1)
+        sent = sent + 1
+    end
+    pumping = outbox[1] ~= nil
+    if pumping then C_Timer.After(1.2, pump) end
+end
+
 
 local function send(kind, ...)
     local args = { ... }
@@ -77,60 +98,147 @@ local function sendData(kind, data)
     end
     seqOut = seqOut % 9999 + 1
     local n = math.max(1, math.ceil(#data / PIECE))
-    for i = 1, n do
-        rawSend(kind, table.concat({ kind, seqOut, i, n, data:sub((i - 1) * PIECE + 1, i * PIECE) }, "\t"))
+    -- Drop the waiting pieces of an older copy, then queue the new ones.
+    for i = #outbox, 1, -1 do
+        if outbox[i][1] == kind then table.remove(outbox, i) end
     end
+    for i = 1, n do
+        outbox[#outbox + 1] = { kind, table.concat({ kind, seqOut, i, n, data:sub((i - 1) * PIECE + 1, i * PIECE) }, "\t") }
+    end
+    if not pumping then pump() end
 end
 
 local function hello(kind)
     send(kind, ns.VERSION, (UnitFactionGroup("player")) or "?")
 end
 
--- Encoding ---------------------------------------------------------------------
--- Needs: "jid:ready.ready/locked.locked;jid:..." (mount IDs).
-local function encodeNeeds()
-    local parts = {}
+-- Status -------------------------------------------------------------------------
+-- What each player shares (STAT), per dataset instance:
+--   [jid] = { pick = {mountID...},  -- mounts in the route this player chose
+--             ready, locked, other,  -- every mount of the instance it still
+--                                    -- misses: lootable now / killed this
+--                                    -- reset / anything else (unknown, faction)
+--             cd = {difficultyID...} } -- its lockouts there (even when it has
+--                                      -- every mount: it may not enter)
+-- A mount of the instance in none of the lists: the player has it.
+local EMPTY = { pick = {}, ready = {}, locked = {}, other = {}, cd = {} }
+Comm.EMPTY = EMPTY
+
+local function collected(id)
+    local m = ns.MountJournal:GetMount(id)
+    if m then return m.isCollected and true or false end
+    local info = { C_MountJournal.GetMountInfoByID(id) }
+    return info[11] and true or false
+end
+
+local statusAt, statusCache
+--- This player's status (same shape as a peer's), rebuilt once per frame.
+function Comm:MyStatus()
+    local now = GetTime()
+    if statusCache and statusAt == now then return statusCache end
     local entries = ns.FarmList:Build()
-    -- Each player shares the route they chose (My route, Show filter); the
-    -- group route is the union.
-    local jids = {}
+    local full = {}
     for _, e in ipairs(entries or {}) do
-        -- World bosses have negative IDs (-814 = Nalak): share them too.
-        if type(e.jid) == "number" and e.jid ~= 0 then
-            local own = ns.Planner:OwnStep(e)
-            if own then jids[#jids + 1] = own end
+        if type(e.jid) == "number" then full[e.jid] = e end
+    end
+    local out = {}
+    local function get(jid)
+        local s = out[jid]
+        if not s then
+            s = { pick = {}, ready = {}, locked = {}, other = {}, cd = {} }
+            out[jid] = s
+        end
+        return s
+    end
+    local seen = {}
+    for _, src in ipairs(ns.Data.sources) do
+        local jid, id = src.journalInstanceID, src.mountID
+        local key = jid .. ":" .. id
+        if not seen[key] and not collected(id) then
+            seen[key] = true
+            local m = full[jid] and full[jid].mounts[id]
+            local s = get(jid)
+            if m and #m.ready > 0 then s.ready[#s.ready + 1] = id
+            elseif m and #m.locked > 0 then s.locked[#s.locked + 1] = id
+            else s.other[#s.other + 1] = id end
         end
     end
-    table.sort(jids, function(a, b) return a.jid < b.jid end)
-    for _, e in ipairs(jids) do
-        local ready, locked = {}, {}
-        for id, m in pairs(e.mounts) do
-            if #m.ready > 0 then ready[#ready + 1] = id
-            elseif #m.locked > 0 then locked[#locked + 1] = id end
+    -- The route this player picked (My route or the full one, its Show filter).
+    for jid, e in pairs(full) do
+        local own = ns.Planner:OwnStep(e)
+        if own then
+            local s = get(jid)
+            for id in pairs(own.mounts) do s.pick[#s.pick + 1] = id end
         end
-        if #ready > 0 or #locked > 0 then
-            table.sort(ready)
-            table.sort(locked)
-            parts[#parts + 1] = ("%d:%s/%s"):format(e.jid, table.concat(ready, "."), table.concat(locked, "."))
+    end
+    -- Lockouts.
+    if ns.Lockouts.byMap then
+        for jid, inst in pairs(ns.Data.instances) do
+            local diffs = inst.mapID and ns.Lockouts.byMap[inst.mapID]
+            if diffs and next(diffs) then
+                local s = get(jid)
+                for d in pairs(diffs) do s.cd[#s.cd + 1] = d end
+            end
         end
+    end
+    statusCache, statusAt = out, now
+    return out
+end
+
+-- Numbers in base 36 (shorter messages): "jid[*]:pick/ready/locked/other/cd;..."
+local DIGITS = "0123456789abcdefghijklmnopqrstuvwxyz"
+local function b36(n)
+    local neg = n < 0
+    n = math.abs(n)
+    local s = ""
+    repeat
+        local r = n % 36
+        s = DIGITS:sub(r + 1, r + 1) .. s
+        n = math.floor(n / 36)
+    until n == 0
+    return (neg and "-" or "") .. s
+end
+
+local function encodeList(list)
+    local copy = {}
+    for i, v in ipairs(list) do copy[i] = v end
+    table.sort(copy)
+    for i, v in ipairs(copy) do copy[i] = b36(v) end
+    return table.concat(copy, ".")
+end
+
+local function encodeStatus()
+    local status = Comm:MyStatus()
+    local jids = {}
+    for jid in pairs(status) do jids[#jids + 1] = jid end
+    table.sort(jids)
+    local parts = {}
+    for _, jid in ipairs(jids) do
+        local s = status[jid]
+        parts[#parts + 1] = ("%s:%s/%s/%s/%s/%s"):format(b36(jid), encodeList(s.pick), encodeList(s.ready),
+            encodeList(s.locked), encodeList(s.other), encodeList(s.cd))
     end
     return table.concat(parts, ";")
 end
 
-local function decodeIDs(s)
+local function decodeList(s)
     local out = {}
-    for id in (s or ""):gmatch("%d+") do out[#out + 1] = tonumber(id) end
+    for v in (s or ""):gmatch("[%w]+") do out[#out + 1] = tonumber(v, 36) end
     return out
 end
 
-local function decodeNeeds(data)
-    local needs = {}
-    for jid, ready, locked in data:gmatch("(%-?%d+):([%d%.]*)/([%d%.]*)") do
-        needs[tonumber(jid)] = { ready = decodeIDs(ready), locked = decodeIDs(locked) }
+local function decodeStatus(data)
+    local status = {}
+    for item in data:gmatch("[^;]+") do
+        local jid, pick, ready, locked, other, cd = item:match("^(%-?%w+):([%w%.]*)/([%w%.]*)/([%w%.]*)/([%w%.]*)/([%w%.]*)$")
+        local n = jid and (jid:sub(1, 1) == "-" and -tonumber(jid:sub(2), 36) or tonumber(jid, 36))
+        if n then
+            status[n] = { pick = decodeList(pick), ready = decodeList(ready), locked = decodeList(locked),
+                other = decodeList(other), cd = decodeList(cd) }
+        end
     end
-    return needs
+    return status
 end
-
 -- Done steps: "jid,jid,ev123,...".
 local function decodeDone(data)
     local done = {}
@@ -171,16 +279,16 @@ end
 
 local lastNeeds, lastDone -- what was sent last (only changes are sent)
 
---- Shares this character's needs (debounced; only when they changed, or
+--- Shares this character's status (debounced; only when it changed, or
 --- force after a new peer).
 function Comm:ShareNeeds(force)
     if force then lastNeeds = nil end
     if not IsInGroup() or not next(self.peers) then return end
     ns:Debounce("comm-needs", 3, function()
-        local data = encodeNeeds()
+        local data = encodeStatus()
         if data == lastNeeds then return end
         lastNeeds = data
-        sendData("NEED", data)
+        sendData("STAT", data)
     end)
 end
 
@@ -196,8 +304,8 @@ end
 local function received(sender, kind, data)
     local p = Comm.peers[sender]
     if not p then return end
-    if kind == "NEED" then
-        p.needs = decodeNeeds(data)
+    if kind == "STAT" then
+        p.status = decodeStatus(data)
     elseif kind == "DONE" then
         p.done = decodeDone(data)
     end
@@ -220,7 +328,7 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
             lastDone = nil
             changed()
         end
-    elseif kind == "NEED" or kind == "DONE" then
+    elseif kind == "STAT" or kind == "DONE" then
         local seq, i, n = tonumber(a), tonumber(b), tonumber(c)
         if not (seq and i and n) then return end
         incoming[sender] = incoming[sender] or {}
@@ -291,16 +399,12 @@ function Comm:LeaderDone(key)
     return leader and leader.done and leader.done[key] or false
 end
 
---- [jid] = { { name, ready = {mountID...}, locked = {...} } } from the peers.
-function Comm:NeedsByJid()
+--- Peers whose status arrived, by name: { { name, status = {[jid] = ...} } }.
+function Comm:PeerStatuses()
     local out = {}
-    for _, p in pairs(self.peers) do
-        for jid, n in pairs(p.needs or {}) do
-            out[jid] = out[jid] or {}
-            table.insert(out[jid], { name = p.name, ready = n.ready, locked = n.locked })
-        end
+    for _, p in ipairs(self:Peers()) do
+        if p.status then out[#out + 1] = { name = p.name, status = p.status } end
     end
-    for _, list in pairs(out) do table.sort(list, function(a, b) return a.name < b.name end) end
     return out
 end
 
@@ -317,9 +421,11 @@ function Comm:Debug()
     if #list == 0 then print("  " .. ns.L["COMM_NOBODY"]) end
     for _, p in ipairs(list) do
         local nNeeds, nDone = 0, 0
-        for _ in pairs(p.needs or {}) do nNeeds = nNeeds + 1 end
+        for _, s in pairs(p.status or {}) do
+            if #s.pick > 0 then nNeeds = nNeeds + 1 end
+        end
         for _ in pairs(p.done or {}) do nDone = nDone + 1 end
-        print(("  %s: v%s %s, leader=%s, needs %d instances, done %d"):format(p.name, p.version, p.faction,
+        print(("  %s: v%s %s, leader=%s, route %d instances, done %d"):format(p.name, p.version, p.faction,
             tostring(UnitIsGroupLeader(p.name)), nNeeds, nDone))
     end
     hello("HELLO")
