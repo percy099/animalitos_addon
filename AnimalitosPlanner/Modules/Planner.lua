@@ -372,14 +372,17 @@ function Planner:SetKind(kind, on)
     return true
 end
 
---- Which route the Planner shows: "full" (everything farmable) or "mine"
---- (only the mounts in My route). db.ui.plannerMode.
+--- Which route the Planner shows: "full" (everything farmable), "mine"
+--- (only the mounts in My route) or "group" (the group route; only takes
+--- effect with someone else with the addon). db.ui.plannerMode.
 function Planner:Mode()
-    return ns.Storage.db.ui.plannerMode == "mine" and "mine" or "full"
+    local m = ns.Storage.db.ui.plannerMode
+    return (m == "mine" or m == "group") and m or "full"
 end
 
 function Planner:SetMode(mode)
-    ns.Storage.db.ui.plannerMode = (mode == "mine") and "mine" or nil
+    ns.Storage.db.ui.plannerMode = (mode == "mine" or mode == "group") and mode or nil
+    ns.Storage.db.ui.plannerGroup = nil -- the old group switch
 end
 
 -- My route: the entry with only the picked mounts (so "done" and the mount

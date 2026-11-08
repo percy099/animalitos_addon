@@ -350,14 +350,24 @@ function PlannerPanel:Create(parent)
     end)
     mini:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
-    -- Full route or My route (only the mounts the player picked).
+    -- Which route: full, My route (only the mounts the player picked) or
+    -- Group route (only shown when someone else in the group runs the addon).
     p.mode = ns.UI.Segmented(p, { { key = "full", text = L["PLAN_MODE_FULL"] },
-        { key = "mine", text = L["PLAN_MODE_MINE"]:format(99) } }, function(key)
+        { key = "mine", text = L["PLAN_MODE_MINE"]:format(99) },
+        { key = "group", text = L["PLAN_GROUP_ROUTE"] } }, function(key)
         ns.Planner:SetMode(key)
         if p.bar then p.bar:SetValue(0) end
         PlannerPanel:Refresh(p)
     end)
     p.mode:SetPoint("LEFT", mini, "RIGHT", 12, 0)
+    p.mode.fullWidth = p.mode:GetWidth()
+    p.mode.buttons[3]:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(L["PLAN_GROUP_ROUTE"], 1, 1, 1)
+        GameTooltip:AddLine(L["PLAN_GROUP_ROUTE_TIP"], nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    p.mode.buttons[3]:HookScript("OnLeave", function() GameTooltip:Hide() end)
     p.mode.buttons[2]:HookScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
         GameTooltip:AddLine(L["PLAN_MODE_MINE"]:format(ns.Collection:RouteCount()), 1, 1, 1)
@@ -377,24 +387,6 @@ function PlannerPanel:Create(parent)
     hideLabel:SetPoint("RIGHT", p.hide, "LEFT", -8, 0)
     hideLabel:SetText(L["PLAN_HIDE_DONE"])
 
-    -- Group route: only when someone else in the group runs the addon.
-    p.group = ns.UI.Switch(p, function(_, checked)
-        ns.Storage.db.ui.plannerGroup = checked or nil
-        if p.bar then p.bar:SetValue(0) end
-        PlannerPanel:Refresh(p)
-        ns.PlannerMini:Refresh()
-    end)
-    p.group:SetPoint("RIGHT", hideLabel, "LEFT", -18, 0)
-    p.groupLabel = ns.UI.fs(p, "small", C.dim)
-    p.groupLabel:SetPoint("RIGHT", p.group, "LEFT", -8, 0)
-    p.groupLabel:SetText(L["PLAN_GROUP_ROUTE"])
-    p.group:HookScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
-        GameTooltip:AddLine(L["PLAN_GROUP_ROUTE"], 1, 1, 1)
-        GameTooltip:AddLine(L["PLAN_GROUP_ROUTE_TIP"], nil, nil, nil, true)
-        GameTooltip:Show()
-    end)
-    p.group:HookScript("OnLeave", function() GameTooltip:Hide() end)
 
     -- What the route includes: a multi-select dropdown (favorites only,
     -- raids, dungeons, world bosses; at least one kind stays on). The menu
@@ -501,10 +493,12 @@ function PlannerPanel:Refresh(p, entries)
     local hideDone = ns.Storage.db.ui.plannerHideDone and true or false
     p.hide:SetChecked(hideDone)
     local anyPeer = #ns.Comm:Peers() > 0
-    p.group:SetShown(anyPeer)
-    p.groupLabel:SetShown(anyPeer)
-    p.group:SetChecked(ns.Storage.db.ui.plannerGroup and true or false)
+    local groupBtn = p.mode.buttons[3]
+    groupBtn:SetShown(anyPeer)
+    p.mode:SetWidth(anyPeer and p.mode.fullWidth or (p.mode.fullWidth - groupBtn:GetWidth() - 2))
     local mode = ns.Planner:Mode()
+    -- Group route picked earlier but nobody with the addon now: the full route.
+    if mode == "group" and not anyPeer then mode = "full" end
     p.mode:SetSelected(mode)
     p.mode.buttons[2].label:SetText(L["PLAN_MODE_MINE"]:format(ns.Collection:RouteCount()))
     local kinds = ns.Planner:Kinds()

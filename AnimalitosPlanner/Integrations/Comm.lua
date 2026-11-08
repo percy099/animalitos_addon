@@ -256,9 +256,10 @@ for _, event in ipairs({ "UPDATE_INSTANCE_INFO", "NEW_MOUNT_ADDED", "ENCOUNTER_E
 end
 
 -- Group route ----------------------------------------------------------------------
---- Is the group route on? The Planner switch, and someone else with the addon.
+--- Is the group route on? Picked in the Planner, and someone else in the
+--- group with the addon.
 function Comm:GroupActive()
-    return ns.Storage.db.ui.plannerGroup and IsInGroup() and next(self.peers) ~= nil or false
+    return ns.Planner:Mode() == "group" and IsInGroup() and next(self.peers) ~= nil or false
 end
 
 --- The leader, when it is a peer with the addon (nil when it is me or it
