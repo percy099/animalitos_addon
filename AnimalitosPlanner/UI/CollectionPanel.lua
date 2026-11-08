@@ -106,10 +106,12 @@ local function newRow(p)
 
     r.fav = ns.UI.FavStar(r, 14)
     r.fav:SetPoint("RIGHT", r.source, "LEFT", -8, 0)
+    r.route = ns.UI.RouteToggle(r, 14)
+    r.route:SetPoint("RIGHT", r.fav, "LEFT", -6, 0)
 
     r.name = ns.UI.fs(r, "GameFontHighlight")
     r.name:SetPoint("LEFT", r.icon, "RIGHT", 8, 0)
-    r.name:SetPoint("RIGHT", r.fav, "LEFT", -6, 0)
+    r.name:SetPoint("RIGHT", r.route, "LEFT", -6, 0)
     r.name:SetWordWrap(false)
 
     -- Achievement view only: thin progress bar under the name.
@@ -158,6 +160,7 @@ local function fillAchRow(r, a, index)
     local m = a.mount
     r.mount, r.farm, r.ach = nil, nil, a
     r.fav:SetMount(m.mountID)
+    r.route:SetMount(m.mountID)
     r.zebra:SetShown(index % 2 == 1)
     r.icon:SetTexture(m.icon or a.icon or 134400)
     r.icon:SetDesaturated(not m.isCollected)
@@ -187,6 +190,7 @@ local function fillRow(r, m, index, farm, sourceText)
     local C = ns.UI.COLORS
     r.mount, r.farm, r.ach = m, farm, nil
     r.fav:SetMount(m.mountID)
+    r.route:SetMount(m.mountID)
     r.ptrack:Hide()
     r.pfill:Hide()
     -- "Other drops" shows who and where instead of the source type.

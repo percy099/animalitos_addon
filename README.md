@@ -6,7 +6,7 @@ Addon de World of Warcraft retail (12.1.5) para **farmear monturas**. Te dice:
 - te pone un waypoint en la entrada y la dificultad correcta;
 - y te avisa de los jefes de eventos de temporada y de las monturas de vendedor que ya puedes comprar.
 
-Estado: **v0.27** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
+Estado: **v0.28** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
 
 ## Instalación
 1. Copia (o enlaza) la carpeta `AnimalitosPlanner/` en `World of Warcraft\_retail_\Interface\AddOns\`.

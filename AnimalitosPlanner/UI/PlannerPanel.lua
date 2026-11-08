@@ -350,6 +350,22 @@ function PlannerPanel:Create(parent)
     end)
     mini:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
+    -- Full route or My route (only the mounts the player picked).
+    p.mode = ns.UI.Segmented(p, { { key = "full", text = L["PLAN_MODE_FULL"] },
+        { key = "mine", text = L["PLAN_MODE_MINE"]:format(99) } }, function(key)
+        ns.Planner:SetMode(key)
+        if p.bar then p.bar:SetValue(0) end
+        PlannerPanel:Refresh(p)
+    end)
+    p.mode:SetPoint("LEFT", mini, "RIGHT", 12, 0)
+    p.mode.buttons[2]:HookScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(L["PLAN_MODE_MINE"]:format(ns.Collection:RouteCount()), 1, 1, 1)
+        GameTooltip:AddLine(L["PLAN_MODE_MINE_TIP"], nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    p.mode.buttons[2]:HookScript("OnLeave", function() GameTooltip:Hide() end)
+
     p.hide = ns.UI.Switch(p, function(_, checked)
         ns.Storage.db.ui.plannerHideDone = checked or nil
         if p.bar then p.bar:SetValue(0) end
@@ -488,6 +504,9 @@ function PlannerPanel:Refresh(p, entries)
     p.group:SetShown(anyPeer)
     p.groupLabel:SetShown(anyPeer)
     p.group:SetChecked(ns.Storage.db.ui.plannerGroup and true or false)
+    local mode = ns.Planner:Mode()
+    p.mode:SetSelected(mode)
+    p.mode.buttons[2].label:SetText(L["PLAN_MODE_MINE"]:format(ns.Collection:RouteCount()))
     local kinds = ns.Planner:Kinds()
     local KIND_KEYS = { { "favorites", "PLAN_KIND_FAV" }, { "raid", "PLAN_KIND_RAID" },
         { "dungeon", "PLAN_KIND_DUNGEON" }, { "worldBoss", "PLAN_KIND_WB" } }
@@ -572,7 +591,8 @@ function PlannerPanel:Refresh(p, entries)
                 local m = mountLineAt(f, i, COL.mount, mountWidth() - (s.event and 16 or 0))
                 m.mountID = row.id
                 m.text:SetText(row.id == lastMount and ""
-                    or ("|T%s:14:14:0:0|t %s%s%s|r"):format(row.icon, ns.Collection:IsFavorite(row.id) and (ns.UI.STAR .. " ") or "", STATE_HEX[row.state], row.mount))
+                    or ("|T%s:14:14:0:0|t %s%s%s%s|r"):format(row.icon, ns.Collection:IsFavorite(row.id) and (ns.UI.STAR .. " ") or "",
+                        (mode == "full" and ns.Collection:InRoute(row.id)) and (ns.UI.ROUTE_ICON .. " ") or "", STATE_HEX[row.state], row.mount))
                 m:SetShown(row.id ~= lastMount)
                 lastMount = row.id
             end
@@ -623,6 +643,7 @@ function PlannerPanel:Refresh(p, entries)
     p.empty:SetShown(sum.total == 0)
     if sum.total == 0 then
         p.empty:SetText(not ns.Lockouts.loaded and L["NOW_LOCKOUTS_LOADING"]
+            or (mode == "mine" and L["PLAN_EMPTY_MINE"])
             or (kinds.favorites and L["PLAN_EMPTY_FAV"]) or L["PLAN_EMPTY"])
     end
     p.child:SetHeight(math.max(y, 1))

@@ -28,10 +28,12 @@ local function create()
 
     f.star = ns.UI.FavStar(f, 18)
     f.star:SetPoint("RIGHT", close, "LEFT", -4, 0)
+    f.route = ns.UI.RouteToggle(f, 18)
+    f.route:SetPoint("RIGHT", f.star, "LEFT", -6, 0)
 
     f.title = ns.UI.fs(f, "GameFontNormalLarge")
     f.title:SetPoint("TOPLEFT", 12, -12)
-    f.title:SetPoint("RIGHT", f.star, "LEFT", -4, 0)
+    f.title:SetPoint("RIGHT", f.route, "LEFT", -4, 0)
     f.title:SetWordWrap(false)
 
     local holder = CreateFrame("Frame", nil, f, "BackdropTemplate")
@@ -397,6 +399,7 @@ function Preview:Show(mountID)
     local extra = ns.MountJournal:GetMountExtra(mountID) or {}
     f.mountID = mountID
     f.star:SetMount(mountID)
+    f.route:SetMount(mountID)
     f.title:SetText(m and m.name or ("#" .. mountID))
     f.scrollChild:SetHeight(math.max(1, build(f, mountID, m, extra)))
     f.scroll:SetVerticalScroll(0)

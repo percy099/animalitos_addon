@@ -685,6 +685,49 @@ function UI.FavStar(parent, size)
     return b
 end
 
+--- "My route" toggle: a flight-path glyph, accent-colored when the mount is
+--- in the player's route, faint otherwise. Hidden for mounts that cannot be
+--- a route step (no instance drop) or are collected. b:SetMount(mountID).
+UI.ROUTE_ICON = "|TInterface\\Minimap\\Tracking\\FlightMaster:14:14|t"
+function UI.RouteToggle(parent, size)
+    local b = CreateFrame("Button", nil, parent)
+    b:SetSize(size or 16, size or 16)
+    b.tex = b:CreateTexture(nil, "OVERLAY")
+    b.tex:SetAllPoints()
+    b.tex:SetTexture("Interface\\Minimap\\Tracking\\FlightMaster")
+    local function paint(self)
+        local on = ns.Collection:InRoute(self.mountID)
+        self.tex:SetDesaturated(not on)
+        self.tex:SetAlpha(on and 1 or (self.hover and 0.8 or 0.25))
+    end
+    function b:SetMount(mountID)
+        self.mountID = mountID
+        local m = mountID and ns.MountJournal:GetMount(mountID)
+        local usable = ns.Collection:CanRoute(mountID) and not (m and m.isCollected)
+        -- Kept in the route once collected only so the player can remove it.
+        self:SetShown(usable or ns.Collection:InRoute(mountID))
+        paint(self)
+    end
+    b:SetScript("OnClick", function(self)
+        ns.Collection:ToggleRoute(self.mountID)
+        paint(self)
+    end)
+    b:SetScript("OnEnter", function(self)
+        self.hover = true
+        paint(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(ns.L[ns.Collection:InRoute(self.mountID) and "ROUTE_REMOVE" or "ROUTE_ADD"], 1, 1, 1)
+        GameTooltip:AddLine(ns.L["ROUTE_TIP"], nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", function(self)
+        self.hover = false
+        paint(self)
+        GameTooltip:Hide()
+    end)
+    return b
+end
+
 --- Client icon file shown as a monochrome glyph tinted with `color`.
 function UI.Glyph(tex, file, color)
     tex:SetTexture(file)

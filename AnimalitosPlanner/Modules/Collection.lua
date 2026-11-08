@@ -338,6 +338,42 @@ function Collection:HasFavorites()
     return next(ns.Storage.db.favorites or {}) ~= nil
 end
 
+-- My route ----------------------------------------------------------------------
+-- The mounts the player picked for their own route (account-wide,
+-- db.myRoute[mountID] = true), apart from favorites. Only mounts that drop
+-- in a dataset instance can be route steps.
+local routable
+function Collection:CanRoute(mountID)
+    if not routable then
+        routable = {}
+        for _, src in ipairs(ns.Data.sources) do routable[src.mountID] = true end
+    end
+    return mountID ~= nil and routable[mountID] == true
+end
+
+function Collection:InRoute(mountID)
+    local r = ns.Storage.db.myRoute
+    return r ~= nil and mountID ~= nil and r[mountID] == true
+end
+
+function Collection:ToggleRoute(mountID)
+    if not mountID then return end
+    local db = ns.Storage.db
+    db.myRoute = db.myRoute or {}
+    db.myRoute[mountID] = (not db.myRoute[mountID]) or nil
+    if ns.UI and ns.UI.Refresh then ns.UI:Refresh() end
+end
+
+--- Mounts in my route that are still missing.
+function Collection:RouteCount()
+    local n = 0
+    for id in pairs(ns.Storage.db.myRoute or {}) do
+        local m = ns.MountJournal:GetMount(id)
+        if not (m and m.isCollected) then n = n + 1 end
+    end
+    return n
+end
+
 --- Mounts the journal shows for this character (same set as its counter),
 --- sorted by name. Each item is a MountJournal:GetMount record. nil if the
 --- journal is not ready yet.

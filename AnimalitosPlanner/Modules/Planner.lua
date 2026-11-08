@@ -372,6 +372,30 @@ function Planner:SetKind(kind, on)
     return true
 end
 
+--- Which route the Planner shows: "full" (everything farmable) or "mine"
+--- (only the mounts in My route). db.ui.plannerMode.
+function Planner:Mode()
+    return ns.Storage.db.ui.plannerMode == "mine" and "mine" or "full"
+end
+
+function Planner:SetMode(mode)
+    ns.Storage.db.ui.plannerMode = (mode == "mine") and "mine" or nil
+end
+
+-- My route: the entry with only the picked mounts (so "done" and the mount
+-- list only look at those); nil when none of its mounts is picked.
+local function routeOnly(e)
+    local mounts, any = {}, false
+    for id, m in pairs(e.mounts) do
+        if ns.Collection:InRoute(id) then mounts[id] = m any = true end
+    end
+    if not any then return nil end
+    local copy = {}
+    for k, v in pairs(e) do copy[k] = v end
+    copy.mounts = mounts
+    return copy
+end
+
 local function hasFavorite(e)
     for mountID in pairs(e.mounts) do
         if ns.Collection:IsFavorite(mountID) then return true end
@@ -422,10 +446,12 @@ end
 
 function Planner:Build(entries, hideCompleted, kinds)
     kinds = kinds or self:Kinds()
+    local mine = self:Mode() == "mine"
     local byJid = {}
     for _, e in ipairs(entries or {}) do
+        if mine then e = routeOnly(e) end
         -- Only the kinds the player picked (the route order stays the same).
-        if kinds[kindOf(e.inst)] and (not kinds.favorites or hasFavorite(e)) then byJid[e.jid] = e end
+        if e and kinds[kindOf(e.inst)] and (not kinds.favorites or hasFavorite(e)) then byJid[e.jid] = e end
     end
     -- Group route: the union of everyone's steps, in the leader's order;
     -- the leader's done marks count for everyone.
@@ -439,6 +465,11 @@ function Planner:Build(entries, hideCompleted, kinds)
     for _, ev in ipairs(ns.FarmList:Holidays()) do
         local fav = not kinds.favorites
         for _, id in ipairs(ev.mounts) do fav = fav or ns.Collection:IsFavorite(id) end
+        if mine then
+            local picked = false
+            for _, id in ipairs(ev.mounts) do picked = picked or ns.Collection:InRoute(id) end
+            fav = fav and picked
+        end
         if fav then
             local key = "ev" .. ev.h.lfgDungeonID
             local auto = ev.state == S.LOCKED_OUT
@@ -450,7 +481,7 @@ function Planner:Build(entries, hideCompleted, kinds)
     for _, jid in ipairs(self:Route(group and ns.Comm:RouteFaction() or nil)) do
         local e = byJid[jid]
         local peers = peerNeeds and peerNeeds[jid]
-        if not e and peers and not kinds.favorites then
+        if not e and peers and not kinds.favorites and not mine then
             local inst = ns.Data.instances[jid]
             if inst and kinds[kindOf(inst)] then e = peerEntry(jid, peers) end
         end
