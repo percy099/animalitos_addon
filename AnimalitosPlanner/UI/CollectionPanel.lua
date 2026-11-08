@@ -15,6 +15,7 @@ local SEARCH_H = 24
 local TOOLBAR_H = 24
 local PROGRESS_H = 30
 local LIST_TOP = SEARCH_H + 8 + TOOLBAR_H + 8 + PROGRESS_H
+local HEADER_H = 20 -- sortable column headers above the list
 
 local FILTERS = {
     { key = "all",       text = "COL_FILTER_ALL" },
@@ -55,6 +56,135 @@ local function farmableMap(entries)
         end
     end
     return map
+end
+
+-- Sorting ---------------------------------------------------------------------
+-- Excel-like: click a column header to sort by it, again to reverse.
+-- Saved in db.ui.collectionSort = { key = "name" | "source" | "status", desc }.
+local function sortSpec()
+    local ui = ns.Storage.db.ui
+    if not ui.collectionSort then ui.collectionSort = { key = "name" } end
+    return ui.collectionSort
+end
+
+-- Farmable now first, then missing, then collected.
+local function statusRank(p, m)
+    if m.isCollected then return 3 end
+    if p.farm and p.farm[m.mountID] then return 1 end
+    return 2
+end
+
+local function sourceLabel(m)
+    if not ns.MountJournal:HasSourceLabel(m.sourceType) then
+        return ns.MountJournal:SourceHint(m.mountID) or ""
+    end
+    return ns.MountJournal:GetSourceTypeLabel(m.sourceType) or ""
+end
+
+-- Per view: what each column sorts by (the text the row shows).
+local SORT_KEYS = {
+    list = {
+        name = function(_, m) return m.name end,
+        source = function(p, m)
+            local req = p.vendorOk and p.vendorOk[m.mountID]
+            if req and req.price then return req.price end
+            return sourceLabel(m)
+        end,
+        status = statusRank,
+    },
+    drops = {
+        name = function(_, e) return e.mount.name end,
+        source = function(_, e) return e.label end,
+        status = function(p, e) return statusRank(p, e.mount) end,
+    },
+    ach = {
+        name = function(_, a) return a.name end,
+        source = function(_, a) return a.mount.name end,
+        -- Done (mount waiting) first, then by progress, collected last.
+        status = function(_, a)
+            if a.mount.isCollected then return 3 end
+            if a.completed then return 0 end
+            return 2 - (a.total > 0 and a.done / a.total or 0)
+        end,
+    },
+}
+
+local function sortItems(p, items)
+    local spec = sortSpec()
+    local keys = SORT_KEYS[p.mode] or SORT_KEYS.list
+    local get = keys[spec.key] or keys.name
+    local value, name = {}, {}
+    for _, it in ipairs(items) do
+        local v = get(p, it)
+        if type(v) == "string" then v = v:lower() end
+        value[it] = v or ""
+        name[it] = (keys.name(p, it) or ""):lower()
+    end
+    local desc = spec.desc
+    table.sort(items, function(a, b)
+        local x, y = value[a], value[b]
+        if x ~= y then
+            if desc then return x > y end
+            return x < y
+        end
+        return name[a] < name[b] -- ties: A to Z
+    end)
+end
+
+-- Header buttons: label + arrow on the sorted column.
+local HEADERS = {
+    { key = "name",   list = "COL_SORT_NAME",   ach = "COL_SORT_ACH",  drops = "COL_SORT_NAME" },
+    { key = "source", list = "COL_SORT_SOURCE", ach = "COL_SORT_NAME", drops = "COL_SORT_DROPPED" },
+    { key = "status", list = "COL_SORT_STATUS", ach = "COL_SORT_STATUS", drops = "COL_SORT_STATUS" },
+}
+
+local function headerButton(p, key)
+    local C = ns.UI.COLORS
+    local b = CreateFrame("Button", nil, p.header)
+    b:SetHeight(HEADER_H - 2)
+    b.text = ns.UI.fs(b, "small", C.dim)
+    b.text:SetPoint("LEFT", 6, 0)
+    b.arrow = b:CreateTexture(nil, "ARTWORK")
+    b.arrow:SetTexture("Interface\\Buttons\\UI-SortArrow")
+    b.arrow:SetSize(9, 8)
+    b.arrow:SetPoint("LEFT", b.text, "RIGHT", 4, 0)
+    ns.UI.Clickable(b)
+    b:SetScript("OnClick", function()
+        local s = sortSpec()
+        if s.key == key then s.desc = (not s.desc) or nil else s.key, s.desc = key, nil end
+        if p.bar then p.bar:SetValue(0) end
+        CollectionPanel:Refresh(p)
+    end)
+    b:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:AddLine(L["COL_SORT_TIP"], 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    return b
+end
+
+-- Labels, arrows and the source column's position (it is wider in Other
+-- drops and Ready to buy, like the rows).
+local function updateHeader(p)
+    local C = ns.UI.COLORS
+    local spec = sortSpec()
+    local mode = SORT_KEYS[p.mode] and p.mode or "list"
+    for _, h in ipairs(HEADERS) do
+        local b = p.sortButtons[h.key]
+        b.text:SetText(L[h[mode]])
+        local on = spec.key == h.key
+        local c = on and C.text or C.dim
+        b.text:SetTextColor(c[1], c[2], c[3], c[4] or 1)
+        b.arrow:SetShown(on)
+        if spec.desc then b.arrow:SetTexCoord(0, 0.5625, 0, 1) else b.arrow:SetTexCoord(0, 0.5625, 1, 0) end
+        b:SetWidth(b.text:GetStringWidth() + 12 + (on and 13 or 0))
+    end
+    -- Row layout from the right: status 78 + 8, dot 4 + 8, gap 14, then the source.
+    local srcW = (p.mode == "drops" or (p.mode == "list" and p.vendorOk)) and 210 or 110
+    local src = p.sortButtons.source
+    src:ClearAllPoints()
+    src:SetPoint("LEFT", p.header, "RIGHT", -(8 + 78 + 4 + 8 + 14 + srcW) - 6, 0)
 end
 
 -- Tooltip ---------------------------------------------------------------------
@@ -345,8 +475,18 @@ function CollectionPanel:Create(parent)
     p.progressFill:SetColorTexture(C.accent[1], C.accent[2], C.accent[3], 0.9)
     p.progressTrack = track
 
+    -- Column headers (click to sort), lined up with the row columns.
+    p.header = CreateFrame("Frame", nil, lv)
+    p.header:SetPoint("TOPLEFT", 0, -LIST_TOP)
+    p.header:SetPoint("RIGHT", lv, "RIGHT", -SCROLL_W - 4, 0)
+    p.header:SetHeight(HEADER_H)
+    p.sortButtons = {}
+    for _, h in ipairs(HEADERS) do p.sortButtons[h.key] = headerButton(p, h.key) end
+    p.sortButtons.name:SetPoint("LEFT", p.header, "LEFT", 26, 0) -- the name starts after the icon
+    p.sortButtons.status:SetPoint("RIGHT", p.header, "RIGHT", -2, 0)
+
     local scroll = CreateFrame("ScrollFrame", nil, lv)
-    scroll:SetPoint("TOPLEFT", 0, -LIST_TOP)
+    scroll:SetPoint("TOPLEFT", 0, -(LIST_TOP + HEADER_H))
     scroll:SetPoint("BOTTOMRIGHT", -SCROLL_W, 0)
     local child = CreateFrame("Frame", nil, scroll)
     child:SetSize(ns.UI.CONTENT_WIDTH - SCROLL_W, 1)
@@ -357,7 +497,7 @@ function CollectionPanel:Create(parent)
 
     -- Enough rows to cover the visible area plus one partly shown.
     p.rows = {}
-    local visible = math.ceil((ns.UI.HEIGHT - LIST_TOP) / ROW_H) + 1
+    local visible = math.ceil((ns.UI.HEIGHT - LIST_TOP - HEADER_H) / ROW_H) + 1
     for i = 1, visible do p.rows[i] = newRow(p) end
 
     p.empty = ns.UI.fs(child, "GameFontHighlightSmall", C.muted)
@@ -529,6 +669,8 @@ local function refreshAchievements(p, key)
         end
         if keep then items[#items + 1] = a end
     end
+    sortItems(p, items)
+    updateHeader(p)
 
     local total = all and #all or 0
     if total > 0 then
@@ -603,6 +745,8 @@ local function refreshDrops(p, key)
         end
         if keep then items[#items + 1] = e end
     end
+    sortItems(p, items)
+    updateHeader(p)
 
     local total = all and #all or 0
     if total > 0 then
@@ -733,6 +877,8 @@ function CollectionPanel:Refresh(p, entries)
         if keep and q ~= "" then keep = m.name:lower():find(q, 1, true) ~= nil end
         if keep then items[#items + 1] = m end
     end
+    sortItems(p, items)
+    updateHeader(p)
     p.items = items
     p.count:SetText(L["COL_COUNT"]:format(fmt(#items)))
     p.count:SetShown(tierSet == nil)
