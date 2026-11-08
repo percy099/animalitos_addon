@@ -12,12 +12,13 @@ Estado: **v0.29.0** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadma
 La versión en prueba está en la rama **`josemaria`**, no en `main`.
 
 1. **Descárgala**, de una de estas dos formas:
+   - **Enlace directo (lo más fácil):** <https://github.com/percy099/animalitos_addon/archive/refs/heads/josemaria.zip>. Siempre baja la última versión.
    - Con git: `git clone -b josemaria https://github.com/percy099/animalitos_addon.git`
-   - Sin git: en GitHub cambia la rama a `josemaria` y usa **Code → Download ZIP**.
-2. **Cierra WoW** y copia la carpeta `AnimalitosPlanner/` (la de adentro, no la del repo entero) en `World of Warcraft\_retail_\Interface\AddOns\`. Si ya tenías una versión anterior, reemplázala entera.
+   - Ojo: el botón **Code → Download ZIP** de la página principal baja `main`, que está desactualizada. Si lo usas, antes cambia la rama a `josemaria`.
+2. **Descomprime y cierra WoW.** Dentro del zip hay una carpeta `animalitos_addon-josemaria`; copia **solo** la carpeta `AnimalitosPlanner` que está adentro en `World of Warcraft\_retail_\Interface\AddOns\` (debe quedar `AddOns\AnimalitosPlanner\AnimalitosPlanner.toc`). Si ya tenías una versión anterior, bórrala y pon esta.
 3. **Abre WoW.** En el chat debe salir `AnimalitosPlanner: v0.29.0 loaded`. Escribe `/aplan`.
 4. **Para ver errores:** `/console scriptErrors 1` y `/reload`. Si sale un error de Lua, manda captura del primero.
-5. **Para actualizar** más adelante: `git pull` (o vuelve a bajar el ZIP), copia la carpeta otra vez y **reinicia el juego** (si solo cambió código ya cargado, basta `/reload`; si hay archivos nuevos, no).
+5. **Para actualizar** más adelante: `git pull` (o vuelve a bajar el zip del enlace directo), copia la carpeta otra vez y **reinicia el juego** (si solo cambió código ya cargado, basta `/reload`; si hay archivos nuevos, no).
 
 El ícono del addon no viene en el repo (ver *Instalación*); sin él funciona igual.
 
