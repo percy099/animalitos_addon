@@ -384,7 +384,12 @@ function PlannerPanel:Create(parent)
         if p.bar then p.bar:SetValue(0) end
         PlannerPanel:Refresh(p)
     end)
-    p.group:SetPoint("RIGHT", hideLabel, "LEFT", -16, 0)
+    -- On the progress row, right side (where Next step was: each step has
+    -- its own Go, so the player found it added nothing).
+    p.right = CreateFrame("Frame", nil, p)
+    p.right:SetSize(110, 22)
+    p.right:SetPoint("TOPRIGHT", -SCROLL_W, -56)
+    p.group:SetPoint("RIGHT", p.right, "RIGHT", -2, 0)
     p.groupLabel = ns.UI.fs(p, "small", C.dim)
     p.groupLabel:SetPoint("RIGHT", p.group, "LEFT", -8, 0)
     p.groupLabel:SetText(L["PLAN_GROUP_SHORT"])
@@ -416,28 +421,22 @@ function PlannerPanel:Create(parent)
     end)
     p.kinds:HookScript("OnLeave", function() GameTooltip:Hide() end)
 
-    p.next = ns.UI.Button(p, "primary")
-    ns.UI.SetButtonText(p.next, L["PLAN_NEXT"], 96)
-    p.next:SetPoint("TOPRIGHT", -SCROLL_W, -56)
-    p.next:SetScript("OnClick", function()
-        if p.nextJid then ns.Navigation:GoToInstance(p.nextJid) end
-    end)
 
     p.progress = ns.UI.fs(p, "small", C.dim)
     p.progress:SetPoint("TOPLEFT", 2, -58)
-    p.progress:SetPoint("RIGHT", p.next, "LEFT", -12, 0)
+    p.progress:SetPoint("RIGHT", p.right, "LEFT", -12, 0)
     p.progress:SetJustifyH("LEFT")
     p.progress:SetWordWrap(false)
     local track = p:CreateTexture(nil, "ARTWORK")
     track:SetPoint("TOPLEFT", 0, -76)
-    track:SetPoint("RIGHT", p.next, "LEFT", -12, 0)
+    track:SetPoint("RIGHT", p.right, "LEFT", -12, 0)
     track:SetHeight(4)
     track:SetColorTexture(1, 1, 1, 0.08)
     p.fill = p:CreateTexture(nil, "ARTWORK", nil, 1)
     p.fill:SetPoint("TOPLEFT", track)
     p.fill:SetPoint("BOTTOMLEFT", track)
     p.fill:SetColorTexture(C.accent[1], C.accent[2], C.accent[3], 0.9)
-    p.trackW = ns.UI.CONTENT_WIDTH - SCROLL_W - 96 - 12
+    p.trackW = ns.UI.CONTENT_WIDTH - SCROLL_W - 110 - 12
 
     -- Column header
     local head = CreateFrame("Frame", nil, p)
@@ -524,8 +523,7 @@ function PlannerPanel:Refresh(p, entries)
     p.kinds:SetText(L["PLAN_KINDS"]:format((kinds.favorites and (ns.UI.STAR .. " ") or "") .. summary))
 
     local steps, sum = ns.Planner:Build(entries, hideDone, kinds)
-    p.nextJid = sum.nextJid
-    p.next:SetEnabled(sum.nextJid ~= nil)
+
     local text = L["PLAN_PROGRESS"]:format(sum.done, sum.total)
     if sum.minutes and sum.minutes > 0 then
         text = text .. "  ·  " .. L["PLAN_TIME_LEFT"]:format(SecondsToTime(sum.minutes * 60, true, nil, 2))

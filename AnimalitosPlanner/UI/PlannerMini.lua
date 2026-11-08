@@ -349,12 +349,9 @@ function Mini:Refresh()
 
     local entries = ns.FarmList:Build()
     local cur, after, sum = ns.Planner:Upcoming(entries)
-    -- Header: progress and a short time left (the button row has no room).
-    local left = ""
-    if sum.minutes and sum.minutes > 0 then
-        left = "   |cff8c8899" .. L["PLAN_TIME_LEFT"]:format(SecondsToTime(sum.minutes * 60, true, nil, 1)) .. "|r"
-    end
-    f.head:SetText(ns.UI.Upper(L["MINI_NEXT"]) .. ("   |cffffffff%d / %d|r"):format(sum.done, sum.total) .. left)
+    -- Header: progress only (the whole-route time estimate confused the
+    -- player here; the Planner shows it with its meaning spelled out).
+    f.head:SetText(ns.UI.Upper(L["MINI_NEXT"]) .. ("   |cffffffff%d / %d|r"):format(sum.done, sum.total))
 
     if not cur then
         place(f, line(f, "small", C.muted),
