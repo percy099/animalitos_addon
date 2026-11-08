@@ -91,21 +91,21 @@ end
 local function encodeNeeds()
     local parts = {}
     local entries = ns.FarmList:Build()
-    -- In My route, share only the picked mounts (each player shares the
-    -- route they chose; the group route is the union).
-    local mine = ns.Planner:Mode() == "mine"
+    -- Each player shares the route they chose (My route, Show filter); the
+    -- group route is the union.
     local jids = {}
     for _, e in ipairs(entries or {}) do
-        if type(e.jid) == "number" and e.jid > 0 then jids[#jids + 1] = e end
+        if type(e.jid) == "number" and e.jid > 0 then
+            local own = ns.Planner:OwnStep(e)
+            if own then jids[#jids + 1] = own end
+        end
     end
     table.sort(jids, function(a, b) return a.jid < b.jid end)
     for _, e in ipairs(jids) do
         local ready, locked = {}, {}
         for id, m in pairs(e.mounts) do
-            if not mine or ns.Collection:InRoute(id) then
-                if #m.ready > 0 then ready[#ready + 1] = id
-                elseif #m.locked > 0 then locked[#locked + 1] = id end
-            end
+            if #m.ready > 0 then ready[#ready + 1] = id
+            elseif #m.locked > 0 then locked[#locked + 1] = id end
         end
         if #ready > 0 or #locked > 0 then
             table.sort(ready)

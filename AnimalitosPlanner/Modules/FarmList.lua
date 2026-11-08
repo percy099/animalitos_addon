@@ -205,6 +205,14 @@ function FarmList:Build()
     return entries, counts
 end
 
+--- How close the player is to an instance's entrance: 2 = in its zone,
+--- 1 = same continent, 0 = elsewhere.
+function FarmList:Near(inst)
+    local ancestors, continent = playerLocation()
+    local ent = inst and inst.entrance
+    return (ent and ancestors[ent.uiMapID] and 2) or (ent and ent.continent == continent and 1) or 0
+end
+
 function FarmList:BuildNow()
     self:ResolveCurated()
     self:ResolveFactionEntrances()

@@ -369,6 +369,7 @@ function Planner:SetKind(kind, on)
         if others == 0 then return false end
     end
     k[kind] = on and true or false
+    if ns.Comm then ns.Comm:ShareNeeds() end -- what this player shares changed
     return true
 end
 
@@ -415,6 +416,50 @@ local function hasFavorite(e)
     return false
 end
 
+--- What this player brings to the group route: its entry after its own
+--- route choice (My route) and Show filter, or nil. Each player filters for
+--- themselves; the union is not filtered again, so everyone sees the same
+--- steps.
+function Planner:OwnStep(e, kinds)
+    kinds = kinds or self:Kinds()
+    if e and self:Mode() == "mine" then e = routeOnly(e) end
+    if e and e.inst and kinds[kindOf(e.inst)] and (not kinds.favorites or hasFavorite(e)) then return e end
+    return nil
+end
+
+-- Dataset sources by journal instance (lazy).
+local srcByJid
+local function sourcesOf(jid)
+    if not srcByJid then
+        srcByJid = {}
+        for _, src in ipairs(ns.Data.sources) do
+            local j = src.journalInstanceID
+            srcByJid[j] = srcByJid[j] or {}
+            table.insert(srcByJid[j], src)
+        end
+    end
+    return srcByJid[jid] or {}
+end
+
+-- Difficulties the others can still loot here, as votes { [d] = n }, or
+-- nil. The leader's "Set H" button uses them even when the leader does
+-- not need the step.
+local function peerDiffs(jid, peers)
+    local votes, any = {}, false
+    for _, p in ipairs(peers or {}) do
+        for _, id in ipairs(p.ready) do
+            for _, src in ipairs(sourcesOf(jid)) do
+                if src.mountID == id then
+                    for _, d in ipairs(src.difficulties or {}) do
+                        if d ~= 0 then votes[d] = (votes[d] or 0) + 1 any = true end
+                    end
+                end
+            end
+        end
+    end
+    return any and votes or nil
+end
+
 -- A group route step only someone else needs: a stand-in entry with their
 -- mounts (no difficulties: those are theirs).
 local function peerEntry(jid, peers)
@@ -426,15 +471,16 @@ local function peerEntry(jid, peers)
             for _, id in ipairs(list) do
                 if not mounts[id] then
                     local source
-                    for _, src in ipairs(ns.Data.sources) do
-                        if src.journalInstanceID == jid and src.mountID == id then source = src break end
+                    for _, src in ipairs(sourcesOf(jid)) do
+                        if src.mountID == id then source = src break end
                     end
                     mounts[id] = { ready = {}, locked = {}, verify = {}, source = source, peer = true }
                 end
             end
         end
     end
-    return { jid = jid, inst = inst, mounts = mounts, readyCount = 0, peerOnly = true }
+    return { jid = jid, inst = inst, mounts = mounts, readyCount = 0, peerOnly = true,
+        near = ns.FarmList:Near(inst) } -- the mini's difficulty line at the entrance
 end
 
 -- Who in the group needs a step: { { name, state = "ready" | "locked" } },
@@ -461,9 +507,9 @@ function Planner:Build(entries, hideCompleted, kinds)
     local mine = self:Mode() == "mine"
     local byJid = {}
     for _, e in ipairs(entries or {}) do
-        if mine then e = routeOnly(e) end
         -- Only the kinds the player picked (the route order stays the same).
-        if e and kinds[kindOf(e.inst)] and (not kinds.favorites or hasFavorite(e)) then byJid[e.jid] = e end
+        e = self:OwnStep(e, kinds)
+        if e then byJid[e.jid] = e end
     end
     -- Group route: the union of everyone's steps, in the leader's order;
     -- the leader's done marks count for everyone.
@@ -493,9 +539,15 @@ function Planner:Build(entries, hideCompleted, kinds)
     for _, jid in ipairs(self:Route(group and ns.Comm:RouteFaction() or nil)) do
         local e = byJid[jid]
         local peers = peerNeeds and peerNeeds[jid]
-        if not e and peers and not kinds.favorites then
-            local inst = ns.Data.instances[jid]
-            if inst and kinds[kindOf(inst)] then e = peerEntry(jid, peers) end
+        -- The others already filtered what they share (their own Show and
+        -- route choice): their steps come in whatever my filter says.
+        if not e and peers then e = peerEntry(jid, peers) end
+        local gd = e and peers and peerDiffs(jid, peers)
+        if gd then
+            local copy = {}
+            for k, v in pairs(e) do copy[k] = v end
+            copy.groupDiffs = gd
+            e = copy
         end
         if e then
             local anyReady, anyLocked = false, false
@@ -982,7 +1034,10 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
     end
 
     -- A known Mythic+ teleport goes straight to the entrance: best of all.
-    if jid and jid > 0 then
+    -- Not in a group with a mage, though: the others cannot follow a
+    -- personal teleport, and the mage's portal takes everyone.
+    local groupPortal = IsInGroup() and mage and (mage.self or mage.group)
+    if jid and jid > 0 and not groupPortal then
         local spellID, spellName = ns.Navigation:DungeonTeleport(ns.FarmList:InstanceName(jid))
         if spellID then return { L["PLAN_CAST"]:format(spellName or "?") } end
     end

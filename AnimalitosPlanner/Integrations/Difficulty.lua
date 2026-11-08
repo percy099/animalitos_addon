@@ -28,6 +28,9 @@ function D:Pick(e)
             if d ~= 0 then votes[d] = (votes[d] or 0) + 1 end
         end
     end
+    -- Group route: what the others can still loot here counts too (the
+    -- leader sets it even for a step only the others need).
+    for d, n in pairs(e and e.groupDiffs or {}) do votes[d] = (votes[d] or 0) + n end
     local best
     for d, n in pairs(votes) do
         if not best or n > votes[best] or (n == votes[best] and d > best) then best = d end
@@ -35,8 +38,9 @@ function D:Pick(e)
     return best
 end
 
---- Is a Ready mount of the entry dropped on difficulty d?
+--- Is a Ready mount of the entry (or one the group needs) dropped on difficulty d?
 function D:Drops(e, d)
+    if e and e.groupDiffs and e.groupDiffs[d] then return true end
     for _, m in pairs(e and e.mounts or {}) do
         for _, rd in ipairs(m.ready) do
             if rd == d then return true end

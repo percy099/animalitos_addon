@@ -6,7 +6,7 @@ Addon de World of Warcraft retail (12.1.5) para **farmear monturas**. Te dice:
 - te pone un waypoint en la entrada y la dificultad correcta;
 - y te avisa de los jefes de eventos de temporada y de las monturas de vendedor que ya puedes comprar.
 
-Estado: **v0.28.3** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
+Estado: **v0.28.4** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
 
 ## Probar esta versión (si te la pasaron)
 La versión en prueba está en la rama **`josemaria`**, no en `main`.
@@ -15,7 +15,7 @@ La versión en prueba está en la rama **`josemaria`**, no en `main`.
    - Con git: `git clone -b josemaria https://github.com/percy099/animalitos_addon.git`
    - Sin git: en GitHub cambia la rama a `josemaria` y usa **Code → Download ZIP**.
 2. **Cierra WoW** y copia la carpeta `AnimalitosPlanner/` (la de adentro, no la del repo entero) en `World of Warcraft\_retail_\Interface\AddOns\`. Si ya tenías una versión anterior, reemplázala entera.
-3. **Abre WoW.** En el chat debe salir `AnimalitosPlanner: v0.28.3 loaded`. Escribe `/aplan`.
+3. **Abre WoW.** En el chat debe salir `AnimalitosPlanner: v0.28.4 loaded`. Escribe `/aplan`.
 4. **Para ver errores:** `/console scriptErrors 1` y `/reload`. Si sale un error de Lua, manda captura del primero.
 5. **Para actualizar** más adelante: `git pull` (o vuelve a bajar el ZIP), copia la carpeta otra vez y **reinicia el juego** (si solo cambió código ya cargado, basta `/reload`; si hay archivos nuevos, no).
 
@@ -27,7 +27,7 @@ El ícono del addon no viene en el repo (ver *Instalación*); sin él funciona i
 | Qué | Cómo |
 |---|---|
 | **My route** (v0.28.0) | Clic en una montura que te falte → botón de **ruta de vuelo** junto a la estrella (también en las filas de Collection). Agrega 3–4. En **Planner** elige **My route (n)**: solo deben salir esas, en orden lógico; la mini sigue el mismo modo. |
-| **Ruta de grupo** (dos personas con esta versión, en grupo) | `/aplan group` en los dos: cada uno debe ver al otro. En el Planner aparece el switch **Group** (a la derecha, en la línea de progreso): actívenlo. *Ya visto funcionando: presencia y pasos del otro.* Cada uno comparte la ruta que tenga elegida (*Full route* o *My route*); la ruta junta los pasos de los dos (orden de la facción del líder) y cada paso dice *Group: You ✓ · Nombre (locked)*. **Falta confirmar:** si el líder marca **Done**, al otro se le marca en unos segundos. |
+| **Ruta de grupo** (dos personas con esta versión, en grupo) | `/aplan group` en los dos: cada uno debe ver al otro. En el Planner aparece el switch **Group** (a la derecha, en la línea de progreso): actívenlo. *Ya visto funcionando: presencia y pasos del otro.* Cada uno comparte la ruta que tenga elegida (*Full route* o *My route*, con su propio filtro **Show:**), así los dos ven los mismos pasos; con un mago en el grupo se viaja con su portal, no con teleports personales (*Path of…*); el líder tiene **Set H** aunque el paso solo le sirva al otro; la ruta junta los pasos de los dos (orden de la facción del líder) y cada paso dice *Group: You ✓ · Nombre (locked)*. **Falta confirmar:** si el líder marca **Done**, al otro se le marca en unos segundos. |
 | **Mago en grupo** | Con un mago en el grupo, los pasos de viaje dicen qué portal pedirle; si el mago tiene el addon, la línea de la mini abre el portal. |
 | **Atajos de mago** (un mago sin Invincible) | De ICC a Utgarde Pinnacle pasando por Dalaran; al salir de Return to Karazhan, teleport y volar a Zul'Gurub. |
 | **Tamaño 10/25** (falta una montura de un solo tamaño) | Obsidian Sanctum, Karazhan (Attumen) o The Eye (Kael'thas): en la entrada, el botón de dificultad debe poner el tamaño correcto. |
