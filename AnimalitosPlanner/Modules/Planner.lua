@@ -372,17 +372,26 @@ function Planner:SetKind(kind, on)
     return true
 end
 
---- Which route the Planner shows: "full" (everything farmable), "mine"
---- (only the mounts in My route) or "group" (the group route; only takes
---- effect with someone else with the addon). db.ui.plannerMode.
+--- Which route the Planner shows: "full" (everything farmable) or "mine"
+--- (only the mounts in My route). db.ui.plannerMode. The group route goes
+--- on top of either (GroupOn): each player shares the route they picked.
 function Planner:Mode()
-    local m = ns.Storage.db.ui.plannerMode
-    return (m == "mine" or m == "group") and m or "full"
+    return ns.Storage.db.ui.plannerMode == "mine" and "mine" or "full"
 end
 
 function Planner:SetMode(mode)
-    ns.Storage.db.ui.plannerMode = (mode == "mine" or mode == "group") and mode or nil
-    ns.Storage.db.ui.plannerGroup = nil -- the old group switch
+    ns.Storage.db.ui.plannerMode = (mode == "mine") and "mine" or nil
+    if ns.Comm then ns.Comm:ShareNeeds() end -- what this player shares changed
+end
+
+function Planner:GroupOn()
+    local ui = ns.Storage.db.ui
+    if ui.plannerMode == "group" then ui.plannerMode, ui.plannerGroup = nil, true end -- 0.28.1
+    return ui.plannerGroup and true or false
+end
+
+function Planner:SetGroup(on)
+    ns.Storage.db.ui.plannerGroup = on and true or nil
 end
 
 -- My route: the entry with only the picked mounts (so "done" and the mount
@@ -484,7 +493,7 @@ function Planner:Build(entries, hideCompleted, kinds)
     for _, jid in ipairs(self:Route(group and ns.Comm:RouteFaction() or nil)) do
         local e = byJid[jid]
         local peers = peerNeeds and peerNeeds[jid]
-        if not e and peers and not kinds.favorites and not mine then
+        if not e and peers and not kinds.favorites then
             local inst = ns.Data.instances[jid]
             if inst and kinds[kindOf(inst)] then e = peerEntry(jid, peers) end
         end

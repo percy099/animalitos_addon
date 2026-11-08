@@ -91,6 +91,9 @@ end
 local function encodeNeeds()
     local parts = {}
     local entries = ns.FarmList:Build()
+    -- In My route, share only the picked mounts (each player shares the
+    -- route they chose; the group route is the union).
+    local mine = ns.Planner:Mode() == "mine"
     local jids = {}
     for _, e in ipairs(entries or {}) do
         if type(e.jid) == "number" and e.jid > 0 then jids[#jids + 1] = e end
@@ -99,8 +102,10 @@ local function encodeNeeds()
     for _, e in ipairs(jids) do
         local ready, locked = {}, {}
         for id, m in pairs(e.mounts) do
-            if #m.ready > 0 then ready[#ready + 1] = id
-            elseif #m.locked > 0 then locked[#locked + 1] = id end
+            if not mine or ns.Collection:InRoute(id) then
+                if #m.ready > 0 then ready[#ready + 1] = id
+                elseif #m.locked > 0 then locked[#locked + 1] = id end
+            end
         end
         if #ready > 0 or #locked > 0 then
             table.sort(ready)
@@ -256,10 +261,10 @@ for _, event in ipairs({ "UPDATE_INSTANCE_INFO", "NEW_MOUNT_ADDED", "ENCOUNTER_E
 end
 
 -- Group route ----------------------------------------------------------------------
---- Is the group route on? Picked in the Planner, and someone else in the
---- group with the addon.
+--- Is the group route on? The Planner's Group switch, and someone else in
+--- the group with the addon.
 function Comm:GroupActive()
-    return ns.Planner:Mode() == "group" and IsInGroup() and next(self.peers) ~= nil or false
+    return ns.Planner:GroupOn() and IsInGroup() and next(self.peers) ~= nil or false
 end
 
 --- The leader, when it is a peer with the addon (nil when it is me or it

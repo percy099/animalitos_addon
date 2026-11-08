@@ -361,6 +361,7 @@ function Collection:ToggleRoute(mountID)
     local db = ns.Storage.db
     db.myRoute = db.myRoute or {}
     db.myRoute[mountID] = (not db.myRoute[mountID]) or nil
+    if ns.Comm then ns.Comm:ShareNeeds() end -- the group sees My route changes
     if ns.UI and ns.UI.Refresh then ns.UI:Refresh() end
 end
 
