@@ -301,6 +301,14 @@ function Comm:ShareDone(keys)
     ns:Debounce("comm-done", 1, function() sendData("DONE", lastDone or "") end)
 end
 
+--- Any player's Done / undo of a step: everyone with the group route on
+--- applies it to its own marks. Not deduplicated, so quick clicks all arrive.
+function Comm:ShareMark(jid, done)
+    if not self:GroupActive() then return end
+    outbox[#outbox + 1] = { "MARK", table.concat({ "MARK", tostring(jid), done and "1" or "0" }, "\t") }
+    if not pumping then pump() end
+end
+
 local function received(sender, kind, data)
     local p = Comm.peers[sender]
     if not p then return end
@@ -328,6 +336,12 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
             lastDone = nil
             changed()
         end
+    elseif kind == "MARK" then
+        if not (a and Comm.peers[sender] and Comm:GroupActive()) then return end
+        local jid = tonumber(a) or a
+        local inst = ns.Data.instances[jid]
+        ns.Planner:SetManuallyDone(jid, inst and inst.isRaid, b == "1", true)
+        changed()
     elseif kind == "STAT" or kind == "DONE" then
         local seq, i, n = tonumber(a), tonumber(b), tonumber(c)
         if not (seq and i and n) then return end
@@ -425,7 +439,7 @@ function Comm:Debug()
             if #s.pick > 0 then nNeeds = nNeeds + 1 end
         end
         for _ in pairs(p.done or {}) do nDone = nDone + 1 end
-        print(("  %s: v%s %s, leader=%s, route %d instances, done %d"):format(p.name, p.version, p.faction,
+        print(("  %s: v%s %s, leader=%s, picks in %d instances, done %d"):format(p.name, p.version, p.faction,
             tostring(UnitIsGroupLeader(p.name)), nNeeds, nDone))
     end
     hello("HELLO")

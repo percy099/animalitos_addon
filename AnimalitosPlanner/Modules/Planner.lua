@@ -300,7 +300,10 @@ function Planner:IsManuallyDone(jid)
     return false
 end
 
-function Planner:SetManuallyDone(jid, isRaid, done)
+--- fromPeer: the mark came from another player (not shared back).
+function Planner:SetManuallyDone(jid, isRaid, done, fromPeer)
+    -- In the group route anyone's Done / undo applies to everyone.
+    if not fromPeer and ns.Comm then ns.Comm:ShareMark(jid, done) end
     if not done then
         doneTable()[jid] = nil
         return
@@ -603,7 +606,7 @@ function Planner:Build(entries, hideCompleted, kinds)
             -- was killed. Unknown (verify only) is never treated as done.
             local auto = ns.Lockouts.loaded and anyLocked and not anyReady
             local manual = self:IsManuallyDone(jid)
-            -- In a group the leader's marks decide, so everyone sees the same.
+            -- In a group the leader's marks decide (anyone's clicks reach it via MARK).
             local done
             if leaderPeer then done = ns.Comm:LeaderDone(jid) or manual
             else done = auto or manual end
