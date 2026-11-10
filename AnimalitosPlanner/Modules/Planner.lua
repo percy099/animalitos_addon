@@ -653,6 +653,7 @@ function Planner:Build(entries, hideCompleted, kinds, travelRuns)
                 if not r.done then travelMinutes = travelMinutes + #texts * MINUTES.travel end
                 here.continent, here.zone = ent.continent, ent.uiMapID
                 here.x, here.y = ent.x, ent.y -- you come out at the entrance
+                here.jid = r.jid
                 here.fromInstance = true -- you start inside: walking out takes time
             end
             steps[#steps + 1] = r
@@ -709,10 +710,11 @@ end
 function Planner:PlayerHere()
     if IsInInstance() then
         local instanceMapID = select(8, GetInstanceInfo())
-        for _, inst in pairs(ns.Data.instances) do
+        for jid, inst in pairs(ns.Data.instances) do
             local ent = inst.entrance
             if inst.mapID == instanceMapID and ent and ent.continent then
-                return { continent = ent.continent, zone = ent.uiMapID, x = ent.x, y = ent.y, fromInstance = true }
+                return { continent = ent.continent, zone = ent.uiMapID, x = ent.x, y = ent.y, fromInstance = true,
+                    jid = jid }
             end
         end
         return nil
@@ -782,7 +784,7 @@ end
 -- Locale key -> icon kind ("spell" = the named spell's own icon), in match order.
 local ICON_RULES = {
     { "PLAN_CAST", "spell" }, { "PLAN_USE_ITEM", "item" }, { "PLAN_FLY", "fly" },
-    { "PLAN_HEARTH", "hearth" }, { "PLAN_PORTAL_AT", "portal" }, { "PLAN_PORTAL_IN", "portal" },
+    { "PLAN_HEARTH", "hearth" }, { "PLAN_PORTAL_AT", "portal" }, { "PLAN_PORTAL_IN", "portal" }, { "PLAN_EXIT_PORTAL", "portal" },
     { "PLAN_PORTAL", "portal" }, { "PLAN_ASK_PORTAL", "portal" }, { "PLAN_TELEPORT", "portal" },
     { "PLAN_DARK_PORTAL", "portal" }, { "PLAN_BOAT_ZULDAZAR", "ride" }, { "PLAN_BOAT_KULTIRAS", "ride" },
     { "PLAN_KROOZ", "ride" }, { "PLAN_TRAVEL_CONTINENT", "ride" }, { "PLAN_TRAVEL_ZONE", "ride" },
@@ -1112,6 +1114,12 @@ local FLY_ACROSS = {
     [2537] = { [23] = true, [22] = true }, -- Quel'Thalas <-> Eastern / Western Plaguelands
 }
 
+-- Raids with a portal out after the last boss (instead of walking out):
+-- [journalInstanceID] = { lands = uiMapID, continent }.
+local EXIT_PORTALS = {
+    [369] = { lands = 390, continent = 424 }, -- Siege of Orgrimmar -> Vale of Eternal Blossoms
+}
+
 local function flyAcross(here, ent)
     local near = FLY_ACROSS[here.continent]
     if near and near[ent.uiMapID] then return true end
@@ -1124,6 +1132,13 @@ end
 --- anything unknown falls back to "Travel to ...".
 function Planner:TravelTexts(fac, here, ent, mage, jid)
     local L = ns.L
+    -- Leaving a raid with an exit portal: take it, then go on from where it lands.
+    local exit = here.fromInstance and here.jid and EXIT_PORTALS[here.jid]
+    if exit then
+        local rest = self:TravelTexts(fac, { continent = exit.continent, zone = exit.lands }, ent, mage, jid)
+        table.insert(rest, 1, L["PLAN_EXIT_PORTAL"]:format(mapName(exit.lands)))
+        return rest
+    end
     if ent.continent == here.continent and (ent.uiMapID == here.zone or sameArea(ent.uiMapID, here.zone)) then
         return {} -- already there (Dazar'alor is inside Zuldazar)
     end

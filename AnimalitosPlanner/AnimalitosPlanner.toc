@@ -4,7 +4,7 @@
 ## Notes-esES: Planificador de colección y farmeo de monturas.
 ## Notes-esMX: Planificador de colección y farmeo de monturas.
 ## Author: AnimalitosPlanner Team
-## Version: 0.30.5
+## Version: 0.30.6
 ## Category: Collections
 ## IconTexture: Interface\AddOns\AnimalitosPlanner\Media\icon
 ## SavedVariables: AnimalitosPlannerDB
