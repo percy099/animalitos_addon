@@ -6,7 +6,7 @@ Addon de World of Warcraft retail (12.1.5) para **farmear monturas**. Te dice:
 - te pone un waypoint en la entrada y la dificultad correcta;
 - y te avisa de los jefes de eventos de temporada y de las monturas de vendedor que ya puedes comprar.
 
-Estado: **v0.30.6** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
+Estado: **v0.30.7** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
 
 ## Probar esta versión (si te la pasaron)
 La versión en prueba está en la rama **`josemaria`**, no en `main`.
@@ -16,7 +16,7 @@ La versión en prueba está en la rama **`josemaria`**, no en `main`.
    - Con git: `git clone -b josemaria https://github.com/percy099/animalitos_addon.git`
    - Ojo: el botón **Code → Download ZIP** de la página principal baja `main`, que está desactualizada. Si lo usas, antes cambia la rama a `josemaria`.
 2. **Descomprime y cierra WoW.** Dentro del zip hay una carpeta `animalitos_addon-josemaria`; copia **solo** la carpeta `AnimalitosPlanner` que está adentro en `World of Warcraft\_retail_\Interface\AddOns\` (debe quedar `AddOns\AnimalitosPlanner\AnimalitosPlanner.toc`). Si ya tenías una versión anterior, bórrala y pon esta.
-3. **Abre WoW.** En el chat debe salir `AnimalitosPlanner: v0.30.6 loaded`. Escribe `/aplan`.
+3. **Abre WoW.** En el chat debe salir `AnimalitosPlanner: v0.30.7 loaded`. Escribe `/aplan`.
 4. **Para ver errores:** `/console scriptErrors 1` y `/reload`. Si sale un error de Lua, manda captura del primero.
 5. **Para actualizar** más adelante: `git pull` (o vuelve a bajar el zip del enlace directo), copia la carpeta otra vez y **reinicia el juego** (si solo cambió código ya cargado, basta `/reload`; si hay archivos nuevos, no).
 

@@ -161,6 +161,8 @@ local CONTINENT_ROUTES = {
     Alliance = {
         -- Kalimdor, fly to the Echo Isles (Durotar), boat to Zuldazar.
         [875] = { via = 1, viaContinent = 12, boat = "PLAN_BOAT_ZULDAZAR", lands = 862 },
+        -- Argus (Antorus): Dalaran (Broken Isles), then the Vindicaar (route of the player).
+        [905] = { via = 627, viaContinent = 619, boat = "PLAN_VINDICAAR", lands = 885 },
     },
     Horde = {
         -- Zuldazar, then the Banshee's Wail to the Kul Tiras zone you pick
@@ -170,6 +172,7 @@ local CONTINENT_ROUTES = {
         -- the Dark Portal, through to the Blasted Lands (route of the player).
         [13] = { via = 100, viaContinent = 101, boat = "PLAN_DARK_PORTAL", lands = 17,
                  zones = { [17] = true, [42] = true, [50] = true, [51] = true, [210] = true, [224] = true } },
+        [905] = { via = 627, viaContinent = 619, boat = "PLAN_VINDICAAR", lands = 885 },
     },
 }
 
@@ -787,7 +790,7 @@ local ICON_RULES = {
     { "PLAN_HEARTH", "hearth" }, { "PLAN_PORTAL_AT", "portal" }, { "PLAN_PORTAL_IN", "portal" }, { "PLAN_EXIT_PORTAL", "portal" },
     { "PLAN_PORTAL", "portal" }, { "PLAN_ASK_PORTAL", "portal" }, { "PLAN_TELEPORT", "portal" },
     { "PLAN_DARK_PORTAL", "portal" }, { "PLAN_BOAT_ZULDAZAR", "ride" }, { "PLAN_BOAT_KULTIRAS", "ride" },
-    { "PLAN_KROOZ", "ride" }, { "PLAN_TRAVEL_CONTINENT", "ride" }, { "PLAN_TRAVEL_ZONE", "ride" },
+    { "PLAN_KROOZ", "ride" }, { "PLAN_VINDICAAR", "portal" }, { "PLAN_TRAVEL_CONTINENT", "ride" }, { "PLAN_TRAVEL_ZONE", "ride" },
 }
 
 --- Icon texture for a travel step text (remembered per text: the same
