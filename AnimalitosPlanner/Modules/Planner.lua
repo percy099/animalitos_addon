@@ -652,6 +652,7 @@ function Planner:Build(entries, hideCompleted, kinds, travelRuns)
                 end
                 if not r.done then travelMinutes = travelMinutes + #texts * MINUTES.travel end
                 here.continent, here.zone = ent.continent, ent.uiMapID
+                here.x, here.y = ent.x, ent.y -- you come out at the entrance
                 here.fromInstance = true -- you start inside: walking out takes time
             end
             steps[#steps + 1] = r
@@ -711,7 +712,7 @@ function Planner:PlayerHere()
         for _, inst in pairs(ns.Data.instances) do
             local ent = inst.entrance
             if inst.mapID == instanceMapID and ent and ent.continent then
-                return { continent = ent.continent, zone = ent.uiMapID, fromInstance = true }
+                return { continent = ent.continent, zone = ent.uiMapID, x = ent.x, y = ent.y, fromInstance = true }
             end
         end
         return nil
@@ -726,7 +727,10 @@ function Planner:PlayerHere()
         id, guard = info.parentMapID, guard + 1
     end
     if not (zone and continent) then return nil end
-    return { continent = continent, zone = zone }
+    local pos = C_Map.GetPlayerMapPosition and C_Map.GetPlayerMapPosition(zone, "player")
+    local x, y = pos and pos.x, pos and pos.y
+    if x and (x <= 0 or y <= 0) then x, y = nil, nil end
+    return { continent = continent, zone = zone, x = x, y = y }
 end
 local function mapName(uiMapID)
     local info = uiMapID and C_Map.GetMapInfo(uiMapID)
@@ -1034,15 +1038,21 @@ end
 
 local function mageShortcut(fac, here, ent, mage)
     local target = worldPos(ent.uiMapID, ent.x, ent.y)
-    local direct = distance(worldPos(here.zone), target)
+    -- From where you really are (an entrance, your position), not the
+    -- zone center: Ulduar is at the far north of the Storm Peaks.
+    local direct = distance(worldPos(here.zone, here.x, here.y), target)
     if not direct then return nil end
     if here.fromInstance then direct = direct + EXIT_COST end
     local L = ns.L
     local best, bestCost = nil, direct
+    -- /aplan travel shows this comparison for the mini's next step.
+    local log = { to = mapName(ent.uiMapID), direct = direct, options = {} }
+    Planner.lastShortcut = log
     local function try(landing, hops, texts)
         local d = distance(worldPos(landing), target)
         if not d then return end
         local cost = d + hops * HOP_COST
+        log.options[#log.options + 1] = { text = texts[1], cost = cost }
         if cost < bestCost then
             best, bestCost = texts, cost
             if not sameArea(landing, ent.uiMapID) then texts[#texts + 1] = L["PLAN_FLY"]:format(mapName(ent.uiMapID)) end
@@ -1079,8 +1089,20 @@ local function mageShortcut(fac, here, ent, mage)
     end
     -- Only when clearly better than flying (half the way or less; from
     -- inside an instance, any clear gain, since the exit is skipped).
-    if best and bestCost < direct * (here.fromInstance and 0.85 or 0.5) then return best end
+    log.limit = direct * (here.fromInstance and 0.85 or 0.5)
+    if best and bestCost < log.limit then return best end
     return nil
+end
+
+--- /aplan travel: the last fly-or-teleport comparison (distances in yards).
+function Planner:DebugTravel()
+    local log = self.lastShortcut
+    if not log then
+        print("  " .. ns.L["TRAVEL_NONE"])
+        return
+    end
+    print(ns.L["TRAVEL_DIRECT"]:format(log.to, log.direct, log.limit or 0))
+    for _, o in ipairs(log.options) do print(("    %s: %.0f"):format(o.text or "?", o.cost)) end
 end
 
 -- Separate continent maps joined by land: from these zones, fly across

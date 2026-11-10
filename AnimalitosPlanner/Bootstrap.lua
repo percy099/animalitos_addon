@@ -251,6 +251,9 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
     elseif cmd == "group" then
         ns:Print("group:")
         ns.Comm:Debug()
+    elseif cmd == "travel" then
+        ns:Print("travel:")
+        ns.Planner:DebugTravel()
     elseif cmd == "perf" or cmd == "perf reset" then
         ns.Probe:Perf(cmd == "perf reset")
     elseif cmd == "skips" then
