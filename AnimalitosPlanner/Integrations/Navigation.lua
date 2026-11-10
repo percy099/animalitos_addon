@@ -199,6 +199,29 @@ local function collectFlyoutSpells()
     return spells
 end
 
+--- Known mage portal to the same place as a teleport, found by name in the
+--- spellbook flyouts ("Teleport: Silvermoon City" -> "Portal: Silvermoon
+--- City": same text after ": " in every locale). For when the hardcoded
+--- portal ID is wrong or new. Returns spellID or nil.
+local portalByPlace
+function Navigation:PortalLike(teleportID)
+    local name = self:SpellName(teleportID)
+    local place = name and name:match(":%s*(.+)$")
+    if not place then return nil end
+    if not portalByPlace or portalByPlace[place] == nil then
+        portalByPlace = portalByPlace or {}
+        local ok, spells = pcall(collectFlyoutSpells)
+        for _, id in ipairs(ok and spells or {}) do
+            local n = self:SpellName(id)
+            local p = n and n:match(":%s*(.+)$")
+            if p and p == place and id ~= teleportID and n ~= name then portalByPlace[p] = id end
+        end
+        if portalByPlace[place] == nil then portalByPlace[place] = false end
+    end
+    return portalByPlace[place] or nil
+end
+ns:On("SPELLS_CHANGED", function() portalByPlace = nil end)
+
 --- Known dungeon-teleport spell whose description mentions the instance
 --- name, as spellID, spellName; or nil.
 function Navigation:DungeonTeleport(instanceName)

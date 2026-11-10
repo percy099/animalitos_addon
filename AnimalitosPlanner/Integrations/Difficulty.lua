@@ -21,7 +21,7 @@ end
 --- Difficulty that drops the most Ready mounts of a farm entry (ties: the
 --- higher one, usually the one with the mount); nil when nothing is Ready
 --- or the step has no difficulty to choose (world bosses).
-function D:Pick(e)
+local function votesOf(e)
     local votes = {}
     for _, m in pairs(e and e.mounts or {}) do
         for _, d in ipairs(m.ready) do
@@ -31,11 +31,28 @@ function D:Pick(e)
     -- Group route: what the others can still loot here counts too (the
     -- leader sets it even for a step only the others need).
     for d, n in pairs(e and e.groupDiffs or {}) do votes[d] = (votes[d] or 0) + n end
+    return votes
+end
+
+function D:Pick(e)
+    local votes = votesOf(e)
     local best
     for d, n in pairs(votes) do
         if not best or n > votes[best] or (n == votes[best] and d > best) then best = d end
     end
     return best
+end
+
+--- Is difficulty d as good as the best one (drops as many of the wanted
+--- mounts)? Dragon Soul 10 Normal drops 2 of 3, Heroic all 3: not as good.
+function D:Best(e, d)
+    local votes = votesOf(e)
+    local n = votes[d]
+    if not n then return false end
+    for _, m in pairs(votes) do
+        if m > n then return false end
+    end
+    return true
 end
 
 --- Is a Ready mount of the entry (or one the group needs) dropped on difficulty d?

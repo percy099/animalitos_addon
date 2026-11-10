@@ -816,25 +816,40 @@ local PORTAL = {
 }
 local HEARTHSTONE = 6948
 
--- Spell ID of a mage teleport this character knows, from its (localized)
--- name, or nil. Alliance and Horde versions share a name ("Teleport:
+-- The known portal for a mage teleport: the hardcoded ID, else found by
+-- name in the spellbook (a wrong or new ID). nil when not learned.
+local function portalFor(teleportID)
+    local portal = PORTAL[teleportID]
+    if portal and ns.Navigation:KnowsSpell(portal) then return portal end
+    return ns.Navigation:PortalLike(teleportID)
+end
+
+-- Spell ID of a mage teleport (or its portal: second return true) this
+-- character knows, from its (localized) name, or nil. Alliance and Horde versions share a name ("Teleport:
 -- Shattrath" is 33690 and 35715): only a known one counts.
 local function mageSpellByName(name)
     local function check(id)
-        return ns.Navigation:SpellName(id) == name and ns.Navigation:KnowsSpell(id) and id or nil
+        if not ns.Navigation:KnowsSpell(id) then return nil end
+        if ns.Navigation:SpellName(id) == name then return id end
+        -- The portal shown in a group, found by name (see portalFor).
+        local portal = ns.Navigation:PortalLike(id)
+        if portal and ns.Navigation:SpellName(portal) == name then return portal, true end
+        return nil
     end
     -- A portal name (shown in a group): that portal.
     for _, portal in pairs(PORTAL) do
-        if ns.Navigation:SpellName(portal) == name and ns.Navigation:KnowsSpell(portal) then return portal end
+        if ns.Navigation:SpellName(portal) == name and ns.Navigation:KnowsSpell(portal) then return portal, true end
     end
     for _, fac in pairs(MAGE) do
         for key, d in pairs(fac) do
             if key == "zone" then
                 for _, z in pairs(d) do
-                    if check(z[2]) then return z[2] end
+                    local id, isPortal = check(z[2])
+                    if id then return id, isPortal end
                 end
-            elseif check(d[2]) then
-                return d[2]
+            else
+                local id, isPortal = check(d[2])
+                if id then return id, isPortal end
             end
         end
     end
@@ -858,10 +873,11 @@ function Planner:TravelAction(text)
     -- "A  »  B" (hearth / teleport home, then a capital portal): A is clickable.
     local first = text:match(formatPattern(L["PLAN_THEN"]))
     if first then text = first end
-    local id = mageSpellByName(text)
+    local id, isPortal = mageSpellByName(text)
     if id then
-        local portal = PORTAL[id]
-        if IsInGroup() and portal and ns.Navigation:KnowsSpell(portal) then
+        if isPortal then return { type = "spell", spell = id, name = text } end
+        local portal = IsInGroup() and portalFor(id)
+        if portal then
             return { type = "spell", spell = portal, name = ns.Navigation:SpellName(portal) }
         end
         return { type = "spell", spell = id, name = text }
@@ -890,8 +906,8 @@ local function mageHop(mage, dest)
     if not (mage and dest) then return nil end
     if mage.self and ns.Navigation:KnowsSpell(dest[2]) then
         -- In a group the click opens the portal (see TravelAction): say so.
-        local portal = PORTAL[dest[2]]
-        if IsInGroup() and portal and ns.Navigation:KnowsSpell(portal) then
+        local portal = IsInGroup() and portalFor(dest[2])
+        if portal then
             return ns.Navigation:SpellName(portal) or ns.L["PLAN_TELEPORT"]:format(mapName(dest[1]))
         end
         return ns.Navigation:SpellName(dest[2]) or ns.L["PLAN_TELEPORT"]:format(mapName(dest[1]))

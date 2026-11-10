@@ -306,7 +306,10 @@ local function helper(f, e)
     if not want then return end
     local inside = D:Inside(e)
     if inside then
-        if D:Drops(e, inside) then
+        if D:Drops(e, inside) and not D:Best(e, inside) then
+            -- Something drops here, but another difficulty drops more.
+            place(f, line(f, "small", C.warning), L["MINI_DIFF_PARTIAL"]:format(D:Name(inside), D:Name(want)), 6)
+        elseif D:Drops(e, inside) then
             place(f, line(f, "small", C.success), "|A:common-icon-checkmark:12:12|a  " .. L["MINI_DIFF_OK"]:format(D:Name(inside)), 6)
         else
             place(f, line(f, "small", C.warning), L["MINI_DIFF_WRONG"]:format(D:Name(inside), D:Name(want)), 6)
