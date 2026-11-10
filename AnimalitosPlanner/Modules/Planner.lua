@@ -532,7 +532,9 @@ local function groupRows(M, total, mine, peers)
     for _, p in ipairs(peers) do add(p.name, false, p) end
     return rows
 end
-function Planner:Build(entries, hideCompleted, kinds)
+--- travelRuns (optional): travel texts only up to that many pending runs
+--- (the mini shows two; the rest of the route only needs its order).
+function Planner:Build(entries, hideCompleted, kinds, travelRuns)
     kinds = kinds or self:Kinds()
     local mine = self:Mode() == "mine"
     local byJid, fullByJid = {}, {}
@@ -637,11 +639,14 @@ function Planner:Build(entries, hideCompleted, kinds)
     local travelMinutes = 0
     local mage = self:MageContext()
     summary.mage = mage
+    local pending = 0
     for _, r in ipairs(runs) do
         if not (hideCompleted and r.done) then
             local ent = r.inst.entrance
             if ent then
-                local texts = self:TravelTexts(fac, here, ent, mage, r.jid)
+                -- Past the runs the caller shows: keep the position, skip the texts.
+                local skip = travelRuns and pending >= travelRuns
+                local texts = skip and {} or self:TravelTexts(fac, here, ent, mage, r.jid)
                 for _, text in ipairs(texts) do
                     steps[#steps + 1] = { kind = "travel", text = text, icon = self:TravelIcon(text) }
                 end
@@ -650,10 +655,11 @@ function Planner:Build(entries, hideCompleted, kinds)
                 here.fromInstance = true -- you start inside: walking out takes time
             end
             steps[#steps + 1] = r
+            if not r.done then pending = pending + 1 end
         end
     end
 
-    -- Rough time left: pending runs plus the travel in front of them.
+    -- Rough time left (only whole when every travel text was built): pending runs plus the travel in front of them.
     local m = travelMinutes
     for _, r in ipairs(runs) do
         if not r.done then
@@ -671,7 +677,7 @@ end
 function Planner:Upcoming(entries)
     -- Same choice as the Planner's "Hide completed steps": with it on, travel
     -- skips finished steps (from the capital), so both windows say the same.
-    local steps, summary = self:Build(entries, ns.Storage.db.ui.plannerHideDone and true or false, self:Kinds())
+    local steps, summary = self:Build(entries, ns.Storage.db.ui.plannerHideDone and true or false, self:Kinds(), 2)
     local found, travel = {}, {}
     for _, s in ipairs(steps) do
         if s.kind == "travel" then
@@ -778,17 +784,33 @@ local ICON_RULES = {
     { "PLAN_KROOZ", "ride" }, { "PLAN_TRAVEL_CONTINENT", "ride" }, { "PLAN_TRAVEL_ZONE", "ride" },
 }
 
---- Icon texture for a travel step text.
+--- Icon texture for a travel step text (remembered per text: the same
+--- texts come back on every refresh; item icons are not, their names load late).
+local iconCache = {}
+ns:On("SPELLS_CHANGED", function() wipe(iconCache) end)
+local travelIcon
 function Planner:TravelIcon(text)
-    local L = ns.L
     if not text then return ICON.ride end
+    local icon = iconCache[text]
+    if icon then return icon end
+    local cacheable
+    icon, cacheable = travelIcon(self, text)
+    if cacheable then iconCache[text] = icon end
+    return icon
+end
+
+function travelIcon(self, text)
+    local L = ns.L
     -- "A » B": the icon of the second hop (the portal you end up taking).
     local _, second = text:match(formatPattern(L["PLAN_THEN"]))
-    if second then return self:TravelIcon(second) end
+    if second then return travelIcon(self, second) end
     for _, rule in ipairs(ICON_RULES) do
         local arg = text:match(formatPattern(L[rule[1]]))
         if arg then
-            if rule[2] == "spell" then return spellIcon(arg:match("^(.-) %(") or arg) or ICON.portal end
+            if rule[2] == "spell" then
+                local t = spellIcon(arg:match("^(.-) %(") or arg)
+                return t or ICON.portal, t ~= nil -- not loaded yet: ask again later
+            end
             if rule[2] == "item" then
                 for _, ti in pairs(TRAVEL_ITEMS) do
                     if ns.Navigation:ItemName(ti.item) == arg and C_Item and C_Item.GetItemIconByID then
@@ -797,11 +819,12 @@ function Planner:TravelIcon(text)
                 end
                 return ICON.hearth
             end
-            return ICON[rule[2]]
+            return ICON[rule[2]], true
         end
     end
     -- A bare spell name: a mage teleport ("Teleport: Theramore").
-    return spellIcon(text) or ICON.portal
+    local t = spellIcon(text)
+    return t or ICON.portal, t ~= nil
 end
 
 -- Clickable travel ------------------------------------------------------------

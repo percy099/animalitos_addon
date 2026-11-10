@@ -274,6 +274,8 @@ local WATCH = {
     { "FarmList", "BuildNow", "FarmList:BuildNow" },
     { "Planner", "Build", "Planner:Build" },
     { "Planner", "Upcoming", "Planner:Upcoming" },
+    { "Planner", "TravelTexts", "Planner:TravelTexts" },
+    { "Planner", "OwnStep", "Planner:OwnStep" },
     { "Comm", "MyStatus", "Comm:MyStatus" },
     { "Collection", "Scan", "Collection:Scan" },
     { "UI", "Refresh", "UI:Refresh" },
