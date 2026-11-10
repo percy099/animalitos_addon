@@ -251,6 +251,8 @@ SlashCmdList.ANIMALITOSPLANNER = function(msg)
     elseif cmd == "group" then
         ns:Print("group:")
         ns.Comm:Debug()
+    elseif cmd == "perf" or cmd == "perf reset" then
+        ns.Probe:Perf(cmd == "perf reset")
     elseif cmd == "skips" then
         ns:Print("raid skip quests:")
         ns.Difficulty:DebugSkips()

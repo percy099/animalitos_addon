@@ -264,3 +264,75 @@ function Probe:Run()
         end
     end)
 end
+
+-- Performance (/aplan perf) ------------------------------------------------------
+-- Times the heavy functions (calls, total, slowest) with debugprofilestop,
+-- and reads the client's own addon profiler and memory, so optimizing goes
+-- where the time really is. Nested: UI:Refresh includes the builds it asks for.
+local perf, perfSince = {}, nil
+local WATCH = {
+    { "FarmList", "BuildNow", "FarmList:BuildNow" },
+    { "Planner", "Build", "Planner:Build" },
+    { "Planner", "Upcoming", "Planner:Upcoming" },
+    { "Comm", "MyStatus", "Comm:MyStatus" },
+    { "Collection", "Scan", "Collection:Scan" },
+    { "UI", "Refresh", "UI:Refresh" },
+    { "PlannerMini", "Refresh", "PlannerMini:Refresh" },
+}
+
+local function timed(owner, method, label)
+    local fn = owner and owner[method]
+    if type(fn) ~= "function" then return end
+    owner[method] = function(...)
+        local t0 = debugprofilestop()
+        local a, b, c, d = fn(...)
+        local ms = debugprofilestop() - t0
+        local s = perf[label]
+        if not s then
+            s = { n = 0, total = 0, max = 0 }
+            perf[label] = s
+        end
+        s.n, s.total = s.n + 1, s.total + ms
+        if ms > s.max then s.max = ms end
+        return a, b, c, d
+    end
+end
+
+ns:On("PLAYER_LOGIN", function()
+    for _, w in ipairs(WATCH) do timed(ns[w[1]], w[2], w[3]) end
+    perfSince = GetTime()
+end)
+
+local function metric(name)
+    local P, E = C_AddOnProfiler, Enum.AddOnProfilerMetric
+    if not (P and P.GetAddOnMetric and E and E[name]) then return nil end
+    local ok, v = pcall(P.GetAddOnMetric, "AnimalitosPlanner", E[name])
+    return ok and v or nil
+end
+
+function Probe:Perf(reset)
+    local L = ns.L
+    if reset then
+        wipe(perf)
+        perfSince = GetTime()
+        ns:Print(L["PERF_RESET"])
+        return
+    end
+    ns:Print(L["PERF_HEAD"]:format(GetTime() - (perfSince or GetTime())))
+    local recent, peak = metric("RecentAverageTime"), metric("PeakTime")
+    if recent or peak then
+        print(L["PERF_CPU"]:format(recent or 0, peak or 0, metric("CountTimeOver5Ms") or 0))
+    end
+    if UpdateAddOnMemoryUsage and GetAddOnMemoryUsage then
+        pcall(UpdateAddOnMemoryUsage)
+        local ok, kb = pcall(GetAddOnMemoryUsage, "AnimalitosPlanner")
+        if ok and kb then print(L["PERF_MEM"]:format(kb / 1024)) end
+    end
+    local list = {}
+    for label, s in pairs(perf) do list[#list + 1] = { label = label, s = s } end
+    table.sort(list, function(a, b) return a.s.total > b.s.total end)
+    if #list == 0 then print(L["PERF_NONE"]) end
+    for _, x in ipairs(list) do
+        print(L["PERF_FN"]:format(x.label, x.s.n, x.s.total, x.s.total / x.s.n, x.s.max))
+    end
+end
