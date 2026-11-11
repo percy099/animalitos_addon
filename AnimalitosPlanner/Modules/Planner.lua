@@ -1123,6 +1123,14 @@ local EXIT_PORTALS = {
     [369] = { lands = 390, continent = 424 }, -- Siege of Orgrimmar -> Vale of Eternal Blossoms
 }
 
+-- Mage hops the player picked after an instance, where the distance rule
+-- says fly: [journalInstanceID] = { [target zone] = MAGE key }. Leaving
+-- Karazhan for Zul'Gurub: portal to Stonard (Horde), then a short flight.
+local MAGE_AFTER = {
+    [745] = { [50] = 13 }, -- Karazhan -> Northern Stranglethorn
+    [860] = { [50] = 13 }, -- Return to Karazhan -> Northern Stranglethorn
+}
+
 local function flyAcross(here, ent)
     local near = FLY_ACROSS[here.continent]
     if near and near[ent.uiMapID] then return true end
@@ -1142,6 +1150,10 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
         table.insert(rest, 1, L["PLAN_EXIT_PORTAL"]:format(mapName(exit.lands)))
         return rest
     end
+    local after = here.fromInstance and here.jid and MAGE_AFTER[here.jid]
+    local key = after and after[ent.uiMapID]
+    local hop = key and mageHop(mage, MAGE[fac][key])
+    if hop then return { hop, L["PLAN_FLY"]:format(mapName(ent.uiMapID)) } end
     if ent.continent == here.continent and (ent.uiMapID == here.zone or sameArea(ent.uiMapID, here.zone)) then
         return {} -- already there (Dazar'alor is inside Zuldazar)
     end
