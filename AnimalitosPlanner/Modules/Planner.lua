@@ -62,7 +62,7 @@ local ZONE_PORTALS = {
 -- Stormwind); a missing entry falls back to "Travel to ...".
 local CONTINENT_PORTALS = {
     Alliance = {
-        [12] = 71,     -- Caverns of Time (Tanaris)
+        [12] = 75,     -- Caverns of Time (in Tanaris; the portal is named after it)
         [948] = 207,   -- Deepholm
         [101] = 111,   -- Shattrath
         [113] = 125,   -- Dalaran (Northrend)
@@ -137,7 +137,7 @@ local TRAVEL_ITEMS = {
 -- Extra zone portals in one faction's capital (Orgrimmar: Caverns of Time,
 -- confirmed by the player). Same shape as ZONE_PORTALS.
 local FACTION_ZONE_PORTALS = {
-    Horde = { [75] = 71, [74] = 71 }, -- Caverns of Time (Dragon Soul, ...) -> Tanaris portal
+    Horde = { [75] = 75, [74] = 75 }, -- Caverns of Time (Dragon Soul, Onyxia via Tanaris, ...) portal
 }
 
 -- Zones you cannot fly into: reached through a portal or a ride in another
