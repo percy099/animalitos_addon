@@ -510,7 +510,9 @@ function FarmPanel:Refresh(p, entries, sum)
             end)
             local D = ns.Difficulty
             local want = D:Pick(e)
+            -- Members cannot set it (the leader does): no button for them.
             local showDiff = want and D:Settable(want) and not D:IsSet(want) and D:Inside(e) == nil
+                and D:Blocked() ~= "leader"
             c.diff:SetShown(showDiff and true or false)
             if showDiff then
                 local blocked = D:Blocked()

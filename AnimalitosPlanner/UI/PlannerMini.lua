@@ -320,6 +320,11 @@ local function helper(f, e)
         place(f, line(f, "small", C.success), "|A:common-icon-checkmark:12:12|a  " .. L["MINI_DIFF_SET"]:format(D:Name(want)), 6)
         return
     end
+    -- Not the leader: no button (it could not be used); say who sets it.
+    if D:Blocked() == "leader" then
+        place(f, line(f, "small", C.text), L["MINI_DIFF_BY_LEADER"]:format(D:Name(want)), 6)
+        return
+    end
     place(f, line(f, "small", C.text), L["MINI_DIFF_NEED"]:format(D:Name(want)), 6)
     if not D:Settable(want) then return end
     local blocked = D:Blocked()
