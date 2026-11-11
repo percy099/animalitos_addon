@@ -787,7 +787,7 @@ end
 -- Locale key -> icon kind ("spell" = the named spell's own icon), in match order.
 local ICON_RULES = {
     { "PLAN_CAST", "spell" }, { "PLAN_USE_ITEM", "item" }, { "PLAN_FLY", "fly" },
-    { "PLAN_HEARTH", "hearth" }, { "PLAN_PORTAL_AT", "portal" }, { "PLAN_PORTAL_IN", "portal" }, { "PLAN_EXIT_PORTAL", "portal" },
+    { "PLAN_HEARTH", "hearth" }, { "PLAN_PORTAL_AT", "portal" }, { "PLAN_PORTAL_IN", "portal" },
     { "PLAN_PORTAL", "portal" }, { "PLAN_ASK_PORTAL", "portal" }, { "PLAN_TELEPORT", "portal" },
     { "PLAN_DARK_PORTAL", "portal" }, { "PLAN_BOAT_ZULDAZAR", "ride" }, { "PLAN_BOAT_KULTIRAS", "ride" },
     { "PLAN_KROOZ", "ride" }, { "PLAN_VINDICAAR", "portal" }, { "PLAN_TRAVEL_CONTINENT", "ride" }, { "PLAN_TRAVEL_ZONE", "ride" },
@@ -1117,18 +1117,15 @@ local FLY_ACROSS = {
     [2537] = { [23] = true, [22] = true }, -- Quel'Thalas <-> Eastern / Western Plaguelands
 }
 
--- Raids with a portal out after the last boss (instead of walking out):
--- [journalInstanceID] = { lands = uiMapID, continent }.
-local EXIT_PORTALS = {
-    [369] = { lands = 390, continent = 424 }, -- Siege of Orgrimmar -> Vale of Eternal Blossoms
-}
-
 -- Mage hops the player picked after an instance, where the distance rule
--- says fly: [journalInstanceID] = { [target zone] = MAGE key }. Leaving
--- Karazhan for Zul'Gurub: portal to Stonard (Horde), then a short flight.
+-- says fly: [journalInstanceID] = { [target zone] = MAGE key, continent =
+-- MAGE key for any target on the same continent }. Karazhan -> Zul'Gurub:
+-- portal to Stonard (Horde). Siege of Orgrimmar -> anywhere in Pandaria:
+-- portal to the Vale (no walking out of the raid).
 local MAGE_AFTER = {
     [745] = { [50] = 13 }, -- Karazhan -> Northern Stranglethorn
     [860] = { [50] = 13 }, -- Return to Karazhan -> Northern Stranglethorn
+    [369] = { continent = 424 }, -- Siege of Orgrimmar -> Vale of Eternal Blossoms
 }
 
 local function flyAcross(here, ent)
@@ -1143,17 +1140,14 @@ end
 --- anything unknown falls back to "Travel to ...".
 function Planner:TravelTexts(fac, here, ent, mage, jid)
     local L = ns.L
-    -- Leaving a raid with an exit portal: take it, then go on from where it lands.
-    local exit = here.fromInstance and here.jid and EXIT_PORTALS[here.jid]
-    if exit then
-        local rest = self:TravelTexts(fac, { continent = exit.continent, zone = exit.lands }, ent, mage, jid)
-        table.insert(rest, 1, L["PLAN_EXIT_PORTAL"]:format(mapName(exit.lands)))
-        return rest
-    end
     local after = here.fromInstance and here.jid and MAGE_AFTER[here.jid]
-    local key = after and after[ent.uiMapID]
-    local hop = key and mageHop(mage, MAGE[fac][key])
-    if hop then return { hop, L["PLAN_FLY"]:format(mapName(ent.uiMapID)) } end
+    local key = after and (after[ent.uiMapID] or (ent.continent == here.continent and after.continent))
+    local dest = key and MAGE[fac][key]
+    local hop = dest and mageHop(mage, dest)
+    if hop then
+        if sameArea(dest[1], ent.uiMapID) then return { hop } end
+        return { hop, L["PLAN_FLY"]:format(mapName(ent.uiMapID)) }
+    end
     if ent.continent == here.continent and (ent.uiMapID == here.zone or sameArea(ent.uiMapID, here.zone)) then
         return {} -- already there (Dazar'alor is inside Zuldazar)
     end

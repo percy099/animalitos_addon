@@ -151,7 +151,6 @@ L["PLAN_NOTE_HEROIC_NORMAL"] = "Heroic once a day · Normal up to 10 runs an hou
 L["PLAN_FLY"] = "Fly to %s"
 L["PLAN_PORTAL"] = "Portal to %s"
 L["PLAN_VINDICAAR"] = "Vindicaar to %s (from Dalaran)"
-L["PLAN_EXIT_PORTAL"] = "Exit portal to %s (after the last boss)"
 L["PLAN_HEARTH"] = "Hearthstone to %s"
 L["PLAN_THEN"] = "%s  »  %s"
 L["PLAN_TELEPORT"] = "Teleport to %s"
