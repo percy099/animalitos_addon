@@ -1124,8 +1124,10 @@ local FLY_ACROSS = {
 -- says fly: [journalInstanceID] = { [target zone] = MAGE key, continent =
 -- MAGE key for any target on the same continent }. Karazhan -> Zul'Gurub:
 -- portal to Stonard (Horde). Siege of Orgrimmar -> anywhere in Pandaria:
--- portal to the Vale (no walking out of the raid).
+-- portal to the Vale (no walking out of the raid). "fly" = just fly, even
+-- with a mage hop into the target zone (Salyis -> Siege: next door).
 local MAGE_AFTER = {
+    [-725] = { [390] = "fly" }, -- Salyis's Warband -> Vale of Eternal Blossoms
     [745] = { [50] = 13 }, -- Karazhan -> Northern Stranglethorn
     [860] = { [50] = 13 }, -- Return to Karazhan -> Northern Stranglethorn
     [369] = { continent = 424 }, -- Siege of Orgrimmar -> Vale of Eternal Blossoms
@@ -1145,6 +1147,7 @@ function Planner:TravelTexts(fac, here, ent, mage, jid)
     local L = ns.L
     local after = here.fromInstance and here.jid and MAGE_AFTER[here.jid]
     local key = after and (after[ent.uiMapID] or (ent.continent == here.continent and after.continent))
+    if key == "fly" then return { L["PLAN_FLY"]:format(mapName(ent.uiMapID)) } end
     local dest = key and MAGE[fac][key]
     local hop = dest and mageHop(mage, dest)
     if hop then
