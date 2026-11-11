@@ -73,15 +73,23 @@ function D:Inside(e)
     return difficultyID
 end
 
+-- The selected difficulties: dungeon, raid, legacy size. A member uses
+-- the leader's (sent by its addon): its own client may not show the change.
+local function selected()
+    local ld = IsInGroup() and not UnitIsGroupLeader("player") and ns.Comm and ns.Comm:LeaderDifficulty()
+    if ld then return ld.dungeon, ld.raid, ld.legacy end
+    return GetDungeonDifficultyID(), GetRaidDifficultyID(), GetLegacyRaidDifficultyID and GetLegacyRaidDifficultyID()
+end
+
 --- Is the selected (outside) difficulty already d?
 function D:IsSet(d)
-    if DUNGEON[d] then return GetDungeonDifficultyID() == d end
-    if FLEX[d] then return GetRaidDifficultyID() == d end
+    local dungeon, raid, size = selected()
+    if DUNGEON[d] then return dungeon == d end
+    if FLEX[d] then return raid == d end
     local l = LEGACY[d]
     if l then
-        local size = GetLegacyRaidDifficultyID and GetLegacyRaidDifficultyID()
         size = (size == 5 and 3) or (size == 6 and 4) or size -- some clients report the heroic id
-        return size == l.size and GetRaidDifficultyID() == (l.heroic and 15 or 14)
+        return size == l.size and raid == (l.heroic and 15 or 14)
     end
     return false
 end
@@ -107,6 +115,8 @@ function D:Set(d)
     else
         return false
     end
+    -- Tell the members (also when the event is late or missing).
+    C_Timer.After(1, function() if ns.Comm then ns.Comm:ShareDifficulty() end end)
     return true
 end
 

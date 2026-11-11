@@ -309,6 +309,24 @@ function Comm:ShareMark(jid, done)
     if not pumping then pump() end
 end
 
+-- Difficulty: members do not always see the one the leader picked, so
+-- the leader sends it (DIFF <dungeon> <raid> <legacy size>) when it
+-- changes, to a new peer and when asked.
+function Comm:ShareDifficulty()
+    if not (IsInGroup() and UnitIsGroupLeader("player") and next(self.peers)) then return end
+    ns:Debounce("comm-diff", 0.5, function()
+        send("DIFF", GetDungeonDifficultyID() or 0, GetRaidDifficultyID() or 0,
+            GetLegacyRaidDifficultyID and GetLegacyRaidDifficultyID() or 0)
+    end)
+end
+
+--- The difficulty the leader (a peer with the addon) has set, or nil:
+--- { dungeon, raid, legacy }.
+function Comm:LeaderDifficulty()
+    local leader = self:LeaderPeer()
+    return leader and leader.diff or nil
+end
+
 -- A status can get lost (dropped pieces) and is only sent again when it
 -- changes: while a peer has none, ask everyone to send theirs again (ASK),
 -- a few times.
@@ -349,6 +367,7 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
         if not known then
             -- A new peer: send it what we know; check later that theirs arrived.
             Comm:ShareNeeds(true)
+            Comm:ShareDifficulty()
             lastDone = nil
             asks = 0
             C_Timer.After(10, askMissing)
@@ -357,7 +376,16 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
     elseif kind == "ASK" then
         -- Someone misses a status: send ours again (debounced, so several
         -- askers cost one copy).
-        if Comm.peers[sender] then Comm:ShareNeeds(true) end
+        if Comm.peers[sender] then
+            Comm:ShareNeeds(true)
+            Comm:ShareDifficulty()
+        end
+    elseif kind == "DIFF" then
+        local p = Comm.peers[sender]
+        if p then
+            p.diff = { dungeon = tonumber(a), raid = tonumber(b), legacy = tonumber(c) }
+            changed()
+        end
     elseif kind == "MARK" then
         if not (a and Comm.peers[sender] and Comm:GroupActive()) then return end
         local jid = tonumber(a) or a
@@ -395,6 +423,7 @@ ns:On("PLAYER_ENTERING_WORLD", function()
     register()
     ns:Debounce("comm-hello", 4, function() hello("HELLO") end)
 end)
+ns:On("PLAYER_DIFFICULTY_CHANGED", function() Comm:ShareDifficulty() end)
 ns:On("PLAYER_REGEN_ENABLED", function()
     local pending = queued
     queued = {}
