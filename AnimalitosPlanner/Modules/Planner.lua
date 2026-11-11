@@ -39,9 +39,12 @@ local HUBS = {
 }
 -- Continents where the player fixed the first stops (journalInstanceIDs,
 -- in order); the walk goes on from the last one. Northrend: Eye of
--- Eternity, Icecrown Citadel, Ulduar, Utgarde Pinnacle (player's order).
+-- Eternity, Icecrown Citadel, Ulduar, Utgarde Pinnacle. Pandaria: Salyis's
+-- Warband, Siege of Orgrimmar, Oondasta, Nalak, Throne of Thunder (player's
+-- orders).
 local FIXED_ORDER = {
     [113] = { 756, 758, 759, 286 },
+    [424] = { -725, 369, -826, -814, 362 },
 }
 local CAPITAL = { Alliance = 84, Horde = 85 }
 local HOME_CONTINENT = { Alliance = 13, Horde = 12 }
@@ -145,9 +148,9 @@ local FACTION_ZONE_PORTALS = {
 -- via = uiMapID of the portal's zone; x/y = its position (nil = unknown);
 -- text = locale key of the step (default: "Portal to <zone> ...").
 local ZONE_ACCESS = {
-    [504] = { -- Isle of Thunder: Kirin Tor / Sunreaver portal in Townlong Steppes (quest chain unlock)
-        Alliance = { via = 388, viaContinent = 424, x = 49.7, y = 68.7 },
-        Horde    = { via = 388, viaContinent = 424 },
+    [504] = { -- Isle of Thunder: portal in the Vale's shrine (quest chain unlock; route of the player)
+        Alliance = { via = 390, viaContinent = 424 },
+        Horde    = { via = 390, viaContinent = 424 },
     },
     [1462] = { -- Mechagon Island: Horde rides with Captain Krooz from the Dazar'alor docks
         Horde = { via = 862, viaContinent = 875, text = "PLAN_KROOZ" },
