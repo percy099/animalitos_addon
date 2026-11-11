@@ -309,11 +309,27 @@ function Comm:ShareMark(jid, done)
     if not pumping then pump() end
 end
 
+-- A status can get lost (dropped pieces) and is only sent again when it
+-- changes: while a peer has none, ask everyone to send theirs again (ASK),
+-- a few times.
+local asks = 0
+local function askMissing()
+    local missing = false
+    for _, p in pairs(Comm.peers) do
+        if not p.status then missing = true end
+    end
+    if not missing or asks >= 4 or not IsInGroup() then return end
+    asks = asks + 1
+    send("ASK")
+    C_Timer.After(15, askMissing)
+end
+
 local function received(sender, kind, data)
     local p = Comm.peers[sender]
     if not p then return end
     if kind == "STAT" then
         p.status = decodeStatus(data)
+        p.statusAt = time()
     elseif kind == "DONE" then
         p.done = decodeDone(data)
     end
@@ -331,11 +347,17 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
         Comm.peers[sender] = p
         if kind == "HELLO" then hello("HI") end
         if not known then
-            -- A new peer: send it what we know.
+            -- A new peer: send it what we know; check later that theirs arrived.
             Comm:ShareNeeds(true)
             lastDone = nil
+            asks = 0
+            C_Timer.After(10, askMissing)
             changed()
         end
+    elseif kind == "ASK" then
+        -- Someone misses a status: send ours again (debounced, so several
+        -- askers cost one copy).
+        if Comm.peers[sender] then Comm:ShareNeeds(true) end
     elseif kind == "MARK" then
         if not (a and Comm.peers[sender] and Comm:GroupActive()) then return end
         local jid = tonumber(a) or a
@@ -441,7 +463,18 @@ function Comm:Debug()
         for _ in pairs(p.done or {}) do nDone = nDone + 1 end
         print(("  %s: v%s %s, leader=%s, picks in %d instances, done %d"):format(p.name, p.version, p.faction,
             tostring(UnitIsGroupLeader(p.name)), nNeeds, nDone))
+        -- Did its status arrive, and is a copy half-way?
+        local box = nil
+        for full, q in pairs(self.peers) do
+            if q == p then box = incoming[full] and incoming[full].STAT end
+        end
+        print(("    status=%s%s%s"):format(p.status and "yes" or "NO",
+            p.statusAt and (" (%ds ago)"):format(time() - p.statusAt) or "",
+            box and (", receiving %d/%d pieces"):format(box.got, box.n) or ""))
     end
+    print(("  my status: %d bytes, %d pieces waiting to go out, asks %d"):format(#(lastNeeds or ""), #outbox, asks))
     hello("HELLO")
     self:ShareNeeds(true)
+    asks = 0
+    send("ASK")
 end
