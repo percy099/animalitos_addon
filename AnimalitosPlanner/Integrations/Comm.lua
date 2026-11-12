@@ -335,6 +335,8 @@ local function askMissing()
     local missing = false
     for _, p in pairs(Comm.peers) do
         if not p.status then missing = true end
+        -- The leader's done list too (the route's done count depends on it).
+        if not p.done and UnitIsGroupLeader(p.name) then missing = true end
     end
     if not missing or asks >= 4 or not IsInGroup() then return end
     asks = asks + 1
@@ -363,7 +365,9 @@ function Comm:Sync()
     self:ShareNeeds(true)
     self:ShareDifficulty()
     self:ShareMarks()
+    -- The leader's done list is only sent from a route rebuild: force one.
     lastDone = nil
+    changed()
     asks = 0
     send("ASK")
 end
@@ -420,6 +424,9 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
             Comm:ShareNeeds(true)
             Comm:ShareDifficulty()
             Comm:ShareMarks()
+            -- Leader: send the done list again (a lost copy was never resent).
+            lastDone = nil
+            changed()
         end
     elseif kind == "DIFF" then
         local p = Comm.peers[sender]
@@ -500,9 +507,12 @@ end
 
 --- Did the leader mark this step done? (nil when I lead or the leader has
 --- no addon.)
+--- nil while the leader's done list has not arrived (then each player
+--- counts its own lockouts and marks, instead of "nothing done").
 function Comm:LeaderDone(key)
     local leader = self:LeaderPeer()
-    return leader and leader.done and leader.done[key] or false
+    if not (leader and leader.done) then return nil end
+    return leader.done[key] or false
 end
 
 --- Peers whose status arrived, by name: { { name, status = {[jid] = ...} } }.
@@ -531,8 +541,8 @@ function Comm:Debug()
             if #s.pick > 0 then nNeeds = nNeeds + 1 end
         end
         for _ in pairs(p.done or {}) do nDone = nDone + 1 end
-        print(("  %s: v%s %s, leader=%s, picks in %d instances, done %d"):format(p.name, p.version, p.faction,
-            tostring(UnitIsGroupLeader(p.name)), nNeeds, nDone))
+        print(("  %s: v%s %s, leader=%s, picks in %d instances, done %s"):format(p.name, p.version, p.faction,
+            tostring(UnitIsGroupLeader(p.name)), nNeeds, p.done and tostring(nDone) or "not received"))
         -- Did its status arrive, and is a copy half-way?
         local box = nil
         for full, q in pairs(self.peers) do

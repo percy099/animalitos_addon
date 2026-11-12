@@ -681,8 +681,10 @@ function Planner:Build(entries, hideCompleted, kinds, travelRuns)
             local auto = ns.Lockouts.loaded and anyLocked and not anyReady
             local manual = self:IsManuallyDone(jid)
             -- In a group the leader's marks decide (anyone's clicks reach it via MARK).
+            -- Until the leader's list arrives: my own lockouts and marks.
+            local leaderDone = leaderPeer and ns.Comm:LeaderDone(jid)
             local done
-            if leaderPeer then done = ns.Comm:LeaderDone(jid) or manual
+            if leaderDone ~= nil then done = leaderDone or manual
             else done = auto or manual end
             runs[#runs + 1] = { kind = "run", jid = jid, inst = e.inst, e = e,
                 done = done, auto = auto, group = rows }
