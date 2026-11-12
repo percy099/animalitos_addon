@@ -303,9 +303,9 @@ end
 
 --- Any player's Done / undo of a step: everyone with the group route on
 --- applies it to its own marks. Not deduplicated, so quick clicks all arrive.
-function Comm:ShareMark(jid, done)
+function Comm:ShareMark(jid, done, stamp)
     if not self:GroupActive() then return end
-    outbox[#outbox + 1] = { "MARK", table.concat({ "MARK", tostring(jid), done and "1" or "0" }, "\t") }
+    outbox[#outbox + 1] = { "MARK", table.concat({ "MARK", tostring(jid), done and "1" or "0", tostring(stamp or "") }, "\t") }
     if not pumping then pump() end
 end
 
@@ -342,13 +342,19 @@ local function askMissing()
     C_Timer.After(15, askMissing)
 end
 
---- All my manual Done marks (MARKS): the others add the ones they miss,
---- so marks made before the group (or a peer) was there reach everyone.
+--- All my manual Done marks and unmarks with their time, and my last Clear
+--- (MARKT: "C<time>,key:time:1|0,..."): for each step the others keep the
+--- latest change, so a Clear or Back made while apart reaches everyone too.
+--- (The old MARKS only added marks and is ignored now.)
 function Comm:ShareMarks()
     if not self:GroupActive() then return end
-    local keys = {}
-    for _, key in ipairs(ns.Planner:ManualMarks()) do keys[#keys + 1] = tostring(key) end
-    ns:Debounce("comm-marks", 1, function() sendData("MARKS", table.concat(keys, ",")) end)
+    ns:Debounce("comm-marks", 1, function()
+        local parts = { "C" .. tostring(ns.Planner:ClearedAt()) }
+        for _, m in ipairs(ns.Planner:MarkLog()) do
+            parts[#parts + 1] = ("%s:%s:%s"):format(tostring(m.key), tostring(m.stamp), m.done and "1" or "0")
+        end
+        sendData("MARKT", table.concat(parts, ","))
+    end)
 end
 
 --- The Sync button: send everything again and ask the others for theirs.
@@ -370,13 +376,17 @@ local function received(sender, kind, data)
         p.statusAt = time()
     elseif kind == "DONE" then
         p.done = decodeDone(data)
-    elseif kind == "MARKS" then
+    elseif kind == "MARKT" then
         if not Comm:GroupActive() then return end
-        for key in data:gmatch("[^,]+") do
-            local jid = tonumber(key) or key
-            if not ns.Planner:IsManuallyDone(jid) then
-                local inst = ns.Data.instances[jid]
-                ns.Planner:SetManuallyDone(jid, inst and inst.isRaid, true, true)
+        for item in data:gmatch("[^,]+") do
+            local clearAt = item:match("^C(%d+)$")
+            if clearAt then
+                ns.Planner:ApplyClear(tonumber(clearAt))
+            else
+                local key, stamp, flag = item:match("^(.-):(%d+):([01])$")
+                if key then
+                    ns.Planner:ApplyPeerMark(tonumber(key) or key, flag == "1", tonumber(stamp))
+                end
             end
         end
     end
@@ -419,11 +429,11 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
         end
     elseif kind == "MARK" then
         if not (a and Comm.peers[sender] and Comm:GroupActive()) then return end
-        local jid = tonumber(a) or a
-        local inst = ns.Data.instances[jid]
-        ns.Planner:SetManuallyDone(jid, inst and inst.isRaid, b == "1", true)
+        -- Live click: its time (now, from an older version without one).
+        local stamp = tonumber(c) or (GetServerTime and GetServerTime() or time())
+        ns.Planner:ApplyPeerMark(tonumber(a) or a, b == "1", stamp)
         changed()
-    elseif kind == "STAT" or kind == "DONE" or kind == "MARKS" then
+    elseif kind == "STAT" or kind == "DONE" or kind == "MARKT" then
         local seq, i, n = tonumber(a), tonumber(b), tonumber(c)
         if not (seq and i and n) then return end
         incoming[sender] = incoming[sender] or {}

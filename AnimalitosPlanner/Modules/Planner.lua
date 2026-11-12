@@ -290,13 +290,28 @@ function Planner:Route(fac)
 end
 
 -- Manual "done" marks (per character, until the next reset) ----------------------
-local function doneTable()
+-- The group sync keeps the latest change: each mark / unmark has the server
+-- time it was made (same clock for everyone), and Clear marks a time before
+-- which every mark counts as cleared. Marks from before this had no time
+-- (0): any later Clear removes them.
+local function charData()
     local key = ns:GetCharacterKey()
     local cd = ns.Storage.db.characterData
     cd[key] = cd[key] or {}
-    cd[key].plannerDone = cd[key].plannerDone or {}
-    return cd[key].plannerDone
+    return cd[key]
 end
+local function doneTable()
+    local c = charData()
+    c.plannerDone = c.plannerDone or {}
+    return c.plannerDone
+end
+local function stamps()
+    local c = charData()
+    c.plannerStamp = c.plannerStamp or {}
+    return c.plannerStamp
+end
+local function serverNow() return GetServerTime and GetServerTime() or time() end
+local STAMP_KEEP = 8 * 86400 -- longer than the weekly reset
 
 function Planner:IsManuallyDone(jid)
     local untilTime = doneTable()[jid]
@@ -307,9 +322,12 @@ function Planner:IsManuallyDone(jid)
 end
 
 --- fromPeer: the mark came from another player (not shared back).
-function Planner:SetManuallyDone(jid, isRaid, done, fromPeer)
+--- stamp: when it was made (server time); now when nil.
+function Planner:SetManuallyDone(jid, isRaid, done, fromPeer, stamp)
+    stamp = stamp or serverNow()
+    stamps()[jid] = stamp
     -- In the group route anyone's Done / undo applies to everyone.
-    if not fromPeer and ns.Comm then ns.Comm:ShareMark(jid, done) end
+    if not fromPeer and ns.Comm then ns.Comm:ShareMark(jid, done, stamp) end
     if not done then
         doneTable()[jid] = nil
         return
@@ -324,24 +342,63 @@ function Planner:SetManuallyDone(jid, isRaid, done, fromPeer)
     doneTable()[jid] = time() + (secs or 86400)
 end
 
---- Keys of every manual mark still valid (for the group sync).
-function Planner:ManualMarks()
-    local out = {}
-    for jid in pairs(doneTable()) do
-        if self:IsManuallyDone(jid) then out[#out + 1] = jid end
+--- When I last pressed Clear marks (or a peer did, once synced); 0 = never.
+function Planner:ClearedAt()
+    return charData().plannerClearAt or 0
+end
+
+--- Every mark / unmark with its time, for the group sync:
+--- { { key, stamp, done }, ... }. Old ones are dropped.
+function Planner:MarkLog()
+    local out, t, oldest = {}, stamps(), serverNow() - STAMP_KEEP
+    for jid, stamp in pairs(t) do
+        if stamp < oldest then
+            t[jid] = nil
+        elseif stamp > self:ClearedAt() then
+            out[#out + 1] = { key = jid, stamp = stamp, done = self:IsManuallyDone(jid) }
+        end
     end
     return out
+end
+
+--- A peer's Clear marks: if newer than mine, every mark older than it goes.
+--- Returns true when something changed.
+function Planner:ApplyClear(at)
+    if not at or at <= self:ClearedAt() then return false end
+    charData().plannerClearAt = at
+    local t, st = doneTable(), stamps()
+    for jid in pairs(t) do
+        if (st[jid] or 0) < at then t[jid] = nil end
+    end
+    return true
+end
+
+--- A peer's mark / unmark: applied only if newer than my last change of
+--- that step and than my last Clear. Returns true when applied.
+function Planner:ApplyPeerMark(jid, done, stamp)
+    if not stamp or stamp <= (stamps()[jid] or 0) or stamp <= self:ClearedAt() then return false end
+    local inst = ns.Data.instances[jid]
+    self:SetManuallyDone(jid, inst and inst.isRaid, done, true, stamp)
+    return true
 end
 
 --- which = "all" | "raids" | "dungeons"
 function Planner:ResetMarks(which)
     local t = doneTable()
+    local now = serverNow()
     for jid in pairs(t) do
         local inst = ns.Data.instances[jid]
         local isRaid = inst and inst.isRaid
         if which == "all" or (which == "raids" and isRaid) or (which == "dungeons" and not isRaid) then
             t[jid] = nil
+            stamps()[jid] = now
         end
+    end
+    -- Clear everything: the whole group clears too (latest change wins).
+    if which == "all" then
+        charData().plannerClearAt = now
+        wipe(stamps())
+        if ns.Comm then ns.Comm:ShareMarks() end
     end
 end
 
