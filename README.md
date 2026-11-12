@@ -6,7 +6,7 @@ Addon de World of Warcraft retail (12.1.5) para **farmear monturas**. Te dice:
 - te pone un waypoint en la entrada y la dificultad correcta;
 - y te avisa de los jefes de eventos de temporada y de las monturas de vendedor que ya puedes comprar.
 
-Estado: **v0.30.14** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
+Estado: **v0.31.0** (en desarrollo, rama `josemaria`). Ver [docs/05-mvp-y-roadmap.md](docs/05-mvp-y-roadmap.md).
 
 ## Probar esta versión (si te la pasaron)
 La versión en prueba está en la rama **`josemaria`**, no en `main`.
@@ -16,7 +16,7 @@ La versión en prueba está en la rama **`josemaria`**, no en `main`.
    - Con git: `git clone -b josemaria https://github.com/percy099/animalitos_addon.git`
    - Ojo: el botón **Code → Download ZIP** de la página principal baja `main`, que está desactualizada. Si lo usas, antes cambia la rama a `josemaria`.
 2. **Descomprime y cierra WoW.** Dentro del zip hay una carpeta `animalitos_addon-josemaria`; copia **solo** la carpeta `AnimalitosPlanner` que está adentro en `World of Warcraft\_retail_\Interface\AddOns\` (debe quedar `AddOns\AnimalitosPlanner\AnimalitosPlanner.toc`). Si ya tenías una versión anterior, bórrala y pon esta.
-3. **Abre WoW.** En el chat debe salir `AnimalitosPlanner: v0.30.14 loaded`. Escribe `/aplan`.
+3. **Abre WoW.** En el chat debe salir `AnimalitosPlanner: v0.31.0 loaded`. Escribe `/aplan`.
 4. **Para ver errores:** `/console scriptErrors 1` y `/reload`. Si sale un error de Lua, manda captura del primero.
 5. **Para actualizar** más adelante: `git pull` (o vuelve a bajar el zip del enlace directo), copia la carpeta otra vez y **reinicia el juego** (si solo cambió código ya cargado, basta `/reload`; si hay archivos nuevos, no).
 
@@ -29,7 +29,7 @@ El ícono del addon no viene en el repo (ver *Instalación*); sin él funciona i
 |---|---|
 | **Ordenar Collection** (v0.29.0) | En Collection, clic en *Mount*, *Source* o *Status* sobre la lista: ordena por esa columna (flecha); otro clic invierte. También en las vistas *Achievements* y *Other drops*. |
 | **My route** (v0.28.0) | Clic en una montura que te falte → botón de **ruta de vuelo** junto a la estrella (también en las filas de Collection). Agrega 3–4. En **Planner** elige **My route (n)**: solo deben salir esas, en orden lógico; la mini sigue el mismo modo. |
-| **Ruta de grupo** (dos personas con esta versión, en grupo) | `/aplan group` en los dos: cada uno debe ver al otro. En el Planner aparece el switch **Group** (a la derecha, en la línea de progreso): actívenlo. *Ya visto funcionando: presencia y pasos del otro.* Cada uno comparte la ruta que tenga elegida (*Full route* o *My route*, con su propio filtro **Show:**), así los dos ven los mismos pasos; con un mago en el grupo se viaja con su portal, no con teleports personales (*Path of…*); el líder tiene **Set H** aunque el paso solo le sirva al otro; la ruta junta las rutas de todos (orden de la facción del líder) y **todos ven la misma lista**. Debajo de cada paso hay una línea por jugador: ✓ si puede lootear algo ahí ahora, su **CD** en esa instancia y cuántas monturas del paso le faltan (o *ya conseguida*). Cualquiera puede marcar **Done** (o deshacerlo) y se le marca a todos los que tengan **Group** activo en unos segundos (v0.30.1). **Falta confirmar en juego.** |
+| **Ruta de grupo** (dos personas con esta versión, en grupo) | `/aplan group` en los dos: cada uno debe ver al otro. En el Planner aparece el switch **Group** (a la derecha, en la línea de progreso): actívenlo. *Ya visto funcionando: presencia y pasos del otro.* Cada uno comparte la ruta que tenga elegida (*Full route* o *My route*, con su propio filtro **Show:**), así los dos ven los mismos pasos; con un mago en el grupo se viaja con su portal, no con teleports personales (*Path of…*); el líder tiene **Set H** aunque el paso solo le sirva al otro; la ruta junta las rutas de todos (orden de la facción del líder) y **todos ven la misma lista**. Debajo de cada paso hay una línea por jugador: ✓ si puede lootear algo ahí ahora, su **CD** en esa instancia y cuántas monturas del paso le faltan (o *ya conseguida*). Cualquiera puede marcar **Done** (o deshacerlo) y se le marca a todos los que tengan **Group** activo en unos segundos (v0.30.1). Botón **Sync** (v0.31.0, junto a Group): todos reenvían ruta, lockouts, dificultad y marcas; las marcas se suman (también al activar Group o al entrar alguien al grupo). **Falta confirmar en juego.** |
 | **Mago en grupo** | Con un mago en el grupo, los pasos de viaje dicen qué portal pedirle; si el mago tiene el addon, la línea de la mini abre el portal. |
 | **Atajos de mago** (un mago sin Invincible) | De ICC a Utgarde Pinnacle pasando por Dalaran; al salir de Return to Karazhan, teleport y volar a Zul'Gurub. |
 | **Tamaño 10/25** (falta una montura de un solo tamaño) | Obsidian Sanctum, Karazhan (Attumen) o The Eye (Kael'thas): en la entrada, el botón de dificultad debe poner el tamaño correcto. |

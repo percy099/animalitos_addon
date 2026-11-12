@@ -324,6 +324,15 @@ function Planner:SetManuallyDone(jid, isRaid, done, fromPeer)
     doneTable()[jid] = time() + (secs or 86400)
 end
 
+--- Keys of every manual mark still valid (for the group sync).
+function Planner:ManualMarks()
+    local out = {}
+    for jid in pairs(doneTable()) do
+        if self:IsManuallyDone(jid) then out[#out + 1] = jid end
+    end
+    return out
+end
+
 --- which = "all" | "raids" | "dungeons"
 function Planner:ResetMarks(which)
     local t = doneTable()

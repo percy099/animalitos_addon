@@ -404,13 +404,14 @@ function PlannerPanel:Create(parent)
     -- group runs the addon. Each player shares the route they picked.
     p.group = ns.UI.Switch(p, function(_, checked)
         ns.Planner:SetGroup(checked)
+        if checked then ns.Comm:Sync() end -- bring the others' marks in
         if p.bar then p.bar:SetValue(0) end
         PlannerPanel:Refresh(p)
     end)
     -- On the progress row, right side (where Next step was: each step has
     -- its own Go, so the player found it added nothing).
     p.right = CreateFrame("Frame", nil, p)
-    p.right:SetSize(110, 22)
+    p.right:SetSize(170, 22)
     p.right:SetPoint("TOPRIGHT", -SCROLL_W, -56)
     p.group:SetPoint("RIGHT", p.right, "RIGHT", -2, 0)
     p.groupLabel = ns.UI.fs(p, "small", C.dim)
@@ -423,6 +424,21 @@ function PlannerPanel:Create(parent)
         GameTooltip:Show()
     end)
     p.group:HookScript("OnLeave", function() GameTooltip:Hide() end)
+    -- Sync: everyone sends route, status, difficulty and Done marks again.
+    p.sync = ns.UI.Button(p, "secondary")
+    ns.UI.SetButtonText(p.sync, L["PLAN_SYNC"], 50)
+    p.sync:SetPoint("RIGHT", p.groupLabel, "LEFT", -10, 0)
+    p.sync:SetScript("OnClick", function()
+        ns.Comm:Sync()
+        ns:Print(L["PLAN_SYNC_SENT"])
+    end)
+    p.sync:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:AddLine(L["PLAN_SYNC"], 1, 1, 1)
+        GameTooltip:AddLine(L["PLAN_SYNC_TIP"], nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    p.sync:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 
     -- What the route includes: a multi-select dropdown (favorites only,
@@ -459,7 +475,7 @@ function PlannerPanel:Create(parent)
     p.fill:SetPoint("TOPLEFT", track)
     p.fill:SetPoint("BOTTOMLEFT", track)
     p.fill:SetColorTexture(C.accent[1], C.accent[2], C.accent[3], 0.9)
-    p.trackW = ns.UI.CONTENT_WIDTH - SCROLL_W - 110 - 12
+    p.trackW = ns.UI.CONTENT_WIDTH - SCROLL_W - 170 - 12
 
     -- Column header
     local head = CreateFrame("Frame", nil, p)
@@ -526,6 +542,7 @@ function PlannerPanel:Refresh(p, entries)
     local anyPeer = #ns.Comm:Peers() > 0
     p.group:SetShown(anyPeer)
     p.groupLabel:SetShown(anyPeer)
+    p.sync:SetShown(anyPeer and ns.Planner:GroupOn())
     p.group:SetChecked(ns.Planner:GroupOn())
     local mode = ns.Planner:Mode()
 

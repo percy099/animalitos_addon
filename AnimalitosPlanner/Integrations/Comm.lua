@@ -342,6 +342,26 @@ local function askMissing()
     C_Timer.After(15, askMissing)
 end
 
+--- All my manual Done marks (MARKS): the others add the ones they miss,
+--- so marks made before the group (or a peer) was there reach everyone.
+function Comm:ShareMarks()
+    if not self:GroupActive() then return end
+    local keys = {}
+    for _, key in ipairs(ns.Planner:ManualMarks()) do keys[#keys + 1] = tostring(key) end
+    ns:Debounce("comm-marks", 1, function() sendData("MARKS", table.concat(keys, ",")) end)
+end
+
+--- The Sync button: send everything again and ask the others for theirs.
+function Comm:Sync()
+    hello("HELLO")
+    self:ShareNeeds(true)
+    self:ShareDifficulty()
+    self:ShareMarks()
+    lastDone = nil
+    asks = 0
+    send("ASK")
+end
+
 local function received(sender, kind, data)
     local p = Comm.peers[sender]
     if not p then return end
@@ -350,6 +370,15 @@ local function received(sender, kind, data)
         p.statusAt = time()
     elseif kind == "DONE" then
         p.done = decodeDone(data)
+    elseif kind == "MARKS" then
+        if not Comm:GroupActive() then return end
+        for key in data:gmatch("[^,]+") do
+            local jid = tonumber(key) or key
+            if not ns.Planner:IsManuallyDone(jid) then
+                local inst = ns.Data.instances[jid]
+                ns.Planner:SetManuallyDone(jid, inst and inst.isRaid, true, true)
+            end
+        end
     end
     changed()
 end
@@ -368,6 +397,7 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
             -- A new peer: send it what we know; check later that theirs arrived.
             Comm:ShareNeeds(true)
             Comm:ShareDifficulty()
+            Comm:ShareMarks()
             lastDone = nil
             asks = 0
             C_Timer.After(10, askMissing)
@@ -379,6 +409,7 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
         if Comm.peers[sender] then
             Comm:ShareNeeds(true)
             Comm:ShareDifficulty()
+            Comm:ShareMarks()
         end
     elseif kind == "DIFF" then
         local p = Comm.peers[sender]
@@ -392,7 +423,7 @@ ns:On("CHAT_MSG_ADDON", function(_, prefix, text, _, sender)
         local inst = ns.Data.instances[jid]
         ns.Planner:SetManuallyDone(jid, inst and inst.isRaid, b == "1", true)
         changed()
-    elseif kind == "STAT" or kind == "DONE" then
+    elseif kind == "STAT" or kind == "DONE" or kind == "MARKS" then
         local seq, i, n = tonumber(a), tonumber(b), tonumber(c)
         if not (seq and i and n) then return end
         incoming[sender] = incoming[sender] or {}
