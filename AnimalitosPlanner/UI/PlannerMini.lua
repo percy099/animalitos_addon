@@ -204,6 +204,15 @@ local function secureButton(i)
             GameTooltip:Show()
         end)
         b:SetScript("OnLeave", function() GameTooltip:Hide() end)
+        -- Say so when a click did not start the cast (instead of nothing).
+        b:HookScript("PostClick", function(self, _, down)
+            if down then return end
+            local name = self.actionName
+            C_Timer.After(0.4, function()
+                if UnitCastingInfo("player") or UnitChannelInfo("player") then return end
+                ns:Print(L["MINI_TRAVEL_FAIL"]:format(name or "?"))
+            end)
+        end)
         secure[i] = b
     end
     return b
@@ -227,11 +236,24 @@ local function placeSecure(f, t, action)
     local width = math.min(t.GetUnboundedStringWidth and t:GetUnboundedStringWidth() or t:GetStringWidth(), right - left)
     f.secureUsed = f.secureUsed + 1
     local b = secureButton(f.secureUsed)
-    b:SetAttribute("type", action.type)
-    b:SetAttribute("spell", action.spell)
-    b:SetAttribute("toy", action.toy)
-    b:SetAttribute("item", action.item)
-    b.actionName = action.name
+    -- Spells are cast by name ("/cast Portal: Oribos"), like by hand: a
+    -- portal clicked by its ID did nothing from The Necrotic Wake.
+    local spellName = action.type == "spell"
+        and (tonumber(action.spell) and ns.Navigation:SpellName(tonumber(action.spell)) or action.spell)
+    if spellName then
+        b:SetAttribute("type", "macro")
+        b:SetAttribute("macrotext", "/cast " .. spellName)
+        b:SetAttribute("spell", nil)
+        b:SetAttribute("toy", nil)
+        b:SetAttribute("item", nil)
+    else
+        b:SetAttribute("type", action.type)
+        b:SetAttribute("macrotext", nil)
+        b:SetAttribute("spell", action.spell)
+        b:SetAttribute("toy", action.toy)
+        b:SetAttribute("item", action.item)
+    end
+    b.actionName = spellName or action.name
     b:SetFrameStrata(f:GetFrameStrata())
     b:SetFrameLevel(f:GetFrameLevel() + 20)
     b:ClearAllPoints()
