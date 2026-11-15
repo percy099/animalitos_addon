@@ -412,8 +412,14 @@ end
 --- boss by boss. Journal encounter IDs go up in boss order (Ultraxion 331,
 --- Madness 333); EJ_GetEncounterInfoByIndex cannot be used, it reads the
 --- instance selected in the journal. Hidden bosses go last.
+--- KILL_ORDER overrides the journal where players kill bosses in another
+--- order (keyed by journalEncounterID, value = sort key).
+local KILL_ORDER = {
+    [181] = 175.5, -- Zul'Gurub: High Priestess Kilnara before Bloodlord Mandokir (176)
+}
 function FarmList:BossOrder(src)
-    return (src and src.journalEncounterID) or math.huge
+    local id = src and src.journalEncounterID
+    return (id and (KILL_ORDER[id] or id)) or math.huge
 end
 
 --- "Raid" / "Dungeon" / "World boss".
