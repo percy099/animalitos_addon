@@ -110,8 +110,22 @@ function D:Set(d)
     elseif FLEX[d] then
         SetRaidDifficultyID(d)
     elseif LEGACY[d] then
-        SetRaidDifficultyID(LEGACY[d].heroic and 15 or 14)
-        if SetLegacyRaidDifficultyID then SetLegacyRaidDifficultyID(LEGACY[d].size) end
+        -- Game bug: setting mode and size at once can leave the server on
+        -- 10 Normal while the client shows the new one (no skull on the
+        -- portal). What players do by hand fixes it: switch to the opposite
+        -- mode and size first, then to the wanted one a second later.
+        local l = LEGACY[d]
+        local function apply(heroic, size)
+            SetRaidDifficultyID(heroic and 15 or 14)
+            if SetLegacyRaidDifficultyID then SetLegacyRaidDifficultyID(size) end
+        end
+        apply(not l.heroic, l.size == 3 and 4 or 3)
+        C_Timer.After(1, function()
+            if self:Blocked() then return end
+            apply(l.heroic, l.size)
+            C_Timer.After(1, function() if ns.Comm then ns.Comm:ShareDifficulty() end end)
+        end)
+        return true
     else
         return false
     end
@@ -123,6 +137,12 @@ end
 --- Can this difficulty be set from a button at all (not LFR, not 40, ...)?
 function D:Settable(d)
     return DUNGEON[d] or FLEX[d] or LEGACY[d] and true or false
+end
+
+--- Legacy raid difficulty (10/25, Normal/Heroic)? The game can ignore
+--- these even when the client shows them set, hence "Re-apply".
+function D:IsLegacy(d)
+    return LEGACY[d] ~= nil
 end
 
 -- Raid skips ------------------------------------------------------------------

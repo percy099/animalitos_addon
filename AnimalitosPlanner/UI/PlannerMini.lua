@@ -338,19 +338,26 @@ local function helper(f, e)
         end
         return
     end
+    local reapply = false
     if D:IsSet(want) then
         place(f, line(f, "small", C.success), "|A:common-icon-checkmark:12:12|a  " .. L["MINI_DIFF_SET"]:format(D:Name(want)), 6)
-        return
+        -- Legacy raids: the game may still put you in 10 Normal (no skull
+        -- on the portal); solo or leader can apply it again.
+        if not (D:IsLegacy(want) and D:Blocked() == nil) then return end
+        reapply = true
     end
     -- Not the leader: no button (it could not be used); say who sets it.
-    if D:Blocked() == "leader" then
+    if not reapply and D:Blocked() == "leader" then
         place(f, line(f, "small", C.text), L["MINI_DIFF_BY_LEADER"]:format(D:Name(want)), 6)
         return
     end
-    place(f, line(f, "small", C.text), L["MINI_DIFF_NEED"]:format(D:Name(want)), 6)
+    if not reapply then
+        place(f, line(f, "small", C.text), L["MINI_DIFF_NEED"]:format(D:Name(want)), 6)
+    end
     if not D:Settable(want) then return end
     local blocked = D:Blocked()
-    ns.UI.SetButtonText(f.diff, L["MINI_DIFF_BTN"]:format(ns.FarmList:DifficultyName(want)), 90)
+    ns.UI.SetButtonText(f.diff, reapply and L["MINI_DIFF_REAPPLY"]
+        or L["MINI_DIFF_BTN"]:format(ns.FarmList:DifficultyName(want)), 90)
     f.diff:ClearAllPoints()
     f.diff:SetPoint("TOPLEFT", PAD, -(f.y + 4))
     f.diff:SetEnabled(blocked == nil)
@@ -359,7 +366,8 @@ local function helper(f, e)
     end)
     f.diff:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
-        GameTooltip:AddLine(blocked and L[DIFF_BLOCKED[blocked] or "MINI_DIFF_LEADER"] or L["MINI_DIFF_TIP"], 1, 1, 1, true)
+        GameTooltip:AddLine(blocked and L[DIFF_BLOCKED[blocked] or "MINI_DIFF_LEADER"]
+            or (reapply and L["MINI_DIFF_REAPPLY_TIP"]) or L["MINI_DIFF_TIP"], 1, 1, 1, true)
         GameTooltip:Show()
     end)
     f.diff:Show()
