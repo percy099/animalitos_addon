@@ -27,7 +27,7 @@ local SECTIONS = {
     { key = "collection", label = "NAV_COLLECTION", icon = MEDIA .. "nav-collection" },
     { key = "settings",   label = "NAV_SETTINGS",   icon = MEDIA .. "nav-settings" },
 }
-local DEFAULT_SECTION = "farm"
+local DEFAULT_SECTION = "planner"
 
 -- Text/icon alpha per nav state (selected / hover / normal).
 local NAV_ALPHA = { selected = 1, hover = 0.86, normal = 0.62 }
@@ -292,7 +292,7 @@ function UI:Toggle()
     if f:IsShown() then
         f:Hide()
     else
-        self:SelectTab(DEFAULT_SECTION) -- every open starts on "Farmable now"
+        self:SelectTab(DEFAULT_SECTION) -- every open starts on the Planner
         f:Show()
     end
 end
