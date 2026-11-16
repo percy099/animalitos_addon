@@ -110,21 +110,31 @@ function D:Set(d)
     elseif FLEX[d] then
         SetRaidDifficultyID(d)
     elseif LEGACY[d] then
-        -- Game bug: setting mode and size at once can leave the server on
-        -- 10 Normal while the client shows the new one (no skull on the
-        -- portal). What players do by hand fixes it: switch to the opposite
-        -- mode and size first, then to the wanted one a second later.
+        -- Game bug: the client can show 25 Heroic set while the server keeps
+        -- 10 Normal (no skull on the portal). What players do by hand fixes
+        -- it, one change at a time: other size, other mode, wanted size,
+        -- wanted mode (25H: 10, Normal, 25, Heroic), a second apart.
+        if self.busy then return true end
         local l = LEGACY[d]
-        local function apply(heroic, size)
-            SetRaidDifficultyID(heroic and 15 or 14)
-            if SetLegacyRaidDifficultyID then SetLegacyRaidDifficultyID(size) end
+        local function size(s) if SetLegacyRaidDifficultyID then SetLegacyRaidDifficultyID(s) end end
+        local function mode(h) SetRaidDifficultyID(h and 15 or 14) end
+        local steps = {
+            function() size(l.size == 3 and 4 or 3) end,
+            function() mode(not l.heroic) end,
+            function() size(l.size) end,
+            function() mode(l.heroic) end,
+        }
+        self.busy = true
+        local function run(i)
+            if i > #steps or (i > 1 and self:Blocked()) then
+                self.busy = nil
+                if ns.Comm then ns.Comm:ShareDifficulty() end
+                return
+            end
+            steps[i]()
+            C_Timer.After(1, function() run(i + 1) end)
         end
-        apply(not l.heroic, l.size == 3 and 4 or 3)
-        C_Timer.After(1, function()
-            if self:Blocked() then return end
-            apply(l.heroic, l.size)
-            C_Timer.After(1, function() if ns.Comm then ns.Comm:ShareDifficulty() end end)
-        end)
+        run(1)
         return true
     else
         return false
