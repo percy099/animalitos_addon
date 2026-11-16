@@ -110,19 +110,20 @@ function D:Set(d)
     elseif FLEX[d] then
         SetRaidDifficultyID(d)
     elseif LEGACY[d] then
-        -- Game bug: the client can show 25 Heroic set while the server keeps
-        -- 10 Normal (no skull on the portal). What players do by hand fixes
-        -- it, one change at a time: other size, other mode, wanted size,
-        -- wanted mode (25H: 10, Normal, 25, Heroic), a second apart.
+        -- The legacy id carries the mode too (3/4 = 10/25 Normal, 5/6 =
+        -- 10/25 Heroic): sending the size alone (4) put the group in
+        -- 25 Normal even with raid mode Heroic (v0.32.4, ICC). Steps a
+        -- second apart, like players fix it by hand: other size, other
+        -- mode, wanted mode, then the full legacy id (25H = 6).
         if self.busy then return true end
         local l = LEGACY[d]
-        local function size(s) if SetLegacyRaidDifficultyID then SetLegacyRaidDifficultyID(s) end end
+        local function legacy(id) if SetLegacyRaidDifficultyID then SetLegacyRaidDifficultyID(id) end end
         local function mode(h) SetRaidDifficultyID(h and 15 or 14) end
         local steps = {
-            function() size(l.size == 3 and 4 or 3) end,
+            function() legacy(l.size == 3 and 4 or 3) end,
             function() mode(not l.heroic) end,
-            function() size(l.size) end,
             function() mode(l.heroic) end,
+            function() legacy(d) end,
         }
         self.busy = true
         local function run(i)
