@@ -57,7 +57,7 @@ end
 -- Walking every achievement in the game takes far too long for one frame
 -- (the screen froze on first open). It runs as a coroutine, resumed with
 -- C_Timer.After(0) and given a few milliseconds per frame (no OnUpdate).
-local SLICE_MS = 6
+local SLICE_MS = 3 -- under 5 ms so the client profiler never flags a frame of ours
 local sliceStart = 0
 
 --- Called inside long loops: gives the frame back when the slice is used up.

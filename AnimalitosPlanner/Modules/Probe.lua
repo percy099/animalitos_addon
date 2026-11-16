@@ -280,6 +280,12 @@ local WATCH = {
     { "Collection", "Scan", "Collection:Scan" },
     { "UI", "Refresh", "UI:Refresh" },
     { "PlannerMini", "Refresh", "PlannerMini:Refresh" },
+    -- What UI:Refresh spends beyond the mini: one line per open panel.
+    { "PlannerPanel", "Refresh", "PlannerPanel:Refresh" },
+    { "FarmPanel", "Refresh", "FarmPanel:Refresh" },
+    { "HomePanel", "Refresh", "HomePanel:Refresh" },
+    { "CollectionPanel", "Refresh", "CollectionPanel:Refresh" },
+    { "MountPreview", "Refresh", "MountPreview:Refresh" },
 }
 
 local function timed(owner, method, label)
