@@ -80,15 +80,44 @@ local function create()
     local close = ns.UI.CloseButton(f)
     close:SetPoint("TOPRIGHT", -4, -3)
     close:SetScript("OnClick", function() Mini:SetShown(false) end)
-    -- Click the header to open the full Planner.
+    -- Opens the full Planner; closes the window if it already shows it.
+    local function togglePlanner()
+        local main = ns.UI.frame
+        if main and main:IsShown() and ns.Storage.db.ui.tab == "planner" then
+            main:Hide()
+        else
+            ns.UI:Open("planner")
+        end
+    end
+    -- Planner icon next to the close button (same glyph as the sidebar).
+    local planner = CreateFrame("Button", nil, f)
+    planner:SetSize(22, 22)
+    planner:SetPoint("RIGHT", close, "LEFT", -2, 0)
+    local icon = planner:CreateTexture(nil, "ARTWORK")
+    icon:SetTexture("Interface\\AddOns\\AnimalitosPlanner\\Media\\nav-planner")
+    icon:SetSize(14, 14)
+    icon:SetPoint("CENTER")
+    icon:SetVertexColor(1, 1, 1, 0.55)
+    planner:SetScript("OnClick", togglePlanner)
+    planner:SetScript("OnEnter", function(self)
+        icon:SetVertexColor(1, 1, 1, 1)
+        GameTooltip:SetOwner(self, "ANCHOR_TOP")
+        GameTooltip:AddLine(L["MINI_OPEN_PLANNER"], 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    planner:SetScript("OnLeave", function()
+        icon:SetVertexColor(1, 1, 1, 0.55)
+        GameTooltip:Hide()
+    end)
+    -- Click the header to open the full Planner too.
     local open = CreateFrame("Button", nil, f)
     open:SetPoint("TOPLEFT", 0, 0)
-    open:SetPoint("TOPRIGHT", close, "TOPLEFT", -4, 0)
+    open:SetPoint("TOPRIGHT", planner, "TOPLEFT", -4, 0)
     open:SetHeight(26)
     open:RegisterForDrag("LeftButton")
     open:SetScript("OnDragStart", function() f:GetScript("OnDragStart")(f) end)
     open:SetScript("OnDragStop", function() f:GetScript("OnDragStop")(f) end)
-    open:SetScript("OnClick", function() ns.UI:Open("planner") end)
+    open:SetScript("OnClick", togglePlanner)
     open:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_TOP")
         GameTooltip:AddLine(L["MINI_TIP"], 1, 1, 1, true)
