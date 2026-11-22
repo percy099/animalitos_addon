@@ -340,13 +340,25 @@ end
 -- True when every boss that drops this mount is dead in the current run:
 -- killed this run (ENCOUNTER_END), or the lockout of the difficulty you
 -- are in says so (a heroic kill keeps the mount "Ready" overall when
--- Normal has no lockout).
+-- Normal has no lockout). Only the bosses that drop it on this difficulty
+-- count: G.M.O.D. is Mekkatorque's on N/H/M but Jaina's on LFR, so a
+-- living Jaina must not keep it "not killed" in Mythic.
+local function dropsOn(src, d)
+    for _, x in ipairs(src.difficulties or {}) do
+        if x == d then return true end
+    end
+    return false
+end
 local function killedThisRun(m, d)
     local S = ns.Eligibility.STATES
+    local any = false
     for _, src in ipairs(m.sources or { m.source }) do
-        if not killedNow(src, d) and ns.Eligibility:Evaluate(src, d) ~= S.LOCKED_OUT then return false end
+        if dropsOn(src, d) then
+            any = true
+            if not killedNow(src, d) and ns.Eligibility:Evaluate(src, d) ~= S.LOCKED_OUT then return false end
+        end
     end
-    return true
+    return any
 end
 -- Difficulty line (and its button) for a step at its entrance or inside.
 local DIFF_BLOCKED = { combat = "JOURNAL_COMBAT", leader = "MINI_DIFF_LEADER" }
