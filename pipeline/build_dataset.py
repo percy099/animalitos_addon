@@ -248,6 +248,27 @@ def build(raw: dict, curated: dict):
             "_comment": f"{x.get('name', '?')} - {name} (curated)",
         })
         report["curatedSources"].append(f"{x.get('name')} - {name}")
+
+    # Drops the journal puts on the wrong boss for some difficulties
+    # (Battle of Dazar'alor: G.M.O.D. is Mekkatorque's on Mythic only and
+    # Jaina's on LFR/Normal/Heroic). Sets each source's difficulties; an
+    # empty list removes the source.
+    for x in curated.get("sourceDifficulties", {}).get("list", []):
+        key = (x["mountID"], x["journalEncounterID"])
+        found = [s for s in sources if (s["mountID"], s.get("journalEncounterID")) == key]
+        if not found:
+            # The journal did not list this boss for the mount: copy another source of it.
+            twin = next((s for s in sources if s["mountID"] == x["mountID"]), None)
+            if twin is None:
+                report["sourceDifficultiesUnknown"].append(f"{x.get('name')} {key}")
+                continue
+            new = dict(twin, journalEncounterID=x["journalEncounterID"], dungeonEncounterID=x.get("dungeonEncounterID"),
+                       _comment=f"{x.get('name', '?')} (curated)")
+            sources.append(new)
+            found = [new]
+        for s in found:
+            s["difficulties"] = sorted(x["difficulties"])
+    sources[:] = [s for s in sources if s["difficulties"]]
     return instances, sources, report
 
 

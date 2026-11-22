@@ -2,7 +2,7 @@
 -- Source: in-game /aplan scan, client 12.1.5.70783, scanned 2026-11-05 13:38:04.
 local _, ns = ...
 ns.Data = {
-    version = { client = "12.1.5.70783", generated = "2026-11-07", hash = "0885b91307ae" },
+    version = { client = "12.1.5.70783", generated = "2026-11-22", hash = "bf8c6ad1064e" },
     instances = {
         [-2210] = { tier = 8, isRaid = true, legacy = true, worldBoss = true, ejInstance = 1028, encounter = 2210, lockoutModel = "worldQuest" }, -- Dunegorger Kraulok (Azeroth)
         [-1262] = { tier = 6, isRaid = true, legacy = true, worldBoss = true, ejInstance = 557, encounter = 1262, lockoutModel = "savedWorldBoss" }, -- Rukhmar (Draenor)
@@ -104,8 +104,8 @@ ns.Data = {
         { mountID = 1053, itemID = 160829, journalInstanceID = 1022, journalEncounterID = 2158, dungeonEncounterID = 2123, difficulties = { 23 } }, -- Unbound Abomination - The Underrot
         { mountID = 1250, itemID = 174842, journalInstanceID = -2210, journalEncounterID = 2210, difficulties = { 0 } }, -- Dunegorger Kraulok - Azeroth (world boss)
         { mountID = 1040, itemID = 159921, journalInstanceID = 1041, journalEncounterID = 2172, dungeonEncounterID = 2143, difficulties = { 23 } }, -- Dazar, The First King - Kings' Rest
-        { mountID = 1217, itemID = 166518, journalInstanceID = 1176, journalEncounterID = 2334, dungeonEncounterID = 2276, difficulties = { 14, 15, 16 } }, -- High Tinker Mekkatorque - Battle of Dazar'alor
-        { mountID = 1217, itemID = 166518, journalInstanceID = 1176, journalEncounterID = 2343, dungeonEncounterID = 2281, difficulties = { 17 } }, -- Lady Jaina Proudmoore - Battle of Dazar'alor
+        { mountID = 1217, itemID = 166518, journalInstanceID = 1176, journalEncounterID = 2334, dungeonEncounterID = 2276, difficulties = { 16 } }, -- High Tinker Mekkatorque - Battle of Dazar'alor
+        { mountID = 1217, itemID = 166518, journalInstanceID = 1176, journalEncounterID = 2343, dungeonEncounterID = 2281, difficulties = { 14, 15, 17 } }, -- Lady Jaina Proudmoore - Battle of Dazar'alor
         { mountID = 1219, itemID = 166705, journalInstanceID = 1176, journalEncounterID = 2343, dungeonEncounterID = 2281, difficulties = { 16 } }, -- Lady Jaina Proudmoore - Battle of Dazar'alor
         { mountID = 1252, itemID = 168826, journalInstanceID = 1178, journalEncounterID = 2355, dungeonEncounterID = 2291, difficulties = { 23 } }, -- HK-8 Aerial Oppression Unit - Operation: Mechagon
         { mountID = 1293, itemID = 174872, journalInstanceID = 1180, journalEncounterID = 2375, dungeonEncounterID = 2344, difficulties = { 16 } }, -- N'Zoth the Corruptor - Ny'alotha, the Waking City

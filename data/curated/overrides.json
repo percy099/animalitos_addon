@@ -150,5 +150,24 @@
   },
   "lockoutModels": {
     "_doc": "journalInstanceID -> instance | perBoss | daily | none. Missing = unknown (Verification Required) until validated in v0.3."
+  },
+  "sourceDifficulties": {
+    "_reason": "The Encounter Journal puts some drops on the wrong boss for some difficulties. Each entry sets the difficulties of one (mountID, journalEncounterID) source; an empty list removes it.",
+    "list": [
+      {
+        "name": "G.M.O.D. - High Tinker Mekkatorque",
+        "mountID": 1217,
+        "journalEncounterID": 2334,
+        "difficulties": [16],
+        "reason": "Battle of Dazar'alor: G.M.O.D. drops from Mekkatorque only on Mythic (reported by the player, 2026-11-22)."
+      },
+      {
+        "name": "G.M.O.D. - Lady Jaina Proudmoore",
+        "mountID": 1217,
+        "journalEncounterID": 2343,
+        "difficulties": [14, 15, 17],
+        "reason": "Battle of Dazar'alor: on LFR, Normal and Heroic G.M.O.D. drops from Jaina; on Mythic she drops Glacial Tidestorm instead (reported by the player, 2026-11-22)."
+      }
+    ]
   }
 }
